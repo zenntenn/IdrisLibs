@@ -11,9 +11,9 @@
 > import Fun.Properties
 > import Unique.Predicates
 > import Finite.Predicates
-> import FiniteOperations
-> import Sigma
-> import PairsOperations
+> import Finite.Operations
+> import Sigma.Sigma
+> import Pairs.Operations
 > import Basics
 > import IsomorphismOperations
 > import FinProperties

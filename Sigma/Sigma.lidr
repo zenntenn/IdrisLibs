@@ -2,6 +2,7 @@
 
 > %default total
 > %access public export
+> %auto_implicits on
 
 > %hide Sigma
 > %hide MkSigma
