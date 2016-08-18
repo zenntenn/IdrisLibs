@@ -1,7 +1,6 @@
 > module SequentialDecisionProblems.CoreAssumptions
 
 > import Sigma.Sigma
-> import Sigma.Operations
 
 > %default total
 > %access public export
@@ -116,7 +115,7 @@ We will also need |Val| to be equipped with a "zero"
 
 > zero : Val
 
-and with a binary "comparison" operator
+and with a binary "comparison" relation
 
 > LTE : Val -> Val -> Type
 

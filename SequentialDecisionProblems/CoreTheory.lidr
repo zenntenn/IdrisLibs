@@ -3,7 +3,6 @@
 > import SequentialDecisionProblems.CoreAssumptions
 
 > import Sigma.Sigma
-> import Sigma.Operations
 
 > %default total
 > %access public export
