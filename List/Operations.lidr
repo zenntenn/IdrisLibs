@@ -33,13 +33,13 @@
 
 * |List| is a container monad:
 
-> ||| 
+> |||
 > NonEmpty    : {A : Type} -> List A -> Type
 > NonEmpty  Nil      = Void
 > NonEmpty (a :: as) = Unit
 
-> idThere : {A : Type} -> 
->           (a : A) -> (as : List A) -> 
+> idThere : {A : Type} ->
+>           (a : A) -> (as : List A) ->
 >           Sigma A (\ x => x `Elem` as) -> Sigma A (\ x => x `Elem` (a :: as))
 > idThere a as (MkSigma x p) = MkSigma x (There p)
 
@@ -53,7 +53,7 @@
 
 > implementation Show (Elem a as) where
 >   show = show' where
->     show' : {A : Type} -> {a : A} -> {as : List A} -> Elem a as -> String 
+>     show' : {A : Type} -> {a : A} -> {as : List A} -> Elem a as -> String
 >     show'  Here     = "Here"
 >     show' (There p) = "There" ++ show' p
 
@@ -62,7 +62,7 @@
 
 > |||
 > sumMapSnd : {A, B : Type} -> (Num B) => List (A, B) -> B
-> sumMapSnd abs = sum (map snd abs) 
+> sumMapSnd abs = sum (map snd abs)
 
 > |||
 > mapIdRightMult : {A, B : Type} -> (Num B) => (List (A, B), B) -> List (A, B)
@@ -75,7 +75,7 @@
 > |||
 > sumProds : {B : Type} -> (Num B) => List (B, B) -> B
 > sumProds Nil = 0
-> sumProds ((b,b') :: bbs) = b * b' + sumProds bbs 
+> sumProds ((b,b') :: bbs) = b * b' + sumProds bbs
 
 
 * Ad-hoc filtering
@@ -93,4 +93,3 @@
 > discardBySndZero (ab :: abs) with (decEq (snd ab) 0)
 >   | (Yes _) = discardBySndZero abs
 >   | (No _)  = ab :: discardBySndZero abs
-
