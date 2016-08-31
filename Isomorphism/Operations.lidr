@@ -4,7 +4,7 @@
 > import Control.Isomorphism
 
 
-> %default total 
+> %default total
 
 > %access public export
 

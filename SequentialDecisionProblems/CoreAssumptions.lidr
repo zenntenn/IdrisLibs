@@ -165,7 +165,7 @@ requires |M| to be a "container":
 >                               a `Elem` ma -> CoreAssumptions.NotEmpty ma
 
 > postulate elemNotEmptySpec1 : {A : Type} ->
->                               (ma : M A) -> CoreAssumptions.NotEmpty ma -> 
+>                               (ma : M A) -> CoreAssumptions.NotEmpty ma ->
 >                               Sigma A (\ a => a `Elem` ma)
 
 The theory presented in "CoreTheory.lidr" relies on two
