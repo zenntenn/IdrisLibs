@@ -1,5 +1,8 @@
 > module SimpleProb
 
+> import NonNegRational.NonNegRational
+> import NonNegRational.BasicProperties
+> import Num.Refinements
 > import List.Operations
 
 > %default total
@@ -8,12 +11,11 @@
 
 
 > |||
-> data SimpleProb : Type -> Type -> Type where
->   MkSimpleProb : {A, B : Type} ->
->                  Num B =>
->                  (aps : List (A, B)) ->
+> data SimpleProb : Type -> Type where
+>   MkSimpleProb : {A : Type} ->
+>                  (aps : List (A, NonNegRational)) ->
 >                  sumMapSnd aps = 1 ->
->                  SimpleProb A B
+>                  SimpleProb A
 
 
 > {-

@@ -1,4 +1,4 @@
-> module SimpleProbBasicOperations
+> module GeenricSimpleProb.BasicOperations
 
 > import Data.List
 > import Syntax.PreorderReasoning
