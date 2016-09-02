@@ -1,6 +1,6 @@
-> module SequentialDecisionProblems.CoreTheoryDeterministic
+> module SequentialDecisionProblems.Generic.CoreTheory
 
-> import SequentialDecisionProblems.CoreAssumptionsDeterministic
+> import SequentialDecisionProblems.Generic.CoreAssumptions
 
 > import Sigma.Sigma
 
@@ -22,9 +22,9 @@
 > good (MkSigma _ p) = p
 
 > |||
-> viable : {t : Nat} -> {x : State t} -> {n : Nat} -> {y : Ctrl t x} ->
->          (y : GoodCtrl t x n) -> Viable {t = S t} n (next t x (ctrl y))
-> viable (MkSigma y p) = p
+> allViable : {t : Nat} -> {x : State t} -> {n : Nat} -> {y : Ctrl t x} ->
+>             (y : GoodCtrl t x n) -> All (Viable {t = S t} n) (step t x (ctrl y)) 
+> allViable (MkSigma y p) = snd p
 
 
 * The core theory of monadic sequential decision problems (SDP):
@@ -51,14 +51,14 @@ Moreover, if |x| is reachable and admits a control |y|, then all states
 that can be obtained by selecting |y| in |x| are also reachable ...
 
 > reachableSpec1 : {t : Nat} ->
->                  (x : State t) -> Reachable x -> (y : Ctrl t x) ->
->                  Reachable (next t x y)
+>                  (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) ->
+>                  All (Reachable {t' = S t}) (step t x y)
 
 ... and the other way round:
 
 > postulate reachableSpec2 : {t : Nat} ->
 >                            (x' : State (S t)) -> Reachable x' ->
->                            Exists (\ x => (Reachable x , Exists (\ y => x' = next t x y)))
+>                            Exists (\ x => (Reachable x , Exists (\ y => x' `Elem` (step t x y))))
 
 
 ** Policies and policy sequences
@@ -108,25 +108,80 @@ just zero:
 <   val {t} {n = Z} x r v ps = zero
 
 If |n = S m| and |ps| consists of a policy |p : Policy t (S m)| and of a
-policy sequence |ps : PolicySeq (S t) m|, we have to first compute the
-reward obtained by selecting the control |y = ctrl (p x r v)| in |x| at
-decision step |t|. Then, we add to this reward the value of making |m|
-further decision steps with |ps| starting from |next t x y|:
+policy sequence |ps : PolicySeq (S t) m|, things are more complicated:
 
-> val : {t : Nat} -> {n : Nat} -> 
->       (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
-> val {t} {n = Z} x r v ps = zero
-> val {t} {n = S m} x r v (p :: ps) = reward t x y x' `plus` val x' r' v' ps where
->   gy :  GoodCtrl t x m
->   gy =  p x r v
->   y  : Ctrl t x
->   y  = ctrl gy
->   x' : State (S t)
->   x' = next t x y   
->   r' : Reachable x'
->   r' = reachableSpec1 x r y
->   v' : Viable m x'
->   v' = viable {y} gy
+<   val {t} {n = S m} x r v (p :: ps) = ?
+
+Here, we first have to compute the rewards obtained by selecting the
+control |y = ctrl (p x r v)| in the first decision step. We get one
+possible reward for each state in |step t x y|. Thus, if |x' `Elem`
+(step t x y)|, its corresponding reward is
+
+< reward t x y x'
+
+Next, we have to add to all these rewards (one for every |x'|) the
+values of making |m| further decision steps with |ps| starting from
+|x'|:
+
+< val x' r' v' ps
+
+To do so, we have to provide reachability and viability evidences |r'|
+and |v'| for |x'|. Finally, we have to reduce all possible values to a
+single aggregated value. Here is where the measure |meas| comes into
+place.
+
+It is useful to introduce the notion of those possible states that can
+be obtained by selecting the control |y : Ctrl t x| in |x : State t|:
+
+> PossibleState : {t : Nat} -> 
+>                 (x  : State t) -> (y : Ctrl t x) -> Type
+> PossibleState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (step t x y))
+
+With this notion in place and assuming 
+
+<   val : {t : Nat} -> {n : Nat} -> 
+<         (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+
+to be available, we can easily implement
+
+> mutual
+
+>   sval : {t : Nat} -> {m : Nat} -> 
+>          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
+>          (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
+>          PossibleState x (ctrl gy) -> Val
+>   sval {t} {m} x r v gy ps (MkSigma x' x'estep) = reward t x y x' `plus` val x' r' v' ps where
+>     y   : Ctrl t x
+>     y   = ctrl gy
+>     ar' : All Reachable (step t x y)
+>     ar' = reachableSpec1 x r y
+>     av' : All (Viable m) (step t x y)
+>     av' = allViable {y} gy
+>     r'  : Reachable x'
+>     r'  = allElemSpec0 x' (step t x y) ar' x'estep
+>     v'  : Viable m x'
+>     v'  = allElemSpec0 x' (step t x y) av' x'estep
+
+And finally
+
+>   val : {t : Nat} -> {n : Nat} -> 
+>         (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>   val {t} {n = Z} x r v ps = zero
+>   val {t} {n = S m} x r v (p :: ps) = meas (fmap (sval x r v gy ps) (tagElem mx')) where
+>     gy   :  GoodCtrl t x m
+>     gy   =  p x r v
+>     y    : Ctrl t x
+>     y    = ctrl gy
+>     mx'  :  M (State (S t))
+>     mx'  =  step t x y
+
+Notice that in the computation we have used, among others, the following
+assumtions from |CoreAssumtions|:
+
+*** That |Val|s can be "added"
+
+*** ...
+
 
 **  Optimality of policy sequences:
 
@@ -149,7 +204,7 @@ states in |State t|. Formally:
 >                             (val x r v ps') `LTE` (val x r v ps)
 
 Notice that the above notion of optimality is very strong. It entails a
-quantification over all (viable and reachable) states of |State t| to
+quantification over all (viable and reachable) states of |Stete t| to
 which the first policy of the sequence can be applied. 
 
 Thus, if we manage to compute an optimal policy sequence of length |n|
@@ -163,9 +218,8 @@ In other words, we have |n| rules for making "best" (in terms of
 
 Thus, an obvious question is whether it is at all possible to compute
 sequences of policies that are optimal in the above sense. As we shall
-see in |FullTheoryDeterministic|, if the assumptions put forward in
-|FullAssumptionsDeterministic| are fulfilled, the answer to this
-question is positive.
+see in |FullTheory|, if the assumptions put forward in |FullAssumptions|
+are fulfilled, the answer to this question is positive. 
 
 In the rest of this file, we implement a generic backwards induction
 algorithm for computing optimal policy sequences for an arbitrary number
@@ -204,15 +258,11 @@ forward in |FullAssumptions|,
 >        (v  : Viable (S n) x) ->
 >        (ps : PolicySeq (S t) n) ->
 >        GoodCtrl t x n -> Val
-> cval {t} {n} x r v ps gy = reward t x y x' `plus` val x' r' v' ps where
->   y  : Ctrl t x
->   y  = ctrl gy
->   x' : State (S t)
->   x' = next t x y
->   r' : Reachable x'
->   r' = reachableSpec1 x r y
->   v' : Viable n x'
->   v' = viable {y} gy
+> cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
+>   y    : Ctrl t x
+>   y    = ctrl gy
+>   mx'  :  M (State (S t))
+>   mx'  =  step t x y
 
 > ||| 
 > optExt : {t : Nat} -> {n : Nat} -> 

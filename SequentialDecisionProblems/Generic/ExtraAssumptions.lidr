@@ -1,6 +1,6 @@
-> module SequentialDecisionProblems.ExtraAssumptions
+> module SequentialDecisionProblems.Generic.ExtraAssumptions
 
-> import SequentialDecisionProblems.CoreAssumptions
+> import SequentialDecisionProblems.Generic.CoreAssumptions
 
 > %default total
 > %access public export

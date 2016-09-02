@@ -1,4 +1,4 @@
-> module SequentialDecisionProblems.CoreAssumptionsNonDeterministic
+> module SequentialDecisionProblems.NonDeterministic.CoreAssumptions
 
 > import Sigma.Sigma
 

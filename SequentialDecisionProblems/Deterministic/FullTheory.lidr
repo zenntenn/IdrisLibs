@@ -1,8 +1,8 @@
-> module SequentialDecisionProblems.FullTheoryDeterministic
+> module SequentialDecisionProblems.Deterministic.FullTheory
 
-> import SequentialDecisionProblems.CoreAssumptionsDeterministic
-> import SequentialDecisionProblems.ExtraAssumptionsDeterministic
-> import SequentialDecisionProblems.CoreTheoryDeterministic
+> import SequentialDecisionProblems.Deterministic.CoreAssumptions
+> import SequentialDecisionProblems.Deterministic.ExtraAssumptions
+> import SequentialDecisionProblems.Deterministic.CoreTheory
 
 > import Sigma.Sigma
 > import Sigma.Operations
