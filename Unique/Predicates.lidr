@@ -1,4 +1,4 @@
-> module Unique -- from an idea by Tim Richter
+> module Unique.Predicates -- from an idea by Tim Richter
 
 > %default total
 > %access public export

@@ -1,4 +1,4 @@
-> module SimpleProb
+> module SimpleProb.SimpleProb
 
 > import NonNegRational.NonNegRational
 > import NonNegRational.BasicProperties

@@ -1,4 +1,4 @@
-> module Properties
+> module Unique.Properties
 
 > import Data.Fin
 > import Control.Isomorphism

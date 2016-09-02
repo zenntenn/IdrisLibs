@@ -1,4 +1,4 @@
-> module Sigma
+> module Sigma.Sigma
 
 > %default total
 > %access public export
