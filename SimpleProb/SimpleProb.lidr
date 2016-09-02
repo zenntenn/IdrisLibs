@@ -11,11 +11,11 @@
 
 
 > |||
-> data SimpleProb : Type -> Type where
->   MkSimpleProb : {A : Type} ->
->                  (aps : List (A, NonNegRational)) ->
->                  sumMapSnd aps = 1 ->
->                  SimpleProb A
+> data SimpleProb  :  Type -> Type where
+>   MkSimpleProb   :  {A : Type} ->
+>                     (aps : List (A, NonNegRational)) ->
+>                     sumMapSnd aps = 1 ->
+>                     SimpleProb A
 
 
 > {-
