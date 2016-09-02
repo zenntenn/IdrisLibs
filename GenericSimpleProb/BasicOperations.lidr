@@ -3,10 +3,10 @@
 > import Data.List
 > import Syntax.PreorderReasoning
 
-> import SimpleProb
+> import GenericSimpleProb.SimpleProb
 > import Fun.Operations
 > import List.Operations
-> -- import ListProperties
+> import List.Properties
 
 > %default total
 > %access public export

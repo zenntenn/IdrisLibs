@@ -1,4 +1,4 @@
-> module ListProperties
+> module List.Properties
 
 > import Data.List
 > import Data.List.Quantifiers
@@ -14,13 +14,13 @@
 > import Finite.Operations
 > import Sigma.Sigma
 > import Pairs.Operations
-> import Basics
-> import IsomorphismOperations
-> import FinProperties
-> import VoidProperties
-> import UnitProperties
-> import NumRefinements
-> import PairProperties
+> import Basic.Operations
+> import Isomorphism.Operations
+> import Fin.Properties
+> import Void.Properties
+> import Unit.Properties
+> import Num.Refinements
+> import Pair.Properties
 
 
 > %default total
@@ -53,7 +53,7 @@
 > |||
 > elemNonEmptySpec0 : {A : Type} ->
 >                     (a : A) -> (as : List A) ->
->                     a `Elem` as -> ListOperations.NonEmpty as
+>                     a `Elem` as -> List.Operations.NonEmpty as
 > elemNonEmptySpec0 _  Nil      p = absurd p
 > elemNonEmptySpec0 _ (a :: as) _ = ()
 
@@ -61,7 +61,7 @@
 > |||
 > elemNonEmptySpec1 : {A : Type} ->
 >                     (as : List A) ->
->                     ListOperations.NonEmpty as -> Sigma A (\ a => a `Elem` as)
+>                     List.Operations.NonEmpty as -> Sigma A (\ a => a `Elem` as)
 > elemNonEmptySpec1  Nil      c = void c
 > elemNonEmptySpec1 (a :: as) _ = MkSigma a Here 
 
@@ -165,7 +165,7 @@
 
 
 > ||| NotEmpty is finite
-> finiteNonEmpty : {A : Type} -> (as : List A) -> Finite (ListOperations.NonEmpty as)
+> finiteNonEmpty : {A : Type} -> (as : List A) -> Finite (List.Operations.NonEmpty as)
 > finiteNonEmpty  Nil      = finiteVoid
 > finiteNonEmpty (a :: as) = finiteUnit
 
