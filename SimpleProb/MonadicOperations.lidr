@@ -77,7 +77,7 @@
 
 > |||
 > NonEmpty : {A : Type} -> SimpleProb A -> Type
-> NonEmpty sp = ListOperations.NonEmpty (support sp) 
+> NonEmpty sp = List.Operations.NonEmpty (support sp) 
 
 > |||
 > All : {A : Type} -> (P : A -> Type) -> SimpleProb A -> Type
@@ -91,7 +91,7 @@
 >     psp  : List NonNegRational
 >     psp  = probs sp
 >     as'  : List (Sigma A (\ a => a `Elem` sp))
->     as'  = ListOperations.tagElem ssp
+>     as'  = List.Operations.tagElem ssp
 >     aps' : List (Sigma A (\ a => a `Elem` sp), NonNegRational)
 >     aps' = zip as' psp
 >     s1p' : sumMapSnd aps' = 1
