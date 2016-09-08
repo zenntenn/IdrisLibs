@@ -4,7 +4,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 * Preliminaries
@@ -107,7 +107,7 @@ end. Here, dead ends are states for which no controls are available. In
 concrete decision problems, they could represent exceptional outcomes:
 aborting a computation, running out of fuel, being shot dead.
 
-> Viable : {t : Nat} -> (n : Nat) -> State t -> Type
+> Viable : (n : Nat) -> State t -> Type
 
 > Good : (t : Nat) -> (x : State t) -> (n : Nat) -> (Ctrl t x) -> Type
 > Good t x n y = Viable {t = S t} n (next t x y)
@@ -115,14 +115,11 @@ aborting a computation, running out of fuel, being shot dead.
 > GoodCtrl : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
 > GoodCtrl t x n = Sigma (Ctrl t x) (Good t x n)
 
-> postulate viableSpec0 : {t : Nat} ->
->                         (x : State t) -> Viable Z x
+> postulate viableSpec0 : (x : State t) -> Viable Z x
 
-> viableSpec1 : {t : Nat} -> {n : Nat} ->
->               (x : State t) -> Viable (S n) x -> GoodCtrl t x n
+> viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
 
-> postulate viableSpec2 : {t : Nat} -> {n : Nat} ->
->                         (x : State t) -> GoodCtrl t x n -> Viable (S n) x
+> postulate viableSpec2 : (x : State t) -> GoodCtrl t x n -> Viable (S n) x
 
 With viability in place , we are now ready to express the last two
 assumption of |CoreTheoryDeterministic|. There, we are going to

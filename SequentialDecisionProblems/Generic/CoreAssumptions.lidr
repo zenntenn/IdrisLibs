@@ -4,7 +4,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 * Preliminaries
@@ -64,15 +64,15 @@ decision step, in a given state and for a selected control. In the
 deterministic case, one could provide such explanation by defining a
 stepping function
 
-< step : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> State (S t)
+< next : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> State (S t)
 
 But what if the decision process has uncertain outcomes? In this case,
 we follow an approach originally proposed by Ionescu [1] and generalize
-|step| to a monadic transition function:
+|next| to a monadic transition function:
 
 > M : Type -> Type
 
-> step    : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> M (State (S t))
+> nexts    : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> M (State (S t))
 
 For reasons that will become clear in |CoreTheory|, |M| is is required
 to be a functor:
@@ -157,16 +157,17 @@ requires |M| to be a "container":
 > All      : {A : Type} -> (P : A -> Type) -> M A -> Type
 > tagElem  : {A : Type} -> (ma : M A) -> M (Sigma A (\ a => a `Elem` ma))
 
-> allElemSpec0 : {A : Type} -> {P : A -> Type} ->
->                (a : A) -> (ma : M A) -> All P ma -> a `Elem` ma -> P a
+> allElemSpec0                 :  {A : Type} -> {P : A -> Type} ->
+>                                 (a : A) -> (ma : M A) -> All P ma -> a `Elem` ma -> P a
 
-> postulate elemNotEmptySpec0 : {A : Type} ->
->                               (a : A) -> (ma : M A) ->
->                               a `Elem` ma -> CoreAssumptions.NotEmpty ma
+> postulate elemNotEmptySpec0  :  {A : Type} -> 
+>                                 (a : A) -> (ma : M A) -> a `Elem` ma -> NotEmpty ma
 
-> postulate elemNotEmptySpec1 : {A : Type} ->
->                               (ma : M A) -> CoreAssumptions.NotEmpty ma ->
->                               Sigma A (\ a => a `Elem` ma)
+> postulate elemNotEmptySpec1  :  {A : Type} -> 
+>                                 (ma : M A) -> NotEmpty ma -> Sigma A (\ a => a `Elem` ma)
+
+
+> postulate tagElemSpec        :  {A : Type} -> (ma : M A) -> fmap outl (tagElem ma) = ma
 
 The theory presented in "CoreTheory.lidr" relies on two
 further assumptions. Expressing these assumptions requires introducing
@@ -182,7 +183,7 @@ computation, running out of fuel, being shot dead.
 > Viable : {t : Nat} -> (n : Nat) -> State t -> Type
 
 > Good : (t : Nat) -> (x : State t) -> (n : Nat) -> (Ctrl t x) -> Type
-> Good t x n y = (NotEmpty (step t x y), All (Viable {t = S t} n) (step t x y))
+> Good t x n y = (NotEmpty (nexts t x y), All (Viable {t = S t} n) (nexts t x y))
 
 > GoodCtrl : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
 > GoodCtrl t x n = Sigma (Ctrl t x) (Good t x n)

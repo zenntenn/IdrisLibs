@@ -6,7 +6,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 * Auxiliary functions
@@ -23,7 +23,7 @@
 
 > |||
 > allViable : {t : Nat} -> {x : State t} -> {n : Nat} -> {y : Ctrl t x} ->
->             (y : GoodCtrl t x n) -> All (Viable {t = S t} n) (step t x (ctrl y)) 
+>             (y : GoodCtrl t x n) -> All (Viable {t = S t} n) (nexts t x (ctrl y)) 
 > allViable (MkSigma y p) = snd p
 
 
@@ -43,22 +43,25 @@ reachable if there are controls that allow for a path from some initial
 state to that state. Thus, tautologically, every initial state is
 reachable:
 
-> Reachable : {t' : Nat} -> State t' -> Type
+> Reachable : State t' -> Type
 
 > postulate reachableSpec0 : (x : State Z) -> Reachable x
 
 Moreover, if |x| is reachable and admits a control |y|, then all states
 that can be obtained by selecting |y| in |x| are also reachable ...
 
-> reachableSpec1 : {t : Nat} ->
->                  (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) ->
->                  All (Reachable {t' = S t}) (step t x y)
+> reachableSpec1 : (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
 
 ... and the other way round:
 
-> postulate reachableSpec2 : {t : Nat} ->
->                            (x' : State (S t)) -> Reachable x' ->
->                            Exists (\ x => (Reachable x , Exists (\ y => x' `Elem` (step t x y))))
+> Pred : State t -> State (S t) -> Type
+> Pred {t} x x'  =  Sigma (Ctrl t x) (\ y => x' `Elem` nexts t x y)
+
+> ReachablePred : State t -> State (S t) -> Type
+> ReachablePred x x'  = (Reachable x, x `Pred` x')
+
+> postulate reachableSpec2 : (x' : State (S t)) -> Reachable x' ->
+>                            Sigma (State t) (\ x => x `ReachablePred` x')
 
 
 ** Policies and policy sequences
@@ -114,8 +117,8 @@ policy sequence |ps : PolicySeq (S t) m|, things are more complicated:
 
 Here, we first have to compute the rewards obtained by selecting the
 control |y = ctrl (p x r v)| in the first decision step. We get one
-possible reward for each state in |step t x y|. Thus, if |x' `Elem`
-(step t x y)|, its corresponding reward is
+possible reward for each state in |nexts t x y|. Thus, if |x' `Elem`
+(nexts t x y)|, its corresponding reward is
 
 < reward t x y x'
 
@@ -135,7 +138,7 @@ be obtained by selecting the control |y : Ctrl t x| in |x : State t|:
 
 > PossibleState : {t : Nat} -> 
 >                 (x  : State t) -> (y : Ctrl t x) -> Type
-> PossibleState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (step t x y))
+> PossibleState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (nexts t x y))
 
 With this notion in place and assuming 
 
@@ -150,17 +153,17 @@ to be available, we can easily implement
 >          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
 >          (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
 >          PossibleState x (ctrl gy) -> Val
->   sval {t} {m} x r v gy ps (MkSigma x' x'estep) = reward t x y x' `plus` val x' r' v' ps where
+>   sval {t} {m} x r v gy ps (MkSigma x' x'enexts) = reward t x y x' `plus` val x' r' v' ps where
 >     y   : Ctrl t x
 >     y   = ctrl gy
->     ar' : All Reachable (step t x y)
+>     ar' : All Reachable (nexts t x y)
 >     ar' = reachableSpec1 x r y
->     av' : All (Viable m) (step t x y)
+>     av' : All (Viable m) (nexts t x y)
 >     av' = allViable {y} gy
 >     r'  : Reachable x'
->     r'  = allElemSpec0 x' (step t x y) ar' x'estep
+>     r'  = allElemSpec0 x' (nexts t x y) ar' x'enexts
 >     v'  : Viable m x'
->     v'  = allElemSpec0 x' (step t x y) av' x'estep
+>     v'  = allElemSpec0 x' (nexts t x y) av' x'enexts
 
 And finally
 
@@ -173,7 +176,7 @@ And finally
 >     y    : Ctrl t x
 >     y    = ctrl gy
 >     mx'  :  M (State (S t))
->     mx'  =  step t x y
+>     mx'  =  nexts t x y
 
 Notice that in the computation we have used, among others, the following
 assumtions from |CoreAssumtions|:
@@ -262,7 +265,7 @@ forward in |FullAssumptions|,
 >   y    : Ctrl t x
 >   y    = ctrl gy
 >   mx'  :  M (State (S t))
->   mx'  =  step t x y
+>   mx'  =  nexts t x y
 
 > ||| 
 > optExt : {t : Nat} -> {n : Nat} -> 

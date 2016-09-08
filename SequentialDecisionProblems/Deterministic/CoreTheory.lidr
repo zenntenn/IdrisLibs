@@ -6,7 +6,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 * Auxiliary functions
@@ -43,22 +43,26 @@ reachable if there are controls that allow for a path from some initial
 state to that state. Thus, tautologically, every initial state is
 reachable:
 
-> Reachable : {t' : Nat} -> State t' -> Type
+> Reachable : State t' -> Type
 
 > postulate reachableSpec0 : (x : State Z) -> Reachable x
 
 Moreover, if |x| is reachable and admits a control |y|, then all states
 that can be obtained by selecting |y| in |x| are also reachable ...
 
-> reachableSpec1 : {t : Nat} ->
->                  (x : State t) -> Reachable x -> (y : Ctrl t x) ->
->                  Reachable (next t x y)
+> reachableSpec1 : (x : State t) -> Reachable x -> (y : Ctrl t x) -> Reachable (next t x y)
 
 ... and the other way round:
 
-> postulate reachableSpec2 : {t : Nat} ->
->                            (x' : State (S t)) -> Reachable x' ->
->                            Exists (\ x => (Reachable x , Exists (\ y => x' = next t x y)))
+
+> Pred : State t -> State (S t) -> Type
+> Pred {t} x x'  =  Sigma (Ctrl t x) (\ y => x' = next t x y)
+
+> ReachablePred : State t -> State (S t) -> Type
+> ReachablePred x x'  = (Reachable x, x `Pred` x')
+
+> postulate reachableSpec2 : (x' : State (S t)) -> Reachable x' ->
+>                            Sigma (State t) (\ x => x `ReachablePred` x')
 
 
 ** Policies and policy sequences
@@ -69,7 +73,7 @@ which |S m| more decision steps are doable) a "good" control, see
 "SeqDecProbsCoreAssumptions":
 
 > Policy : (t : Nat) -> (n : Nat) -> Type
-> Policy t Z      =  ()
+> Policy t Z      =  Unit
 > Policy t (S m)  =  (x : State t) -> Reachable x -> Viable (S m) x -> GoodCtrl t x m
 
 A policy sequence for making |n| decision steps starting from some
@@ -77,10 +81,8 @@ A policy sequence for making |n| decision steps starting from some
 list of policies of length |n|, one for each decision step:
 
 > data PolicySeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  {t : Nat} -> 
->            PolicySeq t Z
->   (::)  :  {t : Nat} -> {n : Nat} -> 
->            Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
+>   Nil   :  PolicySeq t Z
+>   (::)  :  Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
 
 
 ** The value of policy sequences

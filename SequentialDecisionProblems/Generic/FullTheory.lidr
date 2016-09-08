@@ -41,7 +41,7 @@
 >     y'  : Ctrl t x
 >     y'  = ctrl gy'
 >     mx' : M (State (S t))
->     mx' = step t x y'
+>     mx' = nexts t x y'
 >     av' : All (Viable m) mx'
 >     av' = allViable {y = y'} gy'
 >     f' : PossibleState x (ctrl gy') -> Val
@@ -78,13 +78,13 @@
 >   gy    =  p x r v
 >   y     :  Ctrl t x
 >   y     =  ctrl gy
->   av    :  All (Viable n) (step t x y)
+>   av    :  All (Viable n) (nexts t x y)
 >   av    =  allViable {y = y} gy
 >   gy'   :  GoodCtrl t x n
 >   gy'   =  p' x r v
 >   y'    :  Ctrl t x
 >   y'    =  ctrl gy'
->   av'   :  All (Viable n) (step t x y')
+>   av'   :  All (Viable n) (nexts t x y')
 >   av'   =  allViable {y = y'} gy'
 >   g     :  GoodCtrl t x n -> Val
 >   g     =  cval x r v ps
@@ -101,7 +101,7 @@
 >   s3    =  s2
 >   s4    :  (cval x r v ps gy') `LTE` (cval x r v ps gy)
 >   s4    =  s3
->   s5    :  (meas (fmap f' (tagElem (step t x y')))) `LTE` (meas (fmap f (tagElem (step t x y))))
+>   s5    :  (meas (fmap f' (tagElem (nexts t x y')))) `LTE` (meas (fmap f (tagElem (nexts t x y))))
 >   s5    =  s4
 >   s6    :  (val x r v (p' :: ps)) `LTE` (val x r v (p :: ps))
 >   s6    =  s5
