@@ -43,15 +43,15 @@
 >     mx' : M (State (S t))
 >     mx' = nexts t x y'
 >     av' : All (Viable m) mx'
->     av' = allViable {y = y'} gy'
->     f' : PossibleState x (ctrl gy') -> Val
+>     av' = allViable gy'
+>     f' : PossibleNextState x (ctrl gy') -> Val
 >     f' = sval x r v gy' ps'
->     f  : PossibleState x (ctrl gy') -> Val
+>     f  : PossibleNextState x (ctrl gy') -> Val
 >     f  = sval x r v gy' ps
 >     s1 : (x' : State (S t)) -> (r' : Reachable x') -> (v' : Viable m x') ->
 >          (val x' r' v' ps') `LTE` (val x' r' v' ps)
 >     s1 x' r' v' = ops ps' x' r' v'
->     s2 : (z : PossibleState x (ctrl gy')) -> (f' z) `LTE` (f z)
+>     s2 : (z : PossibleNextState x (ctrl gy')) -> (f' z) `LTE` (f z)
 >     s2 (MkSigma x' x'emx') = 
 >       monotonePlusLTE (reflexiveLTE (reward t x y' x')) (s1 x' r' v') where 
 >         ar' : All Reachable mx'
@@ -79,18 +79,18 @@
 >   y     :  Ctrl t x
 >   y     =  ctrl gy
 >   av    :  All (Viable n) (nexts t x y)
->   av    =  allViable {y = y} gy
+>   av    =  allViable gy
 >   gy'   :  GoodCtrl t x n
 >   gy'   =  p' x r v
 >   y'    :  Ctrl t x
 >   y'    =  ctrl gy'
 >   av'   :  All (Viable n) (nexts t x y')
->   av'   =  allViable {y = y'} gy'
+>   av'   =  allViable gy'
 >   g     :  GoodCtrl t x n -> Val
 >   g     =  cval x r v ps
->   f     :  PossibleState x (ctrl gy) -> Val
+>   f     :  PossibleNextState x (ctrl gy) -> Val
 >   f     =  sval x r v gy ps
->   f'    :  PossibleState x (ctrl gy') -> Val
+>   f'    :  PossibleNextState x (ctrl gy') -> Val
 >   f'    =  sval x r v gy' ps
 >   s1    :  (g gy') `LTE` (max x v g)
 >   s1    =  maxSpec x v g gy'

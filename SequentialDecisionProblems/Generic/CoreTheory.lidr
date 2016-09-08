@@ -12,19 +12,16 @@
 * Auxiliary functions
 
 > |||
-> ctrl : {t : Nat} -> {x : State t} -> {n : Nat} ->
->        GoodCtrl t x n -> Ctrl t x
+> ctrl : GoodCtrl t x n -> Ctrl t x
 > ctrl (MkSigma y _) = y
 
 > |||
-> good : {t : Nat} -> {x : State t} -> {n : Nat} ->
->        (y : GoodCtrl t x n) -> Good t x n (ctrl y)
+> good : (y : GoodCtrl t x n) -> Good t x n (ctrl y)
 > good (MkSigma _ p) = p
 
 > |||
-> allViable : {t : Nat} -> {x : State t} -> {n : Nat} -> {y : Ctrl t x} ->
->             (y : GoodCtrl t x n) -> All (Viable {t = S t} n) (nexts t x (ctrl y)) 
-> allViable (MkSigma y p) = snd p
+> allViable : (y : GoodCtrl t x n) -> All (Viable n) (nexts t x (ctrl y)) 
+> allViable (MkSigma _ p) = snd p
 
 
 * The core theory of monadic sequential decision problems (SDP):
@@ -50,7 +47,7 @@ reachable:
 Moreover, if |x| is reachable and admits a control |y|, then all states
 that can be obtained by selecting |y| in |x| are also reachable ...
 
-> reachableSpec1 : (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
+> reachableSpec1  :  (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
 
 ... and the other way round:
 
@@ -60,8 +57,7 @@ that can be obtained by selecting |y| in |x| are also reachable ...
 > ReachablePred : State t -> State (S t) -> Type
 > ReachablePred x x'  = (Reachable x, x `Pred` x')
 
-> postulate reachableSpec2 : (x' : State (S t)) -> Reachable x' ->
->                            Sigma (State t) (\ x => x `ReachablePred` x')
+> postulate reachableSpec2  :  (x' : State (S t)) -> Reachable x' -> Sigma (State t) (\ x => x `ReachablePred` x')
 
 
 ** Policies and policy sequences
@@ -72,7 +68,7 @@ which |S m| more decision steps are doable) a "good" control, see
 "SeqDecProbsCoreAssumptions":
 
 > Policy : (t : Nat) -> (n : Nat) -> Type
-> Policy t Z      =  ()
+> Policy t Z      =  Unit
 > Policy t (S m)  =  (x : State t) -> Reachable x -> Viable (S m) x -> GoodCtrl t x m
 
 A policy sequence for making |n| decision steps starting from some
@@ -80,10 +76,8 @@ A policy sequence for making |n| decision steps starting from some
 list of policies of length |n|, one for each decision step:
 
 > data PolicySeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  {t : Nat} -> 
->            PolicySeq t Z
->   (::)  :  {t : Nat} -> {n : Nat} -> 
->            Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
+>   Nil   :  PolicySeq t Z
+>   (::)  :  Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
 
 
 ** The value of policy sequences
@@ -136,9 +130,8 @@ place.
 It is useful to introduce the notion of those possible states that can
 be obtained by selecting the control |y : Ctrl t x| in |x : State t|:
 
-> PossibleState : {t : Nat} -> 
->                 (x  : State t) -> (y : Ctrl t x) -> Type
-> PossibleState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (nexts t x y))
+> PossibleNextState : (x  : State t) -> (y : Ctrl t x) -> Type
+> PossibleNextState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (nexts t x y))
 
 With this notion in place and assuming 
 
@@ -149,26 +142,26 @@ to be available, we can easily implement
 
 > mutual
 
->   sval : {t : Nat} -> {m : Nat} -> 
->          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
+>   sval : (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
 >          (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
->          PossibleState x (ctrl gy) -> Val
->   sval {t} {m} x r v gy ps (MkSigma x' x'enexts) = reward t x y x' `plus` val x' r' v' ps where
+>          PossibleNextState x (ctrl gy) -> Val
+>   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = reward t x y x' `plus` val x' r' v' ps where
 >     y   : Ctrl t x
 >     y   = ctrl gy
->     ar' : All Reachable (nexts t x y)
+>     mx' : M (State (S t))
+>     mx' = nexts t x y
+>     ar' : All Reachable mx'
 >     ar' = reachableSpec1 x r y
->     av' : All (Viable m) (nexts t x y)
->     av' = allViable {y} gy
+>     av' : All (Viable m) mx'
+>     av' = allViable gy
 >     r'  : Reachable x'
->     r'  = allElemSpec0 x' (nexts t x y) ar' x'enexts
+>     r'  = allElemSpec0 x' mx' ar' x'emx'
 >     v'  : Viable m x'
->     v'  = allElemSpec0 x' (nexts t x y) av' x'enexts
+>     v'  = allElemSpec0 x' mx' av' x'emx'
 
 And finally
 
->   val : {t : Nat} -> {n : Nat} -> 
->         (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>   val : (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
 >   val {t} {n = Z} x r v ps = zero
 >   val {t} {n = S m} x r v (p :: ps) = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >     gy   :  GoodCtrl t x m
