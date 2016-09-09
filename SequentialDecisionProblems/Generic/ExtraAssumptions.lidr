@@ -4,8 +4,9 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
+> %hide Prelude.Nat.LTE
 
 * Preliminaries
 
@@ -29,7 +30,7 @@ be a preorder
 Also, a proof of |Bellman| requires |plus| and |LTE| to satisfy the
 monotonicity condition
 
-> monotonePlusLTE : {a, b, c, d  : Val} -> a `LTE` b -> c `LTE` d -> (a `plus` c) `LTE` (b `plus` d)
+> monotonePlusLTE : a `LTE` b -> c `LTE` d -> (a `plus` c) `LTE` (b `plus` d)
 
 
 * |meas|
@@ -43,7 +44,7 @@ monotonicity condition
 > measMon  :  {A : Type} ->
 >             (f : A -> Val) -> (g : A -> Val) ->
 >             ((a : A) -> (f a) `LTE` (g a)) ->
->             (ma : M A) -> (meas (fmap f ma)) `LTE` (meas (fmap g ma))
+>             (ma : M A) -> meas (fmap f ma) `LTE` meas (fmap g ma)
 
 In a nutshell, |measMon| says that, if |ma| and |mb| are similar
 |M|-structures and |ma| is smaller or equal to |mb|, than it cannot be
@@ -57,15 +58,13 @@ consistent meaning to harm measures in vulnerability studies.
 
 Finally, if |argmax| and |max| fulfill the specification
 
-> argmaxSpec : {t : Nat} -> {n : Nat} ->
->              (x : State t) -> (v : Viable (S n) x) ->
->              (f : GoodCtrl t x n -> Val) ->
->              max x v f = f (argmax x v f)
+> argmaxSpec  :  (x : State t) -> (v : Viable (S n) x) ->
+>                (f : GoodCtrl t x n -> Val) ->
+>                max x v f = f (argmax x v f)
 
-> maxSpec : {t : Nat} -> {n : Nat} ->
->           (x : State t) -> (v : Viable (S n) x) ->
->           (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
->           (f y) `LTE` (max x v f)
+> maxSpec     :  (x : State t) -> (v : Viable (S n) x) ->
+>                (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
+>                (f y) `LTE` (max x v f)
 
 then it is easy to show that |optExt| as defined in |CoreTheory| does in
 fact compute optimal extensions of arbitrary policy sequences. This and

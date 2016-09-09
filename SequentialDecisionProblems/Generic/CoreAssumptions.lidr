@@ -213,13 +213,8 @@ to be able to compute such "optimal" controls only for those states in
 assume that users that want to apply the theory are able to implement
 two functions
 
-> argmax : {t : Nat} -> {n : Nat} ->
->          (x : State t) -> (Viable (S n) x) ->
->          (f : GoodCtrl t x n -> Val) -> GoodCtrl t x n
-
-> max    : {t : Nat} -> {n : Nat} ->
->          (x : State t) -> (Viable (S n) x) ->
->          (f : GoodCtrl t x n -> Val) -> Val
+> argmax  :  (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> GoodCtrl t x n
+> max     :  (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> Val
 
 The idea is that |argmax| and |max| fulfill the specification
 

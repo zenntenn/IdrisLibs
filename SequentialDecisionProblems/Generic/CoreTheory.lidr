@@ -193,11 +193,11 @@ any other policy sequence for making |n| decision steps starting from
 states in |State t|. Formally:
 
 > |||
-> OptPolicySeq : {t : Nat} -> {n : Nat} -> PolicySeq t n -> Type
+> OptPolicySeq : PolicySeq t n -> Type
 > 
 > OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) ->
 >                             (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
->                             (val x r v ps') `LTE` (val x r v ps)
+>                             val x r v ps' `LTE` val x r v ps
 
 Notice that the above notion of optimality is very strong. It entails a
 quantification over all (viable and reachable) states of |Stete t| to
@@ -234,11 +234,10 @@ Informally, a policy |p| is an "optimal" extension of a policy sequence
 steps at step |t|. Formally:
 
 > |||
-> OptExt : {t : Nat} -> {m : Nat} -> 
->          PolicySeq (S t) m -> Policy t (S m) -> Type
+> OptExt : PolicySeq (S t) m -> Policy t (S m) -> Type
 > OptExt {t} {m} ps p  =  (p' : Policy t (S m)) ->
 >                         (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
->                         (val x r v (p' :: ps)) `LTE` (val x r v (p :: ps))
+>                         val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 
 The idea behind the notion of optimal extension is that if |p| is an
 optimal extension of |ps| and |ps| is optimal, then |p :: ps| is optimal.
@@ -248,21 +247,16 @@ This is Bellman's principle of optimality [1] which we will implement in
 forward in |FullAssumptions|,
 
 > ||| 
-> cval : {t : Nat} -> {n : Nat} ->
->        (x  : State t) ->
->        (r  : Reachable x) ->
->        (v  : Viable (S n) x) ->
->        (ps : PolicySeq (S t) n) ->
->        GoodCtrl t x n -> Val
+> cval : (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>        (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
 > cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
->   y    : Ctrl t x
->   y    = ctrl gy
+>   y    :  Ctrl t x
+>   y    =  ctrl gy
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
 > ||| 
-> optExt : {t : Nat} -> {n : Nat} -> 
->          PolicySeq (S t) n -> Policy t (S n)
+> optExt : PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
 >   p : Policy t (S n)
 >   p x r v = argmax x v (cval x r v ps)

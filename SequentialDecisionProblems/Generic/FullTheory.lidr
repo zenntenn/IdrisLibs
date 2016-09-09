@@ -9,7 +9,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 * The full theory of monadic sequential decision problems (SDP):
@@ -25,10 +25,9 @@
 ** Bellman's principle of optimality:
 
 > |||
-> Bellman : {t : Nat} -> {m : Nat} -> 
->           (ps  : PolicySeq (S t) m)  ->   OptPolicySeq ps ->
->           (p   : Policy t (S m))     ->   OptExt ps p ->
->           OptPolicySeq (p :: ps)
+> Bellman  :  (ps  :  PolicySeq (S t) m)  ->   OptPolicySeq ps ->
+>             (p   :  Policy t (S m))     ->   OptExt ps p ->
+>             OptPolicySeq (p :: ps)
 
 > Bellman {t} {m} ps ops p oep = opps where
 >   opps : OptPolicySeq (p :: ps)
@@ -49,7 +48,7 @@
 >     f  : PossibleNextState x (ctrl gy') -> Val
 >     f  = sval x r v gy' ps
 >     s1 : (x' : State (S t)) -> (r' : Reachable x') -> (v' : Viable m x') ->
->          (val x' r' v' ps') `LTE` (val x' r' v' ps)
+>          val x' r' v' ps' `LTE` val x' r' v' ps
 >     s1 x' r' v' = ops ps' x' r' v'
 >     s2 : (z : PossibleNextState x (ctrl gy')) -> (f' z) `LTE` (f z)
 >     s2 (MkSigma x' x'emx') = 
@@ -60,18 +59,17 @@
 >         r'  = allElemSpec0 x' mx' ar' x'emx'
 >         v'  : Viable m x'
 >         v'  = allElemSpec0 x' mx' av' x'emx'
->     s3 : (meas (fmap f' (tagElem mx'))) `LTE` (meas (fmap f (tagElem mx')))
+>     s3 : meas (fmap f' (tagElem mx')) `LTE` meas (fmap f (tagElem mx'))
 >     s3 = measMon f' f s2 (tagElem mx')
->     s4 : (val x r v (p' :: ps')) `LTE` (val x r v (p' :: ps))
+>     s4 : val x r v (p' :: ps') `LTE` val x r v (p' :: ps)
 >     s4 = s3
->     s5 : (val x r v (p' :: ps)) `LTE` (val x r v (p :: ps))
+>     s5 : val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 >     s5 = oep p' x r v
 
 
 > |||
-> optExtLemma : {t : Nat} -> {n : Nat} -> 
->               (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
-> optExtLemma {t} {n} ps p' x r v = s2 where
+> optExtLemma : (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
+> optExtLemma {t} {n} ps p' x r v = s6 where
 >   p     :  Policy t (S n)
 >   p     =  optExt ps
 >   gy    :  GoodCtrl t x n
@@ -92,18 +90,18 @@
 >   f     =  sval x r v gy ps
 >   f'    :  PossibleNextState x (ctrl gy') -> Val
 >   f'    =  sval x r v gy' ps
->   s1    :  (g gy') `LTE` (max x v g)
+>   s1    :  g gy' `LTE` max x v g
 >   s1    =  maxSpec x v g gy'
->   s2    :  (g gy') `LTE` (g (argmax x v g))
+>   s2    :  g gy' `LTE` g (argmax x v g)
 >   s2    =  replace {P = \ z => (g gy' `LTE` z)} (argmaxSpec x v g) s1
 >   -- the rest of the steps are for the (sort of) human reader
->   s3    :  (g gy') `LTE` (g gy)
+>   s3    :  g gy' `LTE` g gy
 >   s3    =  s2
->   s4    :  (cval x r v ps gy') `LTE` (cval x r v ps gy)
+>   s4    :  cval x r v ps gy' `LTE` cval x r v ps gy
 >   s4    =  s3
->   s5    :  (meas (fmap f' (tagElem (nexts t x y')))) `LTE` (meas (fmap f (tagElem (nexts t x y))))
+>   s5    :  meas (fmap f' (tagElem (nexts t x y'))) `LTE` meas (fmap f (tagElem (nexts t x y)))
 >   s5    =  s4
->   s6    :  (val x r v (p' :: ps)) `LTE` (val x r v (p :: ps))
+>   s6    :  val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 >   s6    =  s5
 
 ** Correctness of backwards induction
