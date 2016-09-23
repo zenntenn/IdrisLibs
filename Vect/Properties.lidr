@@ -148,6 +148,11 @@ Membership, quantifiers:
 > elemLemma {n = S m} a as  p = ltZS m
 > %freeze elemLemma
 
+> |||
+> AnySigmaLemma : {A : Type} -> {P : A -> Type} -> {as : Vect n A} ->
+>                 Any P as -> Sigma A P
+> AnySigmaLemma (Here px) = MkSigma _ px
+> AnySigmaLemma (There prf) = AnySigmaLemma prf
 
 > |||
 > AnyExistsLemma : {A : Type} -> {P : A -> Type} -> {as : Vect n A} ->
@@ -159,7 +164,6 @@ Membership, quantifiers:
 > ElemAnyLemma p Here = Here p
 > ElemAnyLemma p (There e) = There (ElemAnyLemma p e)
 > %freeze ElemAnyLemma
-
 
 > |||
 > decAny : {A : Type} -> {P : A -> Type} -> Dec1 P -> Dec1 (Any P)

@@ -8,5 +8,5 @@
 > %hide MkSigma
 
 
-> data Sigma : (a : Type) -> (P : a -> Type) -> Type where
->   MkSigma : .{P : a -> Type} -> (x : a) -> (pf : P x) -> Sigma a P
+> data Sigma : (A : Type) -> (P : A -> Type) -> Type where
+>   MkSigma : {A : Type} -> .{P : A -> Type} -> (x : A) -> (pf : P x) -> Sigma A P

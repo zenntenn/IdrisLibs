@@ -102,8 +102,13 @@ this by applying |contra|. To this end, we need a value of type |Any P
 (toVect fA)|. We compute a value of type |Any P (toVect fA)| by applying
 |ElemAnyLemma|.
 
+> finiteDecSigmaLemma : {A : Type} -> {P : A -> Type} -> Finite A -> ((a : A) -> Dec (P a)) -> Dec (Sigma A P)
+> finiteDecSigmaLemma fA dP with (decAny dP (toVect fA))
+>   | (Yes prf)   = Yes (AnySigmaLemma prf)
+>   | (No contra) = No (\ e => contra (ElemAnyLemma (getProof e) (toVectComplete fA (getWitness e))))
 
-Finiteness of products
+
+* Finiteness of products
 
 > ||| If |P| and |Q| are finite, |(P , Q)| is finite
 > finiteProduct : {A, B : Type} -> Finite A -> Finite B -> Finite (A, B)

@@ -99,6 +99,7 @@
 
 * Trajectories
 
+> ||| The monadic operations
 > ret   :  {A : Type} -> A -> M A
 > bind  :  {A, B : Type} -> M A -> (A -> M B) -> M B
 > postulate monadSpec1   :  {A, B : Type} -> {f : A -> B} ->
