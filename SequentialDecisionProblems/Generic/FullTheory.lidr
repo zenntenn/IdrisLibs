@@ -90,10 +90,10 @@
 >   f     =  sval x r v gy ps
 >   f'    :  PossibleNextState x (ctrl gy') -> Val
 >   f'    =  sval x r v gy' ps
->   s1    :  g gy' `LTE` max x v g
->   s1    =  maxSpec x v g gy'
->   s2    :  g gy' `LTE` g (argmax x v g)
->   s2    =  replace {P = \ z => (g gy' `LTE` z)} (argmaxSpec x v g) s1
+>   s1    :  g gy' `LTE` cvalmax x r v ps
+>   s1    =  cvalmaxSpec x r v ps gy'
+>   s2    :  g gy' `LTE` g (cvalargmax x r v ps)
+>   s2    =  replace {P = \ z => (g gy' `LTE` z)} (cvalargmaxSpec x r v ps) s1
 >   -- the rest of the steps are for the (sort of) human reader
 >   s3    :  g gy' `LTE` g gy
 >   s3    =  s2

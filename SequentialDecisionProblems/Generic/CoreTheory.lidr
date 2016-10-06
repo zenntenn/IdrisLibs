@@ -166,13 +166,13 @@ And finally
 >   val {t} {n = S m} x r v (p :: ps) = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >     gy   :  GoodCtrl t x m
 >     gy   =  p x r v
->     y    : Ctrl t x
->     y    = ctrl gy
+>     y    :  Ctrl t x
+>     y    =  ctrl gy
 >     mx'  :  M (State (S t))
 >     mx'  =  nexts t x y
 
 Notice that in the computation we have used, among others, the following
-assumtions from |CoreAssumtions|:
+assumtions from |CoreAssumptions|:
 
 *** That |Val|s can be "added"
 
@@ -255,14 +255,37 @@ forward in |FullAssumptions|,
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
+The result of |cval x r v ps| is the function to be maximized, in order to obtain the best control for the extension of the policy sequence.
+
+The maximization of |cval| is performed by the functions |cvalmax| and |cvalargmax|.  
+> cvalmax : (x : State t) -> (r : Reachable x) -> (v : Viable (S n) x)
+>           -> (ps : PolicySeq (S t) n) -> Val
+
+> cvalargmax : (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>           (ps : PolicySeq (S t) n) -> GoodCtrl t x n
+
+The reason for using these very specific functions, instead of a more general |max| and |argmax|, is that optimisation is, in most case, not computable.  The following assumptions on |cvalmax| and |cvalargmax| are the minimal requirements for the computability of optimal extensions.  Anything more general risks being non-implementable.
+
+> cvalargmaxSpec : {t : Nat} -> {n : Nat} ->
+>                  (x  : State t) -> (r  : Reachable x) -> 
+>                  (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
+>                  cvalmax x r v ps = cval x r v ps (cvalargmax x r v ps)
+
+> cvalmaxSpec : {t : Nat} -> {n : Nat} ->
+>               (x  : State t) -> (r  : Reachable x) -> 
+>               (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
+>               (y : GoodCtrl t x n) ->
+>               (cval x r v ps y) `LTE` (cvalmax x r v ps)
+
+With these assumptions, we can show that
+
 > ||| 
 > optExt : PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
 >   p : Policy t (S n)
->   p x r v = argmax x v (cval x r v ps)
+>   p x r v = cvalargmax x r v ps
 
 does in fact compute optimal extensions of arbitrary policy sequences.
-
 
 ** Generic machine checkable backwards induction
 

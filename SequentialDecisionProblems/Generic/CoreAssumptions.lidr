@@ -214,20 +214,42 @@ to be able to compute such "optimal" controls only for those states in
 assume that users that want to apply the theory are able to implement
 two functions
 
-> argmax  :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> GoodCtrl t x n
-> max     :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> Val
+< argmax  :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> GoodCtrl t x n
+< max     :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (f : GoodCtrl t x n -> Val) -> Val
+
+The ``ingredients'' needed to construct optimisable functions:
+
+< FunStuff : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
+
+For example, if |GoodCtrl t x n| is finite, we can take
+
+< FunStuff t x n = GoodCtrl t x n -> Val
+
+The function that actually constructs an optimisable function:
+
+< toFun   :  {t, n : Nat} -> {x : State t} -> FunStuff t x n -> GoodCtrl t x n -> Val
+
+In the case of finite |GoodCtrl t x n|, as above, we have
+
+< toFun   =  id
+
+|argmax| and |max| optimise functions constructed from |FunStuff|:
+
+< argmax  :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (fs : FunStuff t x n) -> GoodCtrl t x n
+< max     :  {t, n : Nat} -> (x : State t) -> (Viable (S n) x) -> (fs : FunStuff t x n) -> Val
 
 The idea is that |argmax| and |max| fulfill the specification
 
 < argmaxSpec : {t : Nat} -> {n : Nat} ->
 <              (x : State t) -> (v : Viable (S n) x) ->
-<              (f : GoodCtrl t x n -> Val) ->
-<              max x v f = f (argmax x v f)
+<              (fs : FunStuff t x n) ->
+<              max x v fs = toFun fs (argmax x v fs)
 
 < maxSpec : {t : Nat} -> {n : Nat} ->
 <           (x : State t) -> (v : Viable (S n) x) ->
-<           (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
-<           (f y) `LTE` (max x v f)
+<           (fs : FunStuff t x n) -> 
+<           (y : GoodCtrl t x n) ->
+<           (toFun fs y) `LTE` (max x v fs)
 
 As it turns out, |argmaxSpec| and |maxSpec| are only needed to implement
 the full theory. We introduced them explicitly in |FullAssumptions|.

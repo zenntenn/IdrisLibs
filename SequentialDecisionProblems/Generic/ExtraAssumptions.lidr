@@ -58,13 +58,13 @@ consistent meaning to harm measures in vulnerability studies.
 
 Finally, if |argmax| and |max| fulfill the specification
 
-> argmaxSpec  :  (x : State t) -> (v : Viable (S n) x) ->
->                (f : GoodCtrl t x n -> Val) ->
->                max x v f = f (argmax x v f)
+< argmaxSpec  :  (x : State t) -> (v : Viable (S n) x) ->
+<                (f : GoodCtrl t x n -> Val) ->
+<                max x v f = f (argmax x v f)
 
-> maxSpec     :  (x : State t) -> (v : Viable (S n) x) ->
->                (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
->                (f y) `LTE` (max x v f)
+< maxSpec     :  (x : State t) -> (v : Viable (S n) x) ->
+<                (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
+<                (f y) `LTE` (max x v f)
 
 then it is easy to show that |optExt| as defined in |CoreTheory| does in
 fact compute optimal extensions of arbitrary policy sequences. This and
