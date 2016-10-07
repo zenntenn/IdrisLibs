@@ -12,12 +12,11 @@
 > import Effect.StdIO
 > import Syntax.PreorderReasoning
 
-> import SeqDecProbsCoreAssumptions
-> import SeqDecProbsCoreTheory
-> import SeqDecProbsUtils
-> import SeqDecProbsHelpers
+> import SequentialDecisionProblems.Generic.CoreTheory
+> -- import SeqDecProbsUtils
+> -- import SeqDecProbsHelpers
 
-> import IdentityOperations
+> import Identity.Operations
 > import IdentityProperties
 > import BoundedNat
 > import BoundedNatOperations
@@ -43,6 +42,8 @@
 
 > %default total
 > %auto_implicits off
+
+> {-
 
 
 The possibly simplest "cylinder" problem. |M| is the identity monad, the
