@@ -13,6 +13,7 @@
 > import Syntax.PreorderReasoning
 
 > import SequentialDecisionProblems.Generic.CoreTheory
+> import SequentialDecisionProblems.Generic.FullTheory
 > -- import SeqDecProbsUtils
 > -- import SeqDecProbsHelpers
 
@@ -35,15 +36,15 @@
 > import Unit.Properties
 > -- import Opt
 > import Rel.TotalPreorder
-> -- import EffectException
-> -- import EffectStdIO
+> import LocalEffect.Exception
+> import LocalEffect.StdIO
 > import Fin.Operations
 > import Pairs.Operations
 
 > %default total
 > %auto_implicits off
 
-> {-
+
 
 
 The possibly simplest "cylinder" problem. |M| is the identity monad, the
@@ -57,21 +58,21 @@ right as we wish.
 
 ** M is a monad:
 
-> SeqDecProbsCoreAssumptions.M = Identity
-> SeqDecProbsCoreAssumptions.fmap = map
-> SeqDecProbsCoreAssumptions.ret = return
-> SeqDecProbsCoreAssumptions.bind = (>>=)
+> CoreTheory.M = Identity
+> CoreTheory.fmap = map
+> CoreTheory.ret = return
+> CoreTheory.bind = (>>=)
 
 
 ** M is a container monad:
 
-> SeqDecProbsCoreAssumptions.Elem = IdentityOperations.Elem
-> SeqDecProbsCoreAssumptions.NonEmpty = IdentityOperations.NonEmpty
-> SeqDecProbsCoreAssumptions.All = IdentityOperations.All
-> SeqDecProbsCoreAssumptions.elemNonEmptySpec0 = IdentityProperties.elemNonEmptySpec0
-> SeqDecProbsCoreAssumptions.elemNonEmptySpec1 = IdentityProperties.elemNonEmptySpec1
-> SeqDecProbsCoreAssumptions.tagElem = IdentityOperations.tagElem
-> SeqDecProbsCoreAssumptions.containerMonadSpec3 {A} {P} a1 (Id a2) pa2 a1eqa2 =
+> CoreTheory.Elem = IdentityOperations.Elem
+> CoreTheory.NonEmpty = IdentityOperations.NonEmpty
+> CoreTheory.All = IdentityOperations.All
+> CoreTheory.elemNonEmptySpec0 = IdentityProperties.elemNonEmptySpec0
+> CoreTheory.elemNonEmptySpec1 = IdentityProperties.elemNonEmptySpec1
+> CoreTheory.tagElem = IdentityOperations.tagElem
+> CoreTheory.containerMonadSpec3 {A} {P} a1 (Id a2) pa2 a1eqa2 =
 >   replace (sym a1eqa2) pa2
 
 
@@ -83,69 +84,70 @@ right as we wish.
 > nColumns : Nat
 > nColumns = S maxColumn
 
+> {-
 
 ** States:
 
-> SeqDecProbsCoreAssumptions.State t = LTB nColumns
+> CoreTheory.State t = LTB nColumns
 
 
 ** Controls:
 
-> SeqDecProbsCoreAssumptions.Ctrl t x = LeftAheadRight
+> CoreTheory.Ctrl t x = LeftAheadRight
 
 
 ** Transition function:
 
-> SeqDecProbsCoreAssumptions.step t (MkSigma Z prf) Left =
+> CoreTheory.step t (MkSigma Z prf) Left =
 >   Id (MkSigma maxColumn (ltIdS maxColumn))
-> SeqDecProbsCoreAssumptions.step t (MkSigma (S n) prf) Left =
+> CoreTheory.step t (MkSigma (S n) prf) Left =
 >   Id (MkSigma n (ltLemma1 n nColumns prf))
-> SeqDecProbsCoreAssumptions.step t (MkSigma n prf) Ahead =
+> CoreTheory.step t (MkSigma n prf) Ahead =
 >   Id (MkSigma n prf)
-> SeqDecProbsCoreAssumptions.step t (MkSigma n prf) Right with (decLT n maxColumn)
+> CoreTheory.step t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = Id (MkSigma (S n) (LTESucc p))
 >   | (No contra) = Id (MkSigma  Z    (LTESucc LTEZero))
 
 
 ** Reward function:
 
-> SeqDecProbsCoreAssumptions.Val = Nat
+> CoreTheory.Val = Nat
 
-> SeqDecProbsCoreAssumptions.reward t x y (MkSigma c _) =
+> CoreTheory.reward t x y (MkSigma c _) =
 >   if c == Z
 >   then (S Z)
 >   else if (S c) == nColumns
 >        then (S (S Z))
 >        else Z
 
-> SeqDecProbsCoreAssumptions.plus = Prelude.Nat.plus
-> SeqDecProbsCoreAssumptions.zero = Z
+> CoreTheory.plus = Prelude.Nat.plus
+> CoreTheory.zero = Z
 
-> SeqDecProbsCoreAssumptions.LTE = Prelude.Nat.LTE
-> SeqDecProbsCoreAssumptions.reflexiveLTE = NatLTEProperties.reflexiveLTE
-> SeqDecProbsCoreAssumptions.transitiveLTE = NatLTEProperties.transitiveLTE
+> CoreTheory.LTE = Prelude.Nat.LTE
+> CoreTheory.reflexiveLTE = NatLTEProperties.reflexiveLTE
+> CoreTheory.transitiveLTE = NatLTEProperties.transitiveLTE
 
-> SeqDecProbsCoreAssumptions.monotonePlusLTE = NatLTEProperties.monotoneNatPlusLTE
+> CoreTheory.monotonePlusLTE = NatLTEProperties.monotoneNatPlusLTE
 
 ** M is measurable:
 
-> SeqDecProbsCoreAssumptions.meas (Id x) = x
-> SeqDecProbsCoreAssumptions.measMon f g prf (Id x) = prf x
+> CoreTheory.meas (Id x) = x
+> CoreTheory.measMon f g prf (Id x) = prf x
 
 
 * Viable and Reachable
 
 > -- Viable : (n : Nat) -> State t -> Type
-> SeqDecProbsCoreAssumptions.Viable n x =  Unit
+> CoreTheory.Viable n x =  Unit
 
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> SeqDecProbsCoreAssumptions.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (step t x Left), ())
+> CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (step t x Left), ())
 
 > -- Reachable : State t' -> Type
-> SeqDecProbsCoreAssumptions.Reachable x' = Unit
+> CoreTheory.Reachable x' = Unit
 
 > -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (step t x y)
-> SeqDecProbsCoreAssumptions.reachableSpec1 x r y = ()
+> CoreTheory.reachableSpec1 x r y = ()
 
 
 
@@ -163,7 +165,7 @@ that
 The first condition trivially holds 
 
 > totalPreorderLTE : TotalPreorder Val
-> totalPreorderLTE = MkTotalPreorder SeqDecProbsCoreAssumptions.LTE 
+> totalPreorderLTE = MkTotalPreorder CoreTheory.LTE 
 >                                    NatLTEProperties.reflexiveLTE 
 >                                    NatLTEProperties.transitiveLTE 
 >                                    NatLTEProperties.totalLTE
@@ -194,7 +196,7 @@ follow from finiteness of |All|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SeqDecProbsCoreAssumptions.NonEmpty (step t x y))
+> --                  Finite (CoreTheory.NonEmpty (step t x y))
 > SeqDecProbsHelpers.finiteNonEmpty {t} {n} x y = IdentityProperties.finiteNonEmpty (step t x y)
 
 and, finally, finiteness of controls
@@ -205,16 +207,16 @@ and, finally, finiteness of controls
 
 With these results in place, we have
 
-> SeqDecProbsCoreAssumptions.max x v =
+> CoreTheory.max x v =
 >   Opt.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
 
-> SeqDecProbsCoreAssumptions.argmax x v  =
+> CoreTheory.argmax x v  =
 >   Opt.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
 
-> SeqDecProbsCoreAssumptions.maxSpec x v =
+> CoreTheory.maxSpec x v =
 >   Opt.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
 
-> SeqDecProbsCoreAssumptions.argmaxSpec x v =
+> CoreTheory.argmaxSpec x v =
 >   Opt.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
 
 
@@ -253,7 +255,3 @@ With these results in place, we have
 > main = run computation
 
 > ---}
-
--- Local Variables:
--- idris-packages: ("effects")
--- End:

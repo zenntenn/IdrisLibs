@@ -1,4 +1,4 @@
-> module Effect.Parsing
+> module LocalEffect.Exception
 
 
 > import Effects
@@ -49,8 +49,3 @@
 >   = if all (\x => isDigit x || x == '-') (unpack str)
 >     then pure (cast {to = Int} str)
 >     else raise "Not an Int!"
-
-
--- Local Variables:
--- idris-packages: ("effects")
--- End:

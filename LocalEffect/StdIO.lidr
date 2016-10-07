@@ -1,10 +1,10 @@
-> module Effect.StdIO
+> module LocalEffect.StdIO
 
 > import Effects
 > import Effect.StdIO
 > import Effect.Exception
 
-> import Effect.Parsing
+> import LocalEffect.Exception
 > import BoundedNat.BoundedNat
 > import Sigma.Sigma
 > import Pairs.Operations
@@ -36,8 +36,3 @@
 >                          getLTB b
 >           Right n  => do putStr "thanks!\n"
 >                          pure n
-
-
--- Local Variables:
--- idris-packages: ("effects")
--- End:
