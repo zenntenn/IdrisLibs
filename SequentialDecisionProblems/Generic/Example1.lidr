@@ -18,27 +18,27 @@
 
 > import Identity.Operations
 > import Identity.Properties
-> import BoundedNat
-> import BoundedNatOperations
-> import BoundedNatProperties
-> import LeftAheadRight
-> import Sigma
-> import SigmaOperations
-> import SigmaProperties
-> import NatLTEProperties
-> import NatLTProperties
-> import Finite
-> import FiniteOperations
-> import FiniteProperties
-> import Unique
-> import Decidable
-> import UnitProperties
-> import Opt
-> import TotalPreorder
-> import EffectException
-> import EffectStdIO
-> import FinOperations
-> import PairsOperations
+> import BoundedNat.BoundedNat
+> import BoundedNat.Operations
+> import BoundedNat.Properties
+> -- import SequentialDecisionProblems.Generic.LeftAheadRight
+> import Sigma.Sigma
+> import Sigma.Operations
+> import Sigma.Properties
+> import Nat.LTEProperties
+> import Nat.LTProperties
+> import Finite.Predicates
+> import Finite.Operations
+> import Finite.Properties
+> import Unique.Predicates
+> import Decidable.Predicates
+> import Unit.Properties
+> -- import Opt
+> import Rel.TotalPreorder
+> -- import EffectException
+> -- import EffectStdIO
+> import Fin.Operations
+> import Pairs.Operations
 
 > %default total
 > %auto_implicits off
