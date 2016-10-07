@@ -1,7 +1,5 @@
 > module SequentialDecisionProblems.Generic.FullTheory
 
-> import SequentialDecisionProblems.Generic.CoreAssumptions
-> import SequentialDecisionProblems.Generic.ExtraAssumptions
 > import SequentialDecisionProblems.Generic.CoreTheory
 
 > import Sigma.Sigma
@@ -9,10 +7,70 @@
 
 > %default total
 > %access public export
-> %auto_implicits on
+> %auto_implicits off
+
+> %hide Prelude.Nat.LTE
+
+* Preliminaries
+
+In order to prove the correctness of |backwardsInduction| (see |CoreTheory|), we need a number of additional assumptions, which we introduce here.  These result in proof obligations for the user of the framework.  As in |CoreTheory|, they are represented as meta-variables (or ``holes'').  Once the user has discharged these obligations, type checking this file will prove the optimality of |backwardsInduction| (with some caveats related to the current Idris implementation).
+
+* |LTE|
+
+The binary relation introduced in
+|CoreTheory| for comparing values of sequences of policies has to
+be a preorder:
+
+> reflexiveLTE : (a : Val) -> a `LTE` a
+> transitiveLTE : (a : Val) -> (b : Val) -> (c : Val) -> a `LTE` b -> b `LTE` c -> a `LTE` c
+
+Additionally, |plus| is required to be monotonic with respect to |LTE|:
+
+> monotonePlusLTE : {a, b, c, d : Val} -> a `LTE` b -> c `LTE` d -> (a `plus` c) `LTE` (b `plus` d)
 
 
-* The full theory of monadic sequential decision problems (SDP):
+* |meas|
+
+The function
+|meas| introduced in |CoreTheory| to describe how a decision maker
+measures the possible rewards entailed by (lists, probability
+distributions, etc. of) possible next states is required to fulfill a
+monotonicity condition:
+
+> measMon  :  {A : Type} ->
+>             (f : A -> Val) -> (g : A -> Val) ->
+>             ((a : A) -> (f a) `LTE` (g a)) ->
+>             (ma : M A) -> meas (fmap f ma) `LTE` meas (fmap g ma)
+
+In a nutshell, |measMon| says that, if |ma| and |mb| are similar
+|M|-structures and |ma| is smaller or equal to |mb|, than it cannot be
+the case that the measure of |ma| is greater than the measure of |mb|.
+
+This conditions was originally formalized by Ionescu in [2] to give a
+consistent meaning to harm measures in vulnerability studies.
+
+* |cvalargmax|
+
+The function |cvalargmax| introduced in |CoreTheory| must deliver optimal controls.  We need the function |cvalmax|, returning the value of those optimal controls, in order to fully specify |cvalargmax|:
+
+> cvalmax : {t, n : Nat} -> (x : State t) -> (r : Reachable x) -> (v : Viable (S n) x)
+>           -> (ps : PolicySeq (S t) n) -> Val
+
+
+> cvalargmaxSpec : {t : Nat} -> {n : Nat} ->
+>                  (x  : State t) -> (r  : Reachable x) -> 
+>                  (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
+>                  cvalmax x r v ps = cval x r v ps (cvalargmax x r v ps)
+
+> cvalmaxSpec : {t : Nat} -> {n : Nat} ->
+>               (x  : State t) -> (r  : Reachable x) -> 
+>               (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
+>               (y : GoodCtrl t x n) ->
+>               (cval x r v ps y) `LTE` (cvalmax x r v ps)
+
+The reason for using these very specific functions, instead of more general |max| and |argmax|, is that optimisation is, in most case, not computable.  The assumptions on |cvalmax| and |cvalargmax| are the minimal requirements for the computability of optimal extensions. Anything more general risks being non-implementable.
+
+* The proof of correctness of |backwardsInduction|:
 
 
 ** Policy sequences of length zero are optimal
@@ -25,7 +83,7 @@
 ** Bellman's principle of optimality:
 
 > |||
-> Bellman  :  (ps  :  PolicySeq (S t) m)  ->   OptPolicySeq ps ->
+> Bellman  :  {t, m : Nat} -> (ps  :  PolicySeq (S t) m)  ->   OptPolicySeq ps ->
 >             (p   :  Policy t (S m))     ->   OptExt ps p ->
 >             OptPolicySeq (p :: ps)
 
@@ -68,7 +126,7 @@
 
 
 > |||
-> optExtLemma : (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
+> optExtLemma : {t, n : Nat} -> (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
 > optExtLemma {t} {n} ps p' x r v = s6 where
 >   p     :  Policy t (S n)
 >   p     =  optExt ps
@@ -125,3 +183,10 @@ arbitrary SDPs and number of decision steps.
 > {-
 
 > ---}
+
+
+[1] Bellman, Richard; "Dynamic Programming", Princeton University Press,
+    1957
+
+[2] Ionescu, Cezar; "Vulnerability Modelling and Monadic Dynamical
+    Systems", Freie Universitaet Berlin, 2009
