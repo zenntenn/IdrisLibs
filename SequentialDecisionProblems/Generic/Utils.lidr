@@ -44,6 +44,7 @@
 >                  (x : State t) -> Viable {t = t} (S n) x ->
 >                  Finite (GoodCtrl t x n) 
 
+> {-
 > finiteAllViable : FiniteAll -> FiniteViable -> FiniteAllViable
 > finiteAllViable fAll fViable = fAllViable where
 >   fAll' : {A : Type} -> {P : A -> Type} -> Finite1 P -> (ma : M A) -> Finite (All P ma)
@@ -54,7 +55,7 @@
 >                (x : State t) -> (y : Ctrl t x) -> 
 >                Finite (All (Viable {t = S t} n) (nexts t x y))
 >   fAllViable {t} {n} x y = fAll' (fViable' {t = S t} {n}) (nexts t x y)
-
+> -}
 
 * Show states and controls
 
