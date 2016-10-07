@@ -6,7 +6,7 @@
 > %access public export
 > %auto_implicits on
 
-> %hide Prelude.Nat.LTE
+
 
 * Preliminaries
 
