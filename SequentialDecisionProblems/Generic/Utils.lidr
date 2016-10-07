@@ -3,8 +3,6 @@
 > import Data.Fin
 > import Control.Isomorphism
 
-> import SequentialDecisionProblems.Generic.CoreAssumptions
-> import SequentialDecisionProblems.Generic.ExtraAssumptions
 > import SequentialDecisionProblems.Generic.CoreTheory
 > import Sigma.Sigma
 > import Sigma.Operations
@@ -13,7 +11,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits on
+> %auto_implicits off
 
 
 * ...
@@ -74,8 +72,8 @@
 
 > ||| 
 > data StateCtrlSeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  (x : State t) -> StateCtrlSeq t Z
->   (::)  :  Sigma (State t) (Ctrl t) -> StateCtrlSeq (S t) n -> StateCtrlSeq t (S n)
+>   Nil   :  {t : Nat} -> (x : State t) -> StateCtrlSeq t Z
+>   (::)  :  {t, n : Nat} -> Sigma (State t) (Ctrl t) -> StateCtrlSeq (S t) n -> StateCtrlSeq t (S n)
 
 > using (t : Nat, n : Nat)
 >   implementation Show (StateCtrlSeq t n) where
@@ -113,7 +111,7 @@
 >                           bind (bind ma f) g = bind ma (\ a => bind (f a) g)
 
 > |||
-> possibleStateCtrlSeqs  :  (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+> possibleStateCtrlSeqs  :  {t, n : Nat} -> (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
 >                           (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
 > possibleStateCtrlSeqs {t} {n = Z}    x r v Nil         =  ret (Nil x)
 > possibleStateCtrlSeqs {t} {n = S m}  x r v (p :: ps')  =
