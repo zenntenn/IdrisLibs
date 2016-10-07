@@ -17,7 +17,7 @@
 > -- import SeqDecProbsHelpers
 
 > import Identity.Operations
-> import IdentityProperties
+> import Identity.Properties
 > import BoundedNat
 > import BoundedNatOperations
 > import BoundedNatProperties
