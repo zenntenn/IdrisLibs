@@ -9,7 +9,7 @@
 > %access public export
 > %auto_implicits off
 
-> %hide Prelude.Nat.LTE
+> -- %hide Prelude.Nat.LTE
 
 * Preliminaries
 

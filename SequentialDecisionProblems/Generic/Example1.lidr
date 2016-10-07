@@ -23,7 +23,7 @@
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
-> -- import SequentialDecisionProblems.Generic.LeftAheadRight
+> import SequentialDecisionProblems.Generic.LeftAheadRight
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
@@ -96,24 +96,17 @@ right as we wish.
 
 > SequentialDecisionProblems.Generic.CoreTheory.Ctrl t x = LeftAheadRight
 
-> {-
-
-
-
-
-
 ** Transition function:
 
-> SequentialDecisionProblems.Generic.CoreTheory.step t (MkSigma Z prf) Left =
+> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma Z prf) Left =
 >   Id (MkSigma maxColumn (ltIdS maxColumn))
-> SequentialDecisionProblems.Generic.CoreTheory.step t (MkSigma (S n) prf) Left =
+> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma (S n) prf) Left =
 >   Id (MkSigma n (ltLemma1 n nColumns prf))
-> SequentialDecisionProblems.Generic.CoreTheory.step t (MkSigma n prf) Ahead =
+> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma n prf) Ahead =
 >   Id (MkSigma n prf)
-> SequentialDecisionProblems.Generic.CoreTheory.step t (MkSigma n prf) Right with (decLT n maxColumn)
+> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = Id (MkSigma (S n) (LTESucc p))
 >   | (No contra) = Id (MkSigma  Z    (LTESucc LTEZero))
-
 
 ** Reward function:
 
@@ -130,16 +123,15 @@ right as we wish.
 > SequentialDecisionProblems.Generic.CoreTheory.zero = Z
 
 > SequentialDecisionProblems.Generic.CoreTheory.LTE = Prelude.Nat.LTE
-> SequentialDecisionProblems.Generic.CoreTheory.reflexiveLTE = NatLTEProperties.reflexiveLTE
-> SequentialDecisionProblems.Generic.CoreTheory.transitiveLTE = NatLTEProperties.transitiveLTE
+> SequentialDecisionProblems.Generic.FullTheory.reflexiveLTE = Nat.LTEProperties.reflexiveLTE
+> SequentialDecisionProblems.Generic.FullTheory.transitiveLTE = Nat.LTEProperties.transitiveLTE
 
-> SequentialDecisionProblems.Generic.CoreTheory.monotonePlusLTE = NatLTEProperties.monotoneNatPlusLTE
+> SequentialDecisionProblems.Generic.FullTheory.monotonePlusLTE = Nat.LTEProperties.monotoneNatPlusLTE
 
 ** M is measurable:
 
 > SequentialDecisionProblems.Generic.CoreTheory.meas (Id x) = x
-> SequentialDecisionProblems.Generic.CoreTheory.measMon f g prf (Id x) = prf x
-
+> SequentialDecisionProblems.Generic.FullTheory.measMon f g prf (Id x) = prf x
 
 * Viable and Reachable
 
@@ -147,14 +139,13 @@ right as we wish.
 > SequentialDecisionProblems.Generic.CoreTheory.Viable n x =  Unit
 
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> SequentialDecisionProblems.Generic.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (step t x Left), ())
+> SequentialDecisionProblems.Generic.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
 
 > -- Reachable : State t' -> Type
 > SequentialDecisionProblems.Generic.CoreTheory.Reachable x' = Unit
 
-> -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (step t x y)
+> -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
 > SequentialDecisionProblems.Generic.CoreTheory.reachableSpec1 x r y = ()
-
 
 
 * Max and argmax
@@ -202,14 +193,18 @@ follow from finiteness of |All|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NonEmpty (step t x y))
-> SeqDecProbsHelpers.finiteNonEmpty {t} {n} x y = IdentityProperties.finiteNonEmpty (step t x y)
+> --                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NonEmpty (nexts t x y))
+> SeqDecProbsHelpers.finiteNonEmpty {t} {n} x y = IdentityProperties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
 > SeqDecProbsHelpers.finiteCtrl _ = finiteLeftAheadRight
 > %freeze SeqDecProbsHelpers.finiteCtrl
+
+> {-
+
+
 
 With these results in place, we have
 
