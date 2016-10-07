@@ -1,4 +1,4 @@
-> module SequentialDEcisionProblems.Generic.Helpers
+> module SequentialDecisionProblems.Generic.Helpers
 
 > import Data.Fin
 > import Control.Isomorphism

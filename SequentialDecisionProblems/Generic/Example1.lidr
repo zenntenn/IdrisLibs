@@ -15,8 +15,7 @@
 > import SequentialDecisionProblems.Generic.CoreTheory
 > import SequentialDecisionProblems.Generic.FullTheory
 > import SequentialDecisionProblems.Generic.Utils
-> -- import SeqDecProbsUtils
-> -- import SeqDecProbsHelpers
+> import SequentialDecisionProblems.Generic.Helpers
 
 > import Identity.Operations
 > import Identity.Properties
@@ -35,14 +34,14 @@
 > import Unique.Predicates
 > import Decidable.Predicates
 > import Unit.Properties
-> -- import Opt
+> import Opt.Operations
 > import Rel.TotalPreorder
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 > import Fin.Operations
 > import Pairs.Operations
 
-> %default total
+> -- %default total
 > %auto_implicits off
 
 
@@ -163,9 +162,9 @@ The first condition trivially holds
 
 > totalPreorderLTE : TotalPreorder Val
 > totalPreorderLTE = MkTotalPreorder SequentialDecisionProblems.Generic.CoreTheory.LTE 
->                                    NatLTEProperties.reflexiveLTE 
->                                    NatLTEProperties.transitiveLTE 
->                                    NatLTEProperties.totalLTE
+>                                    Nat.LTEProperties.reflexiveLTE 
+>                                    Nat.LTEProperties.transitiveLTE 
+>                                    Nat.LTEProperties.totalLTE
 
 Finiteness and non-zero cardinality of |GoodCtrl t x n|
 
@@ -181,45 +180,40 @@ follow from finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
-> SeqDecProbsHelpers.finiteAll = IdentityProperties.finiteAll
+> SequentialDecisionProblems.Generic.Helpers.finiteAll = Identity.Properties.finiteAll
 
 , finiteness of |Viable|
 
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
-> SeqDecProbsHelpers.finiteViable _ = finiteUnit
+> SequentialDecisionProblems.Generic.Helpers.finiteViable _ = finiteUnit
 
 , finiteness of |NonEmpty|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NonEmpty (nexts t x y))
-> SeqDecProbsHelpers.finiteNonEmpty {t} {n} x y = IdentityProperties.finiteNonEmpty (nexts t x y)
+> --                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NotEmpty (nexts t x y))
+> SequentialDecisionProblems.Generic.Helpers.finiteNotEmpty {t} {n} x y = Identity.Properties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SeqDecProbsHelpers.finiteCtrl _ = finiteLeftAheadRight
-> %freeze SeqDecProbsHelpers.finiteCtrl
-
-> {-
-
-
+> SequentialDecisionProblems.Generic.Helpers.finiteCtrl _ = finiteLeftAheadRight
+> %freeze SequentialDecisionProblems.Generic.Helpers.finiteCtrl
 
 With these results in place, we have
 
-> SequentialDecisionProblems.Generic.CoreTheory.max x v =
->   Opt.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
+> SequentialDecisionProblems.Generic.FullTheory.cvalmax x r v ps =
+>   Opt.Operations.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.CoreTheory.argmax x v  =
->   Opt.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
+> SequentialDecisionProblems.Generic.CoreTheory.cvalargmax x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.CoreTheory.maxSpec x v =
->   Opt.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
+> SequentialDecisionProblems.Generic.FullTheory.cvalmaxSpec x r v ps =
+>   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.CoreTheory.argmaxSpec x v =
->   Opt.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v)
-
+> SequentialDecisionProblems.Generic.FullTheory.cvalargmaxSpec x r v ps =
+>   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
 
 * Decidability of Viable
@@ -227,15 +221,13 @@ With these results in place, we have
 > dViable : {t : Nat} -> (n : Nat) -> (x : State t) -> Dec (Viable {t} n x)
 > dViable n x = Yes ()
 
-
-
 * The computation:
 
 > -- showState : {t : Nat} -> State t -> String
-> SeqDecProbsUtils.showState = show
+> SequentialDecisionProblems.Generic.Utils.showState = show
 
 > -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
-> SeqDecProbsUtils.showCtrl = show
+> SequentialDecisionProblems.Generic.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
 > computation =
@@ -245,7 +237,7 @@ With these results in place, we have
 >      x0 <- getLTB nColumns
 >      case (dViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (bi Z nSteps)
+>                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn (show mxys)
@@ -254,5 +246,7 @@ With these results in place, we have
 
 > main : IO ()
 > main = run computation
+
+> {-
 
 > ---}
