@@ -20,8 +20,8 @@
 
 > |||
 > FiniteViable : Type
-> FiniteViable = {t : Nat} -> (n : Nat) -> 
->                (x : State t) -> Finite (Viable {t} n x)
+> FiniteViable = {t : Nat} -> 
+>                (n : Nat) -> (x : State t) -> Finite (Viable {t} n x)
 
 > |||
 > FiniteAll : Type

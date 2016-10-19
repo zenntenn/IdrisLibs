@@ -7,6 +7,7 @@
 > %access public export
 > %auto_implicits off
 
+
 * Preliminaries
 
 In a nutshell, the core theory introduces the notion of policy, policy
@@ -18,15 +19,13 @@ However, the core theory does not implement a machine checkable proof
 that |backwardsInduction| is correct that is, that its result is an
 optimal policy sequence.
 
-This is done in the full theory presented in |FullTheory|. The
-additional assumptions needed to implement the full theory are
-summarized in |FullAssumptions|.
-
-Both here and in |FullAssumptions|, the assumptions are implemented as
-holes (metavariables, forward declarations, partial definitions,
-etc.). The idea is that users that wish to apply the theory (typically,
-for computing optimal solutions for a specific decision problem) will
+This is done in the full theory presented in |FullTheory|. Both here and
+in |FullTheory|, the assumptions are implemented as holes
+(metavariables, forward declarations, partial definitions, etc.). The
+idea is that users that wish to apply the theory (typically, for
+computing optimal solutions for a specific decision problem) will
 fill-in the holes by providing problem-specific implementations.
+
 
 * Sequential decision processes
 
@@ -68,15 +67,16 @@ we follow an approach originally proposed by Ionescu [1] and generalize
 
 > M : Type -> Type
 
-> nexts    : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> M (State (S t))
+> nexts : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> M (State (S t))
 
 For reasons that will become clear in the sequel, |M| is is required
 to be a functor:
 
-> fmap : {A, B : Type} -> (A -> B) -> M A -> M B
-> postulate functorSpec1 : fmap . id = id
-> postulate functorSpec2 : {A, B, C : Type} -> {f : B -> C} -> {g : A -> B} ->
->                          fmap (f . g) = (fmap f) . (fmap g)
+> fmap  :  {A, B : Type} -> 
+>          (A -> B) -> M A -> M B
+> postulate functorSpec1  :  fmap . id = id
+> postulate functorSpec2  :  {A, B, C : Type} -> {f : B -> C} -> {g : A -> B} ->
+>                            fmap (f . g) = (fmap f) . (fmap g)
 
 In the above specification and throughout this file, we use postulates
 to denote assumptions that we consider to be conceptually relevant but
@@ -98,7 +98,7 @@ etc.)
 
 > Val : Type
 
-> reward  : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> (x' : State (S t)) -> Val
+> reward : (t : Nat) -> (x : State t) -> (y : Ctrl t x) -> (x' : State (S t)) -> Val
 
 Since the original work of Bellman [1957], this has turned out to be a
 useful abstraction. The idea is that the decision maker seeks controls
@@ -116,7 +116,11 @@ and with a binary "comparison" relation
 > LTE : Val -> Val -> Type
 
 In a deterministic case, implementing the above assumptions completely
-defines a sequential decision problem. But whenever a decision step has an uncertain outcome, uncertainties about "next" states naturally yield uncertainties about rewards. In these cases, the decision makes faces a number of possible rewards (one for each possible next state) and has to explain how it measures such chances. In stochastic decision problems,
+defines a sequential decision problem. But whenever a decision step has
+an uncertain outcome, uncertainties about "next" states naturally yield
+uncertainties about rewards. In these cases, the decision makes faces a
+number of possible rewards (one for each possible next state) and has to
+explain how it measures such chances. In stochastic decision problems,
 possible next states (and, therefore possible rewards) are labelled with
 probabilities. In these cases, possible rewards are often measured in
 terms of their expected value.  Here, again, we follow the approach
@@ -164,6 +168,7 @@ requires |M| to be a "container":
 The theory presented here relies on two further notions: viability and
 reachability.
 
+
 * Viability
 
 Intuitively, a state |x : State t| is viable for |n| steps if, in spite
@@ -175,19 +180,21 @@ computation, running out of fuel, being shot dead.
 
 > Viable : {t : Nat} -> (n : Nat) -> State t -> Type
 
-A control is ``good'', if it does not lead to an empty |M|-structure,
-and if the states that it does lead to are all viable.
+Thus, every state is viable for zero steps
+
+> postulate viableSpec0 : {t : Nat} ->
+>                         (x : State t) -> Viable Z x
+
+and a state is viable for |S n| steps iff there exists a control that
+leads to a non-empty |M|-structure of next states which are viable for
+|n| steps. We call such controls "good" controls:
 
 > Good : (t : Nat) -> (x : State t) -> (n : Nat) -> (Ctrl t x) -> Type
 > Good t x n y = (NotEmpty (nexts t x y), All (Viable {t = S t} n) (nexts t x y))
 
-The type of good controls is:
-
 > GoodCtrl : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
 > GoodCtrl t x n = Sigma (Ctrl t x) (Good t x n)
-
-> postulate viableSpec0 : {t : Nat} ->
->                         (x : State t) -> Viable Z x
+> -- GoodCtrl t x n = Sigma (Ctrl t x) (\ y => (NotEmpty (nexts t x y), All (Viable {t = S t} n) (nexts t x y)))
 
 > viableSpec1 : {t : Nat} -> {n : Nat} ->
 >               (x : State t) -> Viable (S n) x -> GoodCtrl t x n
@@ -202,12 +209,13 @@ Auxiliary functions:
 > ctrl (MkSigma y _) = y
 
 > |||
-> good : {t, n : Nat} -> {x : State t} -> (y : GoodCtrl t x n) -> Good t x n (ctrl y)
-> good (MkSigma _ p) = p
+> -- good : {t, n : Nat} -> {x : State t} -> (y : GoodCtrl t x n) -> Good t x n (ctrl y)
+> -- good (MkSigma _ p) = p
 
 > |||
 > allViable : {t, n : Nat} -> {x : State t} -> (y : GoodCtrl t x n) -> All (Viable n) (nexts t x (ctrl y)) 
 > allViable (MkSigma _ p) = snd p
+
 
 * Reachability
 
@@ -257,8 +265,11 @@ A policy sequence for making |n| decision steps starting from some
 of policies of length |n|, one for each decision step:
 
 > data PolicySeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  {t : Nat} -> PolicySeq t Z
->   (::)  :  {t, n : Nat} -> Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
+>   Nil   :  {t : Nat} -> 
+>            PolicySeq t Z
+>   (::)  :  {t, n : Nat} -> 
+>            Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
+
 
 * The value of policy sequences
 
@@ -310,7 +321,8 @@ place.
 It is useful to introduce the notion of those possible states that can
 be obtained by selecting the control |y : Ctrl t x| in |x : State t|:
 
-> PossibleNextState : {t : Nat} -> (x  : State t) -> (y : Ctrl t x) -> Type
+> PossibleNextState  :  {t : Nat} -> 
+>                       (x  : State t) -> (y : Ctrl t x) -> Type
 > PossibleNextState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (nexts t x y))
 
 With this notion in place and assuming 
@@ -322,9 +334,10 @@ to be available, we can implement
 
 > mutual
 
->   sval : {t, m : Nat} -> (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
->          (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
->          PossibleNextState x (ctrl gy) -> Val
+>   sval  :  {t, m : Nat} -> 
+>            (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
+>            (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
+>            PossibleNextState x (ctrl gy) -> Val
 >   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = reward t x y x' `plus` val x' r' v' ps where
 >     y   : Ctrl t x
 >     y   = ctrl gy
@@ -341,7 +354,8 @@ to be available, we can implement
 
 And finally
 
->   val : {t, n : Nat} -> (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>   val  :  {t, n : Nat} -> 
+>           (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
 >   val {t} {n = Z} x r v ps = zero
 >   val {t} {n = S m} x r v (p :: ps) = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >     gy   :  GoodCtrl t x m
@@ -350,6 +364,7 @@ And finally
 >     y    =  ctrl gy
 >     mx'  :  M (State (S t))
 >     mx'  =  nexts t x y
+
 
 * Optimality of policy sequences
 
@@ -365,7 +380,8 @@ of any other policy sequence for making |n| decision steps starting
 from states in |State t|. Formally:
 
 > |||
-> OptPolicySeq : {t, n : Nat} -> PolicySeq t n -> Type
+> OptPolicySeq  :  {t, n : Nat} -> 
+>                  PolicySeq t n -> Type
 > 
 > OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) ->
 >                             (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
@@ -394,6 +410,7 @@ In the rest of this file, we implement a generic backwards induction
 algorithm for computing optimal policy sequences for an arbitrary number
 of decision steps.
 
+
 * Optimal extensions of policy sequences
 
 The computation at the core of backwards induction is the computation
@@ -408,7 +425,8 @@ Informally, a policy |p| is an optimal extension of a policy sequence
 steps at step |t|. Formally:
 
 > |||
-> OptExt : {t, m : Nat} -> PolicySeq (S t) m -> Policy t (S m) -> Type
+> OptExt  :  {t, m : Nat} -> 
+>            PolicySeq (S t) m -> Policy t (S m) -> Type
 > OptExt {t} {m} ps p  =  (p' : Policy t (S m)) ->
 >                         (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
 >                         val x r v (p' :: ps) `LTE` val x r v (p :: ps)
@@ -421,8 +439,9 @@ implement in |FullTheory|.
 The strong requirement of optimality implies that |p| is optimal for every state, therefore, the control obtained by applying |p| to a given state |x| must be optimal, i.e., it must maximise the function |cval x r v ps|:
 
 > ||| 
-> cval : {t, n : Nat} -> (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
->        (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
+> cval  :  {t, n : Nat} -> 
+>          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>          (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
 > cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >   y    :  Ctrl t x
 >   y    =  ctrl gy
@@ -431,8 +450,9 @@ The strong requirement of optimality implies that |p| is optimal for every state
 
 Let |cvalargmax| be a function that delivers the control that leads to the maximal value of |cval x r v ps|:
 
-> cvalargmax : {t, n : Nat} -> (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
->           (ps : PolicySeq (S t) n) -> GoodCtrl t x n
+> cvalargmax  :  {t, n : Nat} -> 
+>                (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>                (ps : PolicySeq (S t) n) -> GoodCtrl t x n
 
 The controls obtained by maximising |cval x r v ps|
 for each of the states |x : State t| will deliver a policy which is an
@@ -441,18 +461,20 @@ been reduced to the maximisation of |cval| for the states at time |t|.
 Therefore, the function that computes this optimal extension is:
 
 > ||| 
-> optExt : {t, n : Nat} -> PolicySeq (S t) n -> Policy t (S n)
+> optExt  :  {t, n : Nat} -> 
+>            PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
 >   p : Policy t (S n)
 >   p x r v = cvalargmax x r v ps
+
 
 * Generic machine checkable backwards induction
 
 If |LTE| is reflexive, it is straightforward to show that empty policy
 sequences (that is, sequences for performing zero decision steps) are
-optimal.  Therefore, we have a starting point for the recursive process of extending optimal policy sequences.
-This suggests the following implementations of
-backwards induction:
+optimal. Therefore, we have a starting point for the recursive process
+of extending optimal policy sequences. This suggests the following
+implementations of backwards induction:
 
 > backwardsInduction : (t : Nat) -> (n : Nat) -> PolicySeq t n
 > backwardsInduction t  Z     =  Nil
@@ -460,11 +482,24 @@ backwards induction:
 >   ps : PolicySeq (S t) n
 >   ps = backwardsInduction (S t) n
 
-This file contains all the *computational* elements that the user must specify in order to be able to run |backwardsInduction|.  The results are going to fulfill the condition of optimality only if several assumptions hold, some of which we have introduced only informally (and others not at all).  For example, we have not formalised the requirement that |cvalargmax| delivers an optimal control, or that |LTE| is reflexive (and we haven't even mentioned its transitivity, which is also required).
+This file contains all the *computational* elements that the user must
+specify in order to be able to run |backwardsInduction|.  The results
+are going to fulfill the condition of optimality only if several
+assumptions hold, some of which we have introduced only informally (and
+others not at all).  For example, we have not formalised the requirement
+that |cvalargmax| delivers an optimal control, or that |LTE| is
+reflexive (and we haven't even mentioned its transitivity, which is also
+required).
 
-These additional assumptions are formulated in the file |FullTheory|, where we also implement a machine-checked proof of the correctness of |backwardsInduction| under these assumptions.
+These additional assumptions are formulated in the file |FullTheory|,
+where we also implement a machine-checked proof of the correctness of
+|backwardsInduction| under these assumptions.
 
-This separation has been introduced in order to enable users that do not want to deal with formal proofs to use the framework for computing optimal policies.  Of course, the optimality of the results will, in this case, not be machine-checked.
+This separation has been introduced in order to enable users that do not
+want to deal with formal proofs to use the framework for computing
+optimal policies.  Of course, the optimality of the results will, in
+this case, not be machine-checked.
+
 
 > {-
 
