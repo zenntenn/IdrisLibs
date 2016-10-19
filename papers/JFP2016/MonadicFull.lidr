@@ -32,21 +32,20 @@ The function |cvalargmax| introduced in |CoreTheory| must deliver
 optimal controls.  We need the function |cvalmax|, returning the value
 of those optimal controls, in order to fully specify |cvalargmax|:
 
-> cvalmax  :  {t, n : Nat} -> 
->             (x : State t) -> (r : Reachable x) -> (v : Viable (S n) x) ->
->             (ps : PolicySeq (S t) n) -> Val
-
-
-> cvalargmaxSpec  :  {t : Nat} -> {n : Nat} ->
->                    (x  : State t) -> (r  : Reachable x) -> 
+< cvalargmax      :  (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+<                    (ps : PolicySeq (S t) n) -> GoodCtrl t x n
+                
+> cvalmax         :  (x : State t) -> (r : Reachable x) -> (v : Viable (S n) x) ->
+>                    (ps : PolicySeq (S t) n) -> Val
+>
+> cvalargmaxSpec  :  (x  : State t) -> (r  : Reachable x) -> 
 >                    (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
 >                    cvalmax x r v ps = cval x r v ps (cvalargmax x r v ps)
-
-> cvalmaxSpec  :  {t : Nat} -> {n : Nat} ->
->                 (x  : State t) -> (r  : Reachable x) -> 
->                 (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
->                 (y : GoodCtrl t x n) ->
->                 (cval x r v ps y) `LTE` (cvalmax x r v ps)
+>
+> cvalmaxSpec     :  (x  : State t) -> (r  : Reachable x) -> 
+>                    (v  : Viable (S n) x) ->  (ps : PolicySeq (S t) n) ->
+>                    (gy : GoodCtrl t x n) ->
+>                    (cval x r v ps gy) `LTE` (cvalmax x r v ps)
 
 The reason for using these very specific functions, instead of more
 general |max| and |argmax|, is that optimisation is, in most case, not
@@ -157,9 +156,6 @@ extensions. Anything more general risks being non-implementable.
 >   p    =  optExt ps
 >   oep  :  OptExt ps p
 >   oep  =  optExtLemma ps
-
-Thus, we can compute provably optimal sequences of policies for
-arbitrary SDPs and number of decision steps. 
 
 
 > {-

@@ -162,16 +162,8 @@
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
-Let |cvalargmax| be a function that delivers the control that leads to the maximal value of |cval x r v ps|:
-
 > cvalargmax  :  (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
 >                (ps : PolicySeq (S t) n) -> GoodCtrl t x n
-
-The controls obtained by maximising |cval x r v ps|
-for each of the states |x : State t| will deliver a policy which is an
-optimal extension of |ps|.  Thus, the problem of maximising |val| has
-been reduced to the maximisation of |cval| for the states at time |t|.
-Therefore, the function that computes this optimal extension is:
 
 > optExt : PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
