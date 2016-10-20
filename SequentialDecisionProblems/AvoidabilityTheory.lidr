@@ -1,8 +1,6 @@
-> module SequentialDecisionProblems.Generic.FullTheory
+> module SequentialDecisionProblems.FullTheory
 
-> import SequentialDecisionProblems.Generic.CoreAssumptions
-> -- import SequentialDecisionProblems.Generic.ExtraAssumptions
-> import SequentialDecisionProblems.Generic.CoreTheory
+> import SequentialDecisionProblems.CoreTheory
 
 > import Sigma.Sigma
 > import Sigma.Operations
@@ -71,12 +69,12 @@ in |Finite.Properties|.
 
 > decEqState : (x : State t) -> (x' : State t') -> Dec (x = x')
 
-> SequentialDecisionProblems.Generic.CoreAssumptions.Viable {t}  Z     _  =  Unit
-> SequentialDecisionProblems.Generic.CoreAssumptions.Viable {t} (S m)  x  =  GoodCtrl t x m
+> SequentialDecisionProblems.CoreTheory.Viable {t}  Z     _  =  Unit
+> SequentialDecisionProblems.CoreTheory.Viable {t} (S m)  x  =  GoodCtrl t x m
 
-> SequentialDecisionProblems.Generic.CoreAssumptions.viableSpec0 _ = ()
-> SequentialDecisionProblems.Generic.CoreAssumptions.viableSpec1 x = id
-> SequentialDecisionProblems.Generic.CoreAssumptions.viableSpec2 x = id
+> SequentialDecisionProblems.CoreTheory.viableSpec0 _ = ()
+> SequentialDecisionProblems.CoreTheory.viableSpec1 x = id
+> SequentialDecisionProblems.CoreTheory.viableSpec2 x = id
 
 > finCtrl      :  (x : State t) -> Finite (Ctrl t x)
 > -- decAll       :  {A : Type} -> (P : A -> Type) -> ((a : A) -> Dec (P a)) -> (ma : M A) -> Dec (All P ma)

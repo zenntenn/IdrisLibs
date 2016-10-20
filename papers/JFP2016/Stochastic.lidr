@@ -2,7 +2,6 @@
 
 > import Sigma.Sigma
 > import SimpleProb.SimpleProb
-> -- import SimpleProb.MonadicOperations
 
 > %default total
 > %access public export

@@ -1,4 +1,4 @@
-> module SequentialDecisionProblems.Generic.CoreTheory
+> module SequentialDecisionProblems.CoreTheory
 
 > import Sigma.Sigma
 > import Sigma.Operations

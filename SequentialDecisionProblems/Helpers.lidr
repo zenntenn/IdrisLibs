@@ -1,9 +1,9 @@
-> module SequentialDecisionProblems.Generic.Helpers
+> module SequentialDecisionProblems.Helpers
 
 > import Data.Fin
 > import Control.Isomorphism
 
-> import SequentialDecisionProblems.Generic.CoreTheory
+> import SequentialDecisionProblems.CoreTheory
 > import Finite.Predicates
 > import Finite.Operations
 > import Finite.Properties
@@ -38,7 +38,7 @@
 > FiniteNotEmpty : Type
 > FiniteNotEmpty = {t : Nat} -> {n : Nat} -> 
 >                  (x : State t) -> (y : Ctrl t x) -> 
->                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NotEmpty (nexts t x y))
+>                  Finite (NotEmpty (nexts t x y))
 
 > |||
 > FiniteGood : Type
@@ -89,7 +89,7 @@ Similarly, we assume that users are able to prove that |NotEmpty| is finite
 
 > finiteNotEmpty : {t : Nat} -> {n : Nat} -> 
 >                  (x : State t) -> (y : Ctrl t x) -> 
->                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NotEmpty (nexts t x y))
+>                  Finite (NotEmpty (nexts t x y))
 
 Finiteness of |NotEmpty| and |All Viable| directly implies finiteness of
 |Good|

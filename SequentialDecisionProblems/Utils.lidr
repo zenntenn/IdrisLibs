@@ -1,9 +1,9 @@
-> module SequentialDecisionProblems.Generic.Utils
+> module SequentialDecisionProblems.Utils
 
 > import Data.Fin
 > import Control.Isomorphism
 
-> import SequentialDecisionProblems.Generic.CoreTheory
+> import SequentialDecisionProblems.CoreTheory
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Finite.Predicates

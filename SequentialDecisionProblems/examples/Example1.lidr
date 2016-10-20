@@ -1,4 +1,4 @@
-> module SequentialDecisionProblems.Generic.Main
+> module SequentialDecisionProblems.examples.Main
 
 > import Decidable.Order
 
@@ -12,17 +12,17 @@
 > import Effect.StdIO
 > import Syntax.PreorderReasoning
 
-> import SequentialDecisionProblems.Generic.CoreTheory
-> import SequentialDecisionProblems.Generic.FullTheory
-> import SequentialDecisionProblems.Generic.Utils
-> import SequentialDecisionProblems.Generic.Helpers
+> import SequentialDecisionProblems.CoreTheory
+> import SequentialDecisionProblems.FullTheory
+> import SequentialDecisionProblems.Utils
+> import SequentialDecisionProblems.Helpers
 
 > import Identity.Operations
 > import Identity.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
-> import SequentialDecisionProblems.Generic.LeftAheadRight
+> import SequentialDecisionProblems.examples.LeftAheadRight
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
@@ -58,22 +58,21 @@ right as we wish.
 
 ** M is a monad:
 
-> SequentialDecisionProblems.Generic.CoreTheory.M = Identity
-> SequentialDecisionProblems.Generic.CoreTheory.fmap = map {f = Identity}
+> SequentialDecisionProblems.CoreTheory.M = Identity
+> SequentialDecisionProblems.CoreTheory.fmap = map {f = Identity}
 
-> SequentialDecisionProblems.Generic.Utils.ret = pure
-> SequentialDecisionProblems.Generic.Utils.bind = (>>=)
+> SequentialDecisionProblems.Utils.ret = pure
+> SequentialDecisionProblems.Utils.bind = (>>=)
 
 ** M is a container monad:
 
-> SequentialDecisionProblems.Generic.CoreTheory.Elem = Identity.Operations.Elem
-> SequentialDecisionProblems.Generic.CoreTheory.NotEmpty = Identity.Operations.NonEmpty
-> SequentialDecisionProblems.Generic.CoreTheory.All = Identity.Operations.All
-> SequentialDecisionProblems.Generic.CoreTheory.elemNotEmptySpec0 = Identity.Properties.elemNonEmptySpec0
-> SequentialDecisionProblems.Generic.CoreTheory.elemNotEmptySpec1 = Identity.Properties.elemNonEmptySpec1
-> SequentialDecisionProblems.Generic.CoreTheory.tagElem = Identity.Operations.tagElem
-> -- SequentialDecisionProblems.Generic.CoreTheory.containerMonadSpec3 {A} {P} a1 (Id a2) pa2 a1eqa2 =
-> SequentialDecisionProblems.Generic.CoreTheory.allElemSpec0 {A} {P} a1 (Id a2) pa2 a1eqa2 =
+> SequentialDecisionProblems.CoreTheory.Elem = Identity.Operations.Elem
+> SequentialDecisionProblems.CoreTheory.NotEmpty = Identity.Operations.NonEmpty
+> SequentialDecisionProblems.CoreTheory.All = Identity.Operations.All
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 = Identity.Properties.elemNonEmptySpec0
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec1 = Identity.Properties.elemNonEmptySpec1
+> SequentialDecisionProblems.CoreTheory.tagElem = Identity.Operations.tagElem
+> SequentialDecisionProblems.CoreTheory.allElemSpec0 {A} {P} a1 (Id a2) pa2 a1eqa2 =
 >   replace (sym a1eqa2) pa2
 
 * The decision process:
@@ -88,63 +87,63 @@ right as we wish.
 
 ** States:
 
-> SequentialDecisionProblems.Generic.CoreTheory.State t = LTB nColumns
+> SequentialDecisionProblems.CoreTheory.State t = LTB nColumns
 
 
 ** Controls:
 
-> SequentialDecisionProblems.Generic.CoreTheory.Ctrl t x = LeftAheadRight
+> SequentialDecisionProblems.CoreTheory.Ctrl t x = LeftAheadRight
 
 ** Transition function:
 
-> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma Z prf) Left =
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
 >   Id (MkSigma maxColumn (ltIdS maxColumn))
-> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma (S n) prf) Left =
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
 >   Id (MkSigma n (ltLemma1 n nColumns prf))
-> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma n prf) Ahead =
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead =
 >   Id (MkSigma n prf)
-> SequentialDecisionProblems.Generic.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = Id (MkSigma (S n) (LTESucc p))
 >   | (No contra) = Id (MkSigma  Z    (LTESucc LTEZero))
 
 ** Reward function:
 
-> SequentialDecisionProblems.Generic.CoreTheory.Val = Nat
+> SequentialDecisionProblems.CoreTheory.Val = Nat
 
-> SequentialDecisionProblems.Generic.CoreTheory.reward t x y (MkSigma c _) =
+> SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
 >   if c == Z
 >   then (S Z)
 >   else if (S c) == nColumns
 >        then (S (S Z))
 >        else Z
 
-> SequentialDecisionProblems.Generic.CoreTheory.plus = Prelude.Nat.plus
-> SequentialDecisionProblems.Generic.CoreTheory.zero = Z
+> SequentialDecisionProblems.CoreTheory.plus = Prelude.Nat.plus
+> SequentialDecisionProblems.CoreTheory.zero = Z
 
-> SequentialDecisionProblems.Generic.CoreTheory.LTE = Prelude.Nat.LTE
-> SequentialDecisionProblems.Generic.FullTheory.reflexiveLTE = Nat.LTEProperties.reflexiveLTE
-> SequentialDecisionProblems.Generic.FullTheory.transitiveLTE = Nat.LTEProperties.transitiveLTE
+> SequentialDecisionProblems.CoreTheory.LTE = Prelude.Nat.LTE
+> SequentialDecisionProblems.FullTheory.reflexiveLTE = Nat.LTEProperties.reflexiveLTE
+> SequentialDecisionProblems.FullTheory.transitiveLTE = Nat.LTEProperties.transitiveLTE
 
-> SequentialDecisionProblems.Generic.FullTheory.monotonePlusLTE = Nat.LTEProperties.monotoneNatPlusLTE
+> SequentialDecisionProblems.FullTheory.monotonePlusLTE = Nat.LTEProperties.monotoneNatPlusLTE
 
 ** M is measurable:
 
-> SequentialDecisionProblems.Generic.CoreTheory.meas (Id x) = x
-> SequentialDecisionProblems.Generic.FullTheory.measMon f g prf (Id x) = prf x
+> SequentialDecisionProblems.CoreTheory.meas (Id x) = x
+> SequentialDecisionProblems.FullTheory.measMon f g prf (Id x) = prf x
 
 * Viable and Reachable
 
 > -- Viable : (n : Nat) -> State t -> Type
-> SequentialDecisionProblems.Generic.CoreTheory.Viable n x =  Unit
+> SequentialDecisionProblems.CoreTheory.Viable n x =  Unit
 
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> SequentialDecisionProblems.Generic.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
 
 > -- Reachable : State t' -> Type
-> SequentialDecisionProblems.Generic.CoreTheory.Reachable x' = Unit
+> SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 
 > -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
-> SequentialDecisionProblems.Generic.CoreTheory.reachableSpec1 x r y = ()
+> SequentialDecisionProblems.CoreTheory.reachableSpec1 x r y = ()
 
 
 * Max and argmax
@@ -161,7 +160,7 @@ that
 The first condition trivially holds 
 
 > totalPreorderLTE : TotalPreorder Val
-> totalPreorderLTE = MkTotalPreorder SequentialDecisionProblems.Generic.CoreTheory.LTE 
+> totalPreorderLTE = MkTotalPreorder SequentialDecisionProblems.CoreTheory.LTE 
 >                                    Nat.LTEProperties.reflexiveLTE 
 >                                    Nat.LTEProperties.transitiveLTE 
 >                                    Nat.LTEProperties.totalLTE
@@ -180,39 +179,39 @@ follow from finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
-> SequentialDecisionProblems.Generic.Helpers.finiteAll = Identity.Properties.finiteAll
+> SequentialDecisionProblems.Helpers.finiteAll = Identity.Properties.finiteAll
 
 , finiteness of |Viable|
 
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
-> SequentialDecisionProblems.Generic.Helpers.finiteViable _ = finiteUnit
+> SequentialDecisionProblems.Helpers.finiteViable _ = finiteUnit
 
 , finiteness of |NonEmpty|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SequentialDecisionProblems.Generic.CoreTheory.NotEmpty (nexts t x y))
-> SequentialDecisionProblems.Generic.Helpers.finiteNotEmpty {t} {n} x y = Identity.Properties.finiteNonEmpty (nexts t x y)
+> --                  Finite (SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x y))
+> SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = Identity.Properties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SequentialDecisionProblems.Generic.Helpers.finiteCtrl _ = finiteLeftAheadRight
-> %freeze SequentialDecisionProblems.Generic.Helpers.finiteCtrl
+> SequentialDecisionProblems.Helpers.finiteCtrl _ = finiteLeftAheadRight
+> %freeze SequentialDecisionProblems.Helpers.finiteCtrl
 
 With these results in place, we have
 
-> SequentialDecisionProblems.Generic.FullTheory.cvalmax x r v ps =
+> SequentialDecisionProblems.FullTheory.cvalmax x r v ps =
 >   Opt.Operations.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.CoreTheory.cvalargmax x r v ps =
+> SequentialDecisionProblems.CoreTheory.cvalargmax x r v ps =
 >   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.FullTheory.cvalmaxSpec x r v ps =
+> SequentialDecisionProblems.FullTheory.cvalmaxSpec x r v ps =
 >   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-> SequentialDecisionProblems.Generic.FullTheory.cvalargmaxSpec x r v ps =
+> SequentialDecisionProblems.FullTheory.cvalargmaxSpec x r v ps =
 >   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
 
@@ -224,10 +223,10 @@ With these results in place, we have
 * The computation:
 
 > -- showState : {t : Nat} -> State t -> String
-> SequentialDecisionProblems.Generic.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show
 
 > -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
-> SequentialDecisionProblems.Generic.Utils.showCtrl = show
+> SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
 > computation =
