@@ -79,10 +79,30 @@ of those optimal controls, in order to fully specify |cvalargmax|:
 >                 (cval x r v ps y) `LTE` (cvalmax x r v ps)
 
 The reason for using these very specific functions, instead of more
-general |max| and |argmax|, is that optimisation is, in most case, not
-computable.  The assumptions on |cvalmax| and |cvalargmax| are the
-minimal requirements for the computability of optimal
-extensions. Anything more general risks being non-implementable.
+general |argmax|, |max|, |argmaxSpec| and |maxSpec| like for instance
+
+< argmax : {t : Nat} -> {n : Nat} ->
+<          (x : State t) -> (Viable (S n) x) ->
+<          (f : GoodCtrl t x n -> Val) -> GoodCtrl t x n
+
+< max    : {t : Nat} -> {n : Nat} ->
+<          (x : State t) -> (Viable (S n) x) ->
+<          (f : GoodCtrl t x n -> Val) -> Val
+
+< argmaxSpec : {t : Nat} -> {n : Nat} ->
+<              (x : State t) -> (v : Viable (S n) x) ->
+<              (f : GoodCtrl t x n -> Val) ->
+<              max x v f = f (argmax x v f)
+
+< maxSpec : {t : Nat} -> {n : Nat} ->
+<           (x : State t) -> (v : Viable (S n) x) ->
+<           (f : GoodCtrl t x n -> Val) -> (y : GoodCtrl t x n) ->
+<           (f y) `LTE` (max x v f)
+
+is that optimisation is, in most case, not computable.  The assumptions
+on |cvalmax| and |cvalargmax| are the minimal requirements for the
+computability of optimal extensions. Anything more general risks being
+non-implementable.
 
 
 * The proof of correctness of |backwardsInduction|:
