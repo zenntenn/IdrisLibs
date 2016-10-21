@@ -4,8 +4,9 @@
 
 > import Data.Fin
 > import Data.Vect
+> import Data.List
+> import Data.List.Quantifiers
 > import Data.So
-> import Control.Monad.Identity
 > import Control.Isomorphism
 > import Effects
 > import Effect.Exception
@@ -17,8 +18,8 @@
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.Helpers
 
-> import Identity.Operations
-> import Identity.Properties
+> import List.Operations
+> import List.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
@@ -26,6 +27,7 @@
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
+> import Nat.OperationsProperties
 > import Nat.LTEProperties
 > import Nat.LTProperties
 > import Finite.Predicates
@@ -44,32 +46,31 @@
 > -- %default total
 > %auto_implicits off
 
-
-The possibly simplest "cylinder" problem. |M| is the identity monad, the
-state space is constant and we can move to the left, ahead or to the
-right as we wish.
+> -- %logging 5
 
 
-* The monad M (Identity):
+We reimplement "Example1.lidr", this time with |M = List|.
+
+
+* The monad M (List):
 
 ** M is a monad:
 
-> SequentialDecisionProblems.CoreTheory.M = Identity
-> SequentialDecisionProblems.CoreTheory.fmap = map {f = Identity}
+> SequentialDecisionProblems.CoreTheory.M = List
+> SequentialDecisionProblems.CoreTheory.fmap = List.Operations.fmap
 
-> SequentialDecisionProblems.Utils.ret = pure
-> SequentialDecisionProblems.Utils.bind = (>>=)
+> SequentialDecisionProblems.Utils.ret = List.Operations.ret
+> SequentialDecisionProblems.Utils.bind = List.Operations.bind
 
 ** M is a container monad:
 
-> SequentialDecisionProblems.CoreTheory.Elem = Identity.Operations.Elem
-> SequentialDecisionProblems.CoreTheory.NotEmpty = Identity.Operations.NonEmpty
-> SequentialDecisionProblems.CoreTheory.All = Identity.Operations.All
-> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 = Identity.Properties.elemNonEmptySpec0
-> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec1 = Identity.Properties.elemNonEmptySpec1
-> SequentialDecisionProblems.CoreTheory.tagElem = Identity.Operations.tagElem
-> SequentialDecisionProblems.CoreTheory.allElemSpec0 {A} {P} a1 (Id a2) pa2 a1eqa2 =
->   replace (sym a1eqa2) pa2
+> SequentialDecisionProblems.CoreTheory.Elem = Data.List.Elem
+> SequentialDecisionProblems.CoreTheory.NotEmpty = List.Operations.NonEmpty
+> SequentialDecisionProblems.CoreTheory.All = Data.List.Quantifiers.All
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 = List.Properties.elemNonEmptySpec0
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec1 = List.Properties.elemNonEmptySpec1
+> SequentialDecisionProblems.CoreTheory.tagElem = List.Operations.tagElem
+> SequentialDecisionProblems.CoreTheory.allElemSpec0 = List.Properties.containerMonadSpec3
 
 
 * The decision process:
@@ -91,14 +92,19 @@ right as we wish.
 ** Transition function:
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
->   Id (MkSigma maxColumn (ltIdS maxColumn))
+>   [MkSigma maxColumn (ltIdS maxColumn)]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
->   Id (MkSigma n (ltLemma1 n nColumns prf))
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead =
->   Id (MkSigma n prf)
+>   [MkSigma n (ltLemma1 n nColumns prf)]
+> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = [x]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
->   | (Yes p)     = Id (MkSigma (S n) (LTESucc p))
->   | (No contra) = Id (MkSigma  Z    (LTESucc LTEZero))
+>   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
+>   | (No contra) = [MkSigma  Z    (LTESucc LTEZero)]
+
+> nextsNotEmptyLemma : {t : Nat} -> 
+>                      (x : State t) -> 
+>                      SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+> nextsNotEmptyLemma {t} x = 
+>   SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 {A = State (S t)} x [x] Here
 
 ** Reward function:
 
@@ -117,13 +123,12 @@ right as we wish.
 > SequentialDecisionProblems.CoreTheory.LTE = Prelude.Nat.LTE
 > SequentialDecisionProblems.FullTheory.reflexiveLTE = Nat.LTEProperties.reflexiveLTE
 > SequentialDecisionProblems.FullTheory.transitiveLTE = Nat.LTEProperties.transitiveLTE
-
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = Nat.LTEProperties.monotoneNatPlusLTE
 
 ** M is measurable:
 
-> SequentialDecisionProblems.CoreTheory.meas (Id x) = x
-> SequentialDecisionProblems.FullTheory.measMon f g prf (Id x) = prf x
+> SequentialDecisionProblems.CoreTheory.meas = sum
+> SequentialDecisionProblems.FullTheory.measMon = sumMon
 
 
 * Viability and reachability
@@ -131,14 +136,26 @@ right as we wish.
 > -- Viable : (n : Nat) -> State t -> Type
 > SequentialDecisionProblems.CoreTheory.Viable n x =  Unit
 
+> viableLemma : {t : Nat} -> {n : Nat} ->
+>               (x : State t) -> 
+>               SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+> viableLemma (MkSigma n prf) = [()]
+
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
+>   ne : NotEmpty (nexts t x Ahead)
+>   ne = nextsNotEmptyLemma {t} x
+>   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>   av = viableLemma x
 
 > -- Reachable : State t' -> Type
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 
 > -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
-> SequentialDecisionProblems.CoreTheory.reachableSpec1 x r y = ()
+> SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
+>   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
+>   all Nil = Nil
+>   all (x :: xs) = () :: (all xs)
 
 
 * |cvalargmax| and |cvalmax| 
@@ -155,7 +172,7 @@ that
 The first condition trivially holds 
 
 > totalPreorderLTE : TotalPreorder Val
-> totalPreorderLTE = MkTotalPreorder SequentialDecisionProblems.CoreTheory.LTE 
+> totalPreorderLTE = MkTotalPreorder SequentialDecisionProblems.CoreTheory.LTE
 >                                    Nat.LTEProperties.reflexiveLTE 
 >                                    Nat.LTEProperties.transitiveLTE 
 >                                    Nat.LTEProperties.totalLTE
@@ -166,6 +183,8 @@ Finiteness and non-zero cardinality of |GoodCtrl t x n|
 <                  (x : State t) -> 
 <                  Finite (GoodCtrl t x n) 
 
+and
+
 < cnzGoodCtrl : {t : Nat} -> {n : Nat} -> 
 <               (x : State t) -> (v : Viable {t = t} (S n) x) ->
 <               CardNotZ (finiteGoodCtrl {t} {n} x)
@@ -174,7 +193,7 @@ follow from finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
-> SequentialDecisionProblems.Helpers.finiteAll = Identity.Properties.finiteAll
+> SequentialDecisionProblems.Helpers.finiteAll = List.Properties.finiteAll
 
 , finiteness of |Viable|
 
@@ -182,12 +201,12 @@ follow from finiteness of |All|
 > --                (x : State t) -> Finite (Viable {t} n x)
 > SequentialDecisionProblems.Helpers.finiteViable _ = finiteUnit
 
-, finiteness of |NonEmpty|
+, finiteness of |NotEmpty|
 
-> -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
+> -- finiteNotEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x y))
-> SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = Identity.Properties.finiteNonEmpty (nexts t x y)
+> --                  Finite (SeqDecProbsCoreAssumptions.NotEmpty (nexts t x y))
+> SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = List.Properties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
@@ -213,7 +232,7 @@ With these results in place, we have
 * Decidability of Viable
 
 > dViable : {t : Nat} -> (n : Nat) -> (x : State t) -> Dec (Viable {t} n x)
-> dViable n x = Yes ()
+> dViable {t} n x = Yes ()
 
 
 * The computation:
@@ -246,3 +265,8 @@ With these results in place, we have
 > {-
 
 > ---}
+
+
+-- Local Variables:
+-- idris-packages: ("effects")
+-- End:
