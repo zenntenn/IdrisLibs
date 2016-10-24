@@ -272,7 +272,7 @@ follow from finiteness of |All|
 >     -- s3 : Finite (Viable {t} (S m) x)
 >     -- s3 = replace (sym s2) s1
 
-, finiteness of |NonEmpty|
+, finiteness of |NotEmpty|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
