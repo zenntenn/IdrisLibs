@@ -205,7 +205,7 @@ follow from finiteness of |All|
 
 > -- finiteNotEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
-> --                  Finite (SeqDecProbsCoreAssumptions.NotEmpty (nexts t x y))
+> --                  Finite (SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x y))
 > SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = List.Properties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
