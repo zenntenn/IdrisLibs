@@ -9,6 +9,9 @@ example1:
 example2: 
 	${IDRIS} ${IDRISFLAGS} Example2.lidr -o example2
 
+example3: 
+	${IDRIS} ${IDRISFLAGS} Example3.lidr -o example3
+
 clean:
 	-find . -name '*.ibc' -delete
 	-find . -name '*~' -delete
