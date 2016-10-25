@@ -185,6 +185,16 @@
 >                                  QED
 
 
+* |fmap| preserves shape:
+
+> mapPreservesNonEmpty : {A, B : Type} -> 
+>                        (f : A -> B) -> (as : List A) -> 
+>                        List.Operations.NonEmpty as -> 
+>                        List.Operations.NonEmpty (map f as)
+> mapPreservesNonEmpty f Nil ne = absurd ne
+> mapPreservesNonEmpty f (a :: as) ne = ()                       
+
+
 * Fusion-related properties:
 
 > ||| 
@@ -371,6 +381,10 @@
 >   ={ Refl }=
 >     ( sum (concat (bs :: bss)) )
 >   QED
+
+> |||
+> sumMapSndNilLemma : {A, B : Type} -> (Num B) => sumMapSnd {A} {B} Prelude.List.Nil = fromInteger 0
+> sumMapSndNilLemma = Refl
 
 > |||
 > sumMapSndSingletonLemma : {A, B : Type} -> (NumPlusZeroNeutral B) => 

@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -p effects -V
+IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. +RTS -K32000000 -RTS -p contrib -p effects -V
 
 example1: 
 	${IDRIS} ${IDRISFLAGS} Example1.lidr -o example1
@@ -14,6 +14,9 @@ example3:
 
 example4: 
 	${IDRIS} ${IDRISFLAGS} Example4.lidr -o example4
+
+example5: 
+	${IDRIS} ${IDRISFLAGS} Example5.lidr -o example5
 
 clean:
 	rm example1 example2 example3 example4 example5
