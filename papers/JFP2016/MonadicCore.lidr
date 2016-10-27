@@ -48,13 +48,13 @@
 
 > allElemSpec0       :  {A : Type} -> {P : A -> Type} ->
 >                       (a : A) -> (ma : M A) -> All P ma -> a `Elem` ma -> P a
-> elemNotEmptySpec0  :  {A : Type} -> 
->                       (a : A) -> (ma : M A) -> a `Elem` ma -> NotEmpty ma
-> elemNotEmptySpec1  :  {A : Type} -> 
->                       (ma : M A) -> NotEmpty ma -> Sigma A (\ a => a `Elem` ma)
+> postulate elemNotEmptySpec0  :  {A : Type} -> 
+>                                 (a : A) -> (ma : M A) -> a `Elem` ma -> NotEmpty ma
+> postulate elemNotEmptySpec1  :  {A : Type} -> 
+>                                 (ma : M A) -> NotEmpty ma -> Sigma A (\ a => a `Elem` ma)
 
 > tagElem      :  {A : Type} -> (ma : M A) -> M (Sigma A (\ a => a `Elem` ma))
-> tagElemSpec  :  {A : Type} -> (ma : M A) -> fmap outl (tagElem ma) = ma
+> postulate tagElemSpec  :  {A : Type} -> (ma : M A) -> fmap outl (tagElem ma) = ma
 
 
 * Viability
@@ -67,9 +67,9 @@
 > GoodCtrl        :  (t : Nat) -> (x : State t) -> (n : Nat) -> Type
 > GoodCtrl t x n  =  Sigma (Ctrl t x) (Good t x n)
 
-> viableSpec0  :  (x : State t) -> Viable Z x
+> postulate viableSpec0  :  (x : State t) -> Viable Z x
 > viableSpec1  :  (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> viableSpec2  :  (x : State t) -> GoodCtrl t x n -> Viable (S n) x
+> postulate viableSpec2  :  (x : State t) -> GoodCtrl t x n -> Viable (S n) x
 
 > ctrl : GoodCtrl t x n -> Ctrl t x
 > ctrl (MkSigma y _) = y
@@ -88,9 +88,9 @@
 > ReachablePred       :  State t -> State (S t) -> Type
 > ReachablePred x x'  =  (Reachable x, x `Pred` x')
 
-> reachableSpec0  :  (x : State Z) -> Reachable x
+> postulate reachableSpec0  :  (x : State Z) -> Reachable x
 > reachableSpec1  :  (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
-> reachableSpec2  :  (x' : State (S t)) -> Reachable x' -> Sigma (State t) (\ x => x `ReachablePred` x')
+> postulate reachableSpec2  :  (x' : State (S t)) -> Reachable x' -> Sigma (State t) (\ x => x `ReachablePred` x')
 
 
 * Policies and policy sequences

@@ -133,6 +133,18 @@
 >       v'  =  allElemSpec0 x' mx' av x'emx'
 
 > |||
+> morePossibleStateCtrlSeqs  :  (mx : M (State t)) -> 
+>                               All Reachable mx -> All (Viable n) mx ->
+>                               (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
+> morePossibleStateCtrlSeqs {t} {n}  mx ar av ps  =  bind (tagElem mx) f where
+>   f : Sigma (State t) (\ x => x `Elem` mx) -> M (StateCtrlSeq t n)
+>   f (MkSigma x xemx) = possibleStateCtrlSeqs x r v ps where
+>       r  :  Reachable x
+>       r  =  allElemSpec0 x mx ar xemx
+>       v  :  Viable n x
+>       v  =  allElemSpec0 x mx av xemx
+
+> |||
 > possibleStateCtrlSeqsRewards : {t : Nat} -> {n : Nat} -> 
 >                                (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
 >                                (ps : PolicySeq t n) -> M (StateCtrlSeq t n, Val)
