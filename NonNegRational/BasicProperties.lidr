@@ -433,6 +433,14 @@
 >   QED
 
 
+> postulate sumOneLemma : {m, n, d : Nat} -> m + n = S d -> 
+>                         fromFraction (m, Element (S d) MkPositive) 
+>                         + 
+>                         fromFraction (n, Element (S d) MkPositive) 
+>                         = 
+>                         1
+
+
 > {-
 
 > ---}
