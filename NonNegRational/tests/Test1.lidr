@@ -24,4 +24,4 @@
 > y  = fromFraction (1, Element 10 MkPositive) 
 
 > p : x + y = 1
-> p = sumOneLemma Refl
+> -- p = sumOneLemma Refl
