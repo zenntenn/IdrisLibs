@@ -17,11 +17,22 @@
 >                         = 
 >                         1
 
+> n1 : Nat
+> n1 = 1
+
+> n2 : Nat
+> n2 = 3
+
+> d  : Nat
+> d  = 3
+
 > x  : NonNegRational
-> x  = fromFraction (9, Element 10 MkPositive) 
+> x  = fromFraction (n1, Element (S d) MkPositive) 
 
 > y  : NonNegRational
-> y  = fromFraction (1, Element 10 MkPositive) 
+> y  = fromFraction (n2, Element (S d) MkPositive) 
+
+> postulate h : n1 + n2 = S d
 
 > p : x + y = 1
-> -- p = sumOneLemma Refl
+> p = NonNegRational.tests.Main.sumOneLemma {m = n1} {n = n2} {d = d} h
