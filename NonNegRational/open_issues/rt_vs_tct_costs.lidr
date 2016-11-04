@@ -11,7 +11,7 @@
 > %auto_implicits off
 
 > n : Nat
-> n = 6
+> n = 1
 
 > x : NonNegRational
 > x = fromFraction (1, Element (S n) MkPositive)

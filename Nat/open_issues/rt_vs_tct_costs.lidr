@@ -4,7 +4,7 @@
 > %auto_implicits off
 
 > n : Nat
-> n = 100
+> n = 1
 
 > ns : List Nat
 > ns = [1..n]
