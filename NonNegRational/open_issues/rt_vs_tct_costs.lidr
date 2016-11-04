@@ -1,4 +1,4 @@
-> module NonNegRational.pathologies.Main
+> module NonNegRational.open_issues.Main
 
 > import NonNegRational.NonNegRational
 > import NonNegRational.BasicOperations

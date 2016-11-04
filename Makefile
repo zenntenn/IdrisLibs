@@ -12,6 +12,7 @@ libs:
   -not \( -path "./GenericSimpleProb" -prune \) \
   -not \( -path "./SequentialDecisionProblems" -prune \) \
   -not \( -path "./NonNegRational/tests" -prune \) \
+  -not \( -path "./NonNegRational/pathologies" -prune \) \
   -name '*.lidr' | xargs -n 1 ${IDRIS} ${IDRISFLAGS} --check
 
 clean:
