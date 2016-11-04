@@ -11,8 +11,8 @@ libs:
   -not \( -path "./tmp" -prune \) \
   -not \( -path "./GenericSimpleProb" -prune \) \
   -not \( -path "./SequentialDecisionProblems" -prune \) \
-  -not \( -path "./NonNegRational/tests" -prune \) \
-  -not \( -path "./NonNegRational/pathologies" -prune \) \
+  -not \( -path "./*/tests" -prune \) \
+  -not \( -path "./*/open_issues" -prune \) \
   -name '*.lidr' | xargs -n 1 ${IDRIS} ${IDRISFLAGS} --check
 
 clean:
