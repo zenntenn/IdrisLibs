@@ -1,9 +1,10 @@
-This repository contains the Idris code presented in [1]. It has been
-derived from
+This repository contains the Idris code presented in [1]. The code has
+been derived from
 [SequentialDecisionProblems](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems).
+It has been type checked (make all) with Idris 0.12.2-git:PRE (ff776da).
 
 
-# [1]
+** [1]
 
 Title: Contributions to a computational theory of policy advice and
        avoidability
