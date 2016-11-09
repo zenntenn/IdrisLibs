@@ -104,36 +104,64 @@ boxes, the opaque box will likely be empty. Let |p1| be the probability
 that the prediction is right and |p2| the probability that it is wrong
 with |p1 >> p2|:
 
+> n   :  Nat
+> n   =  9
+
 > p1  :  NonNegRational
-> p1  =  fromFraction (9, Element 10 MkPositive)
+> p1  =  fromFraction (n, Element (S n) MkPositive)
 > p2  :  NonNegRational
-> p2  =  fromFraction (1, Element 10 MkPositive)
+> p2  =  fromFraction (1, Element (S n) MkPositive)
+
+> %freeze n
+> %freeze fromFraction
 
 > lala : p1 + p2 = 1
-> lala = sumOneLemma pin
+> lala = sumOneLemma1 {n = n}
 
-Thus, the agent faces a stochastic decision problem and |M =
-SimpleProb|.
+> lula : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
+>        sumMapSnd [(x1, p1), (x2, p2)] = 1
+
+> lola : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
+>        sumMapSnd [(x1, p2), (x2, p1)] = 1
+
+The agent faces a stochastic decision problem and |M = SimpleProb|
 
 > SequentialDecisionProblems.CoreTheory.M = SimpleProb
-
-> {-
-
-> SequentialDecisionProblems.CoreTheory.nexts Z () TakeOpaqueBox =
->   MkSimpleProb [(OneMillion, p1), (Zero, p2)] Refl
-> SequentialDecisionProblems.CoreTheory.nexts Z () TakeBothBoxes =
->   MkSimpleProb [(OneMillion, p2), (Zero, p1)] Refl
-> SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = ret s
-
-In order to solve the problem We have to show that |SimpleProb| is a
-container monad:
-
 > SequentialDecisionProblems.CoreTheory.fmap =
 >   SimpleProb.MonadicOperations.fmap
 > SequentialDecisionProblems.Utils.ret =
 >   SimpleProb.MonadicOperations.ret
 > SequentialDecisionProblems.Utils.bind =
 >   SimpleProb.MonadicOperations.bind
+
+with transition function
+
+> SequentialDecisionProblems.CoreTheory.nexts Z () TakeOpaqueBox =
+>   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (lula {t = 1} {x1 = OneMillion} {x2 = Zero})
+
+> SequentialDecisionProblems.CoreTheory.nexts Z () TakeBothBoxes =
+>   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (lola {t = 1} {x1 = OneMillion} {x2 = Zero})
+
+> SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = SimpleProb.MonadicOperations.ret s
+
+and reward function
+
+> SequentialDecisionProblems.CoreTheory.Val = NonNegRational.NonNegRational
+
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = 1000
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       = 0
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = 1001
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       = 1
+
+> SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = 0
+
+
+> {-
+
+
+
+In order to solve the problem We have to show that |SimpleProb| is a
+container monad:
 
 > SequentialDecisionProblems.CoreTheory.Elem = 
 >   SimpleProb.MonadicOperations.Elem
