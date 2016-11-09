@@ -11,7 +11,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits on
+> %auto_implicits off
 
 
 * ...
@@ -71,8 +71,10 @@
 * Sequences of state-control pairs
 
 > data StateCtrlSeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  (x : State t) -> StateCtrlSeq t Z
->   (::)  :  Sigma (State t) (Ctrl t) -> StateCtrlSeq (S t) n -> StateCtrlSeq t (S n)
+>   Nil   :  {t : Nat} -> 
+>            (x : State t) -> StateCtrlSeq t Z
+>   (::)  :  {t, n : Nat} -> 
+>            Sigma (State t) (Ctrl t) -> StateCtrlSeq (S t) n -> StateCtrlSeq t (S n)
 
 > using (t : Nat, n : Nat)
 >   implementation Show (StateCtrlSeq t n) where
@@ -109,7 +111,8 @@
 > postulate monadSpec23  :  {A, B, C : Type} -> {f : A -> M B} -> {g : B -> M C} -> {ma : M A} ->
 >                           bind (bind ma f) g = bind ma (\ a => bind (f a) g)
 
-> possibleStateCtrlSeqs  :  (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+> possibleStateCtrlSeqs  :  {t, n : Nat} -> 
+>                           (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
 >                           (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
 >                           
 > possibleStateCtrlSeqs {t} {n = Z}    x r v Nil         =  ret (Nil x)
@@ -133,7 +136,8 @@
 >       v'  =  allElemSpec0 x' mx' av x'emx'
 
 > |||
-> morePossibleStateCtrlSeqs  :  (mx : M (State t)) -> 
+> morePossibleStateCtrlSeqs  :  {t, n : Nat} -> 
+>                               (mx : M (State t)) -> 
 >                               All Reachable mx -> All (Viable n) mx ->
 >                               (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
 > morePossibleStateCtrlSeqs {t} {n}  mx ar av ps  =  bind (tagElem mx) f where

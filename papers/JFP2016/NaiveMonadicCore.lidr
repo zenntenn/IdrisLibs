@@ -5,7 +5,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits on
+> %auto_implicits off
 
 
 * Sequential decision processes
@@ -65,13 +65,16 @@
 > Policy t = (x : State t) -> Ctrl t x
 
 > data PolicySeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  PolicySeq t Z
->   (::)  :  Policy t -> PolicySeq (S t) n -> PolicySeq t (S n)
+>   Nil   :  {t : Nat} -> 
+>            PolicySeq t Z
+>   (::)  :  {t, n : Nat} -> 
+>            Policy t -> PolicySeq (S t) n -> PolicySeq t (S n)
 
 
 * The value of policy sequences
 
-> val : (x : State t) -> PolicySeq t n -> Val
+> val : {t, n : Nat} -> 
+>       (x : State t) -> PolicySeq t n -> Val
 > val {t} {n = Z} x ps = zero
 > val {t} {n = S m} x (p :: ps) = meas (fmap f mx') where
 >   y     :  Ctrl t x
@@ -84,25 +87,30 @@
 
 * Optimality of policy sequences
 
-> OptPolicySeq  :  PolicySeq t n -> Type
+> OptPolicySeq  :  {t, n : Nat} -> 
+>                  PolicySeq t n -> Type
 > OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) -> (x : State t) -> val x ps' `LTE` val x ps
 
 
 * Optimal extensions of policy sequences
 
-> OptExt : PolicySeq (S t) m -> Policy t -> Type
+> OptExt : {t, m : Nat} -> 
+>          PolicySeq (S t) m -> Policy t -> Type
 > OptExt {t} {m} ps p  =  (p' : Policy t) -> (x : State t) -> val x (p' :: ps) `LTE` val x (p :: ps)
 
-> cval : (x  : State t) -> (ps : PolicySeq (S t) n) -> Ctrl t x -> Val
+> cval : {t, n : Nat} -> 
+>        (x  : State t) -> (ps : PolicySeq (S t) n) -> Ctrl t x -> Val
 > cval {t} {n} x ps y = meas (fmap f mx') where
 >   f    :  State (S t) -> Val
 >   f x' =  reward t x y x' `plus` val x' ps 
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
-> cvalargmax : (x  : State t) -> (ps : PolicySeq (S t) n) -> Ctrl t x
+> cvalargmax : {t, n : Nat} -> 
+>              (x  : State t) -> (ps : PolicySeq (S t) n) -> Ctrl t x
 
-> optExt : PolicySeq (S t) n -> Policy t
+> optExt : {t, n : Nat} -> 
+>          PolicySeq (S t) n -> Policy t
 > optExt {t} ps = p where
 >   p : Policy t
 >   p x = cvalargmax x ps

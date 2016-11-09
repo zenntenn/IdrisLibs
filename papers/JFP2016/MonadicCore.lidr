@@ -5,7 +5,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits on
+> %auto_implicits off
 
 
 * Sequential decision processes
@@ -59,7 +59,8 @@
 
 * Viability
 
-> Viable       :  (n : Nat) -> State t -> Type
+> Viable       :  {t : Nat} -> 
+>                 (n : Nat) -> State t -> Type
 
 > Good            :  (t : Nat) -> (x : State t) -> (n : Nat) -> (Ctrl t x) -> Type
 > Good t x n y    =  (NotEmpty (nexts t x y), All (Viable {t = S t} n) (nexts t x y))
@@ -67,30 +68,40 @@
 > GoodCtrl        :  (t : Nat) -> (x : State t) -> (n : Nat) -> Type
 > GoodCtrl t x n  =  Sigma (Ctrl t x) (Good t x n)
 
-> postulate viableSpec0  :  (x : State t) -> Viable Z x
-> viableSpec1  :  (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> postulate viableSpec2  :  (x : State t) -> GoodCtrl t x n -> Viable (S n) x
+> postulate viableSpec0  :  {t : Nat} -> 
+>                           (x : State t) -> Viable Z x
+> viableSpec1  :  {t, n : Nat} -> 
+>                 (x : State t) -> Viable (S n) x -> GoodCtrl t x n
+> postulate viableSpec2  :  {t, n : Nat} -> 
+>                           (x : State t) -> GoodCtrl t x n -> Viable (S n) x
 
-> ctrl : GoodCtrl t x n -> Ctrl t x
+> ctrl : {t, n : Nat} -> {x : State t} -> 
+>        GoodCtrl t x n -> Ctrl t x
 > ctrl (MkSigma y _) = y
 
-> allViable : (y : GoodCtrl t x n) -> All (Viable n) (nexts t x (ctrl y)) 
+> allViable : {t, n : Nat} -> {x : State t} -> 
+>             (y : GoodCtrl t x n) -> All (Viable n) (nexts t x (ctrl y)) 
 > allViable (MkSigma _ p) = snd p
 
 
 * Reachability
 
-> Reachable       :  State t' -> Type
+> Reachable       :  {t' : Nat} -> 
+>                    State t' -> Type
 
-> Pred           :  State t -> State (S t) -> Type
+> Pred           :  {t : Nat} -> 
+>                   State t -> State (S t) -> Type
 > Pred {t} x x'  =  Sigma (Ctrl t x) (\ y => x' `Elem` nexts t x y)
 
-> ReachablePred       :  State t -> State (S t) -> Type
+> ReachablePred       :  {t : Nat} -> 
+>                        State t -> State (S t) -> Type
 > ReachablePred x x'  =  (Reachable x, x `Pred` x')
 
 > postulate reachableSpec0  :  (x : State Z) -> Reachable x
-> reachableSpec1  :  (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
-> postulate reachableSpec2  :  (x' : State (S t)) -> Reachable x' -> Sigma (State t) (\ x => x `ReachablePred` x')
+> reachableSpec1  :  {t : Nat} -> 
+>                    (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
+> postulate reachableSpec2  :  {t : Nat} -> 
+>                              (x' : State (S t)) -> Reachable x' -> Sigma (State t) (\ x => x `ReachablePred` x')
 
 
 * Policies and policy sequences
@@ -100,18 +111,22 @@
 > Policy t (S m)  =  (x : State t) -> Reachable x -> Viable (S m) x -> GoodCtrl t x m
 
 > data PolicySeq : (t : Nat) -> (n : Nat) -> Type where
->   Nil   :  PolicySeq t Z
->   (::)  :  Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
+>   Nil   :  {t : Nat} -> 
+>            PolicySeq t Z
+>   (::)  :  {t, n : Nat} -> 
+>            Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
 
 
 * The value of policy sequences
 
-> PossibleNextState : (x  : State t) -> (y : Ctrl t x) -> Type
+> PossibleNextState : {t : Nat} -> 
+>                     (x  : State t) -> (y : Ctrl t x) -> Type
 > PossibleNextState {t} x y = Sigma (State (S t)) (\ x' => x' `Elem` (nexts t x y))
 
 > mutual
 
->   sval  :  (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
+>   sval  :  {t, m : Nat} -> 
+>            (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
 >            (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
 >            PossibleNextState x (ctrl gy) -> Val
 >   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = reward t x y x' `plus` val x' r' v' ps where
@@ -128,7 +143,8 @@
 >     v'   :  Viable m x'
 >     v'   =  allElemSpec0 x' mx' av' x'emx'
 
->   val  :  (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>   val  :  {t, n : Nat} -> 
+>           (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
 >   val {t} {n = Z} x r v ps           =  zero
 >   val {t} {n = S m} x r v (p :: ps)  =  meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >     gy   :  GoodCtrl t x m
@@ -141,7 +157,8 @@
 
 * Optimality of policy sequences
 
-> OptPolicySeq : PolicySeq t n -> Type
+> OptPolicySeq : {t, n : Nat} -> 
+>                PolicySeq t n -> Type
 > OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) ->
 >                             (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
 >                             val x r v ps' `LTE` val x r v ps
@@ -149,12 +166,14 @@
 
 * Optimal extensions of policy sequences
 
-> OptExt : PolicySeq (S t) m -> Policy t (S m) -> Type
+> OptExt : {t, m : Nat} -> 
+>          PolicySeq (S t) m -> Policy t (S m) -> Type
 > OptExt {t} {m} ps p  =  (p' : Policy t (S m)) ->
 >                         (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
 >                         val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 
-> cval  :  (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+> cval  :  {t, n : Nat} -> 
+>          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
 >          (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
 > cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >   y    :  Ctrl t x
@@ -162,10 +181,12 @@
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
-> cvalargmax  :  (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+> cvalargmax  :  {t, n : Nat} -> 
+>                (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
 >                (ps : PolicySeq (S t) n) -> GoodCtrl t x n
 
-> optExt : PolicySeq (S t) n -> Policy t (S n)
+> optExt : {t, n : Nat} -> 
+>          PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
 >   p : Policy t (S n)
 >   p x r v = cvalargmax x r v ps
