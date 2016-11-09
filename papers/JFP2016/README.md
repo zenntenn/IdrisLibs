@@ -8,7 +8,7 @@ This work has been partially supported by [GRACeFUL
    H2020-FETPROACT-2014). [CoeGSS project](http://coegss.eu/) (676547,
    H2020-EINFRA-2015-1) in the context of Global Systems Science (GSS).
 
-##
+---
 
 [1] Contributions to a computational theory of policy advice and
     avoidability. Nicola Botta, Patrik Jansson, Cezar Ionescu.
