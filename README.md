@@ -9,8 +9,7 @@ collection of Idris Libraries. Some related Agda code is available in
 ## Type checking
 
 With Idris-dev-ff776da, you should be able to type check all the basic
-libraries with "make libs" in the top-level repository.
-
-With more recent Idris version some libraries might fail to type check,
-please see issues #3405 and #3505 in
+libraries by entering "make libs" in the top-level repository. With more
+recent Idris versions, some libraries might fail to type check, please
+see issues #3405 and #3505 in
 [Idris-dev/issues](https://github.com/idris-lang/Idris-dev/issues).
