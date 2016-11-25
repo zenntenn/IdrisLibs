@@ -3,10 +3,10 @@
 This repository is an attempt at restructuring the code developed for
 the computation of Sequential Decision Problems (SDPs) in
 [SeqDecProbs](https://github.com/nicolabotta/SeqDecProbs) into a
-collection of Idris Libraries.
-
-Some related Agda code is available in
+collection of Idris Libraries. Some related Agda code is available in
 [patrikja/SeqDecProb_Agda](https://github.com/patrikja/SeqDecProb_Agda).
+
+## Type checking
 
 With Idris-dev-ff776da, you should be able to type check all the basic
 libraries with "make libs" in the top-level repository.
