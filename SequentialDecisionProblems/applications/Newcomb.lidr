@@ -105,28 +105,34 @@ that the prediction is right and |p2| the probability that it is wrong
 with |p1 >> p2|:
 
 > n   :  Nat
-> n   =  9
+> n   =  99
 
 > p1  :  NonNegRational
 > p1  =  fromFraction (n, Element (S n) MkPositive)
 > p2  :  NonNegRational
 > p2  =  fromFraction (1, Element (S n) MkPositive)
 
-> %freeze n
-> %freeze fromFraction
+We postulate that the sum of the probabilities of |[(x1, p1), (x2, p2)]|
+and |[(x1, p2), (x2, p1)]| is one: 
 
-> lala : p1 + p2 = 1
-> lala = sumOneLemma1 {n = n}
+> postulate sumOne1 : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
+>                     sumMapSnd [(x1, p1), (x2, p2)] = 1
 
-> lula : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
->        sumMapSnd [(x1, p1), (x2, p2)] = 1
+> postulate sumOne2 : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
+>                     sumMapSnd [(x1, p2), (x2, p1)] = 1
 
-> lola : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
->        sumMapSnd [(x1, p2), (x2, p1)] = 1
+This is in principle not necessary. But a naive implementation of
+|sumOne1|
 
-The agent faces a stochastic decision problem and |M = SimpleProb|
+< sumOne1 = Refl
 
-> SequentialDecisionProblems.CoreTheory.M = SimpleProb
+would take too long to type check. In fact, type checking |sumOne1|
+would lead to a stack overflow. In oder to define the transition
+function, we have to specify the kind of SDP at stake. Here, we have to
+do with a stochastic SDP and therefore |M = SimpleProb|:
+
+> SequentialDecisionProblems.CoreTheory.M = 
+>   SimpleProb.SimpleProb
 > SequentialDecisionProblems.CoreTheory.fmap =
 >   SimpleProb.MonadicOperations.fmap
 > SequentialDecisionProblems.Utils.ret =
@@ -134,34 +140,72 @@ The agent faces a stochastic decision problem and |M = SimpleProb|
 > SequentialDecisionProblems.Utils.bind =
 >   SimpleProb.MonadicOperations.bind
 
-with transition function
+As it turns out, we also have to
+
+> %freeze n
+> %freeze fromFraction
+
+to actuallly be able to use the postulates in the implementation of the
+transition function. The alternative is, again, a stack overflow during
+type checking. With these preliminaries in place, we can define the
+transition function for Newcomb's problem. Selecting the opaque box at
+decision step zero yields one million dollars in the opaque box with
+probability |p1| and zero dollars with probability |p2| (with |p1 >>
+p2|):
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeOpaqueBox =
->   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (lula {t = 1} {x1 = OneMillion} {x2 = Zero})
+>   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (sumOne1 {t = 1} {x1 = OneMillion} {x2 = Zero})
+
+Conversely, selecting both boxes yields one million dollars in the
+opaque box with probability |p2| and zero dollars with probability |p1|:
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeBothBoxes =
->   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (lola {t = 1} {x1 = OneMillion} {x2 = Zero})
+>   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (sumOne2 {t = 1} {x1 = OneMillion} {x2 = Zero})
+
+At all subsequent decision steps, nothing interesting happens. There are
+no options to decide upon and the transition function simply returns the
+current state:
 
 > SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = SimpleProb.MonadicOperations.ret s
 
-and reward function
+We can now procede to define the reward function for Newcomb's
+problem. The return type of |reward| is |NonNegRational|
 
 > SequentialDecisionProblems.CoreTheory.Val = NonNegRational.NonNegRational
+
+for which we have a zero element
+
+> SequentialDecisionProblems.CoreTheory.zero = fromInteger 0
+
+an "addition" 
+
+> SequentialDecisionProblems.CoreTheory.plus = NonNegRational.BasicOperations.plus
+
+and a reflexive and transitive comparison relation
+
+> SequentialDecisionProblems.CoreTheory.LTE = NonNegRational.Predicates.LTE
+> SequentialDecisionProblems.FullTheory.reflexiveLTE = NonNegRational.LTEProperties.reflexiveLTE
+> SequentialDecisionProblems.FullTheory.transitiveLTE = NonNegRational.LTEProperties.transitiveLTE
+
+Moreover, addition preserves comparisons that is |a `LTE` b -> a + c
+`LTE` b + c| for arbitary |a, b, c : NonNegRational|:
+
+> SequentialDecisionProblems.FullTheory.monotonePlusLTE = NonNegRational.LTEProperties.monotonePlusLTE
+
+Having fully characterized |Val|, the return type of the reward
+function, we can now define the rewards for the first decision step in
+units of 1k dollars
 
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = 1000
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       = 0
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = 1001
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       = 1
 
+For all subsequent steps, rewards are simply zero:
+
 > SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = 0
 
-
-> {-
-
-
-
-In order to solve the problem We have to show that |SimpleProb| is a
-container monad:
+Next, we have to show that |SimpleProb| is a container monad:
 
 > SequentialDecisionProblems.CoreTheory.Elem = 
 >   SimpleProb.MonadicOperations.Elem
@@ -178,15 +222,22 @@ container monad:
 > SequentialDecisionProblems.CoreTheory.allElemSpec0 = 
 >   SimpleProb.MonadicProperties.containerMonadSpec3
 
-** States:
+and explain how the decision maker accounts for uncertainties on rewards
+induced by uncertainties in the transition function. We first assume
+that the decision maker measures uncertain rewards by their average or,
+in other words, expected value:
+
+> SequentialDecisionProblems.CoreTheory.meas = average
+> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
 
-** Controls:
+
+> {-
 
 
-** Transition function:
 
-
+Notice that |SimpleProb|s are never empty. Thus, at every decision step,
+there exists a control that yields non-empty next possible states
 
 > nextsNonEmptyLemma : {t : Nat} -> 
 >                      (x : State t) -> 
@@ -197,29 +248,17 @@ container monad:
 >   xesp : SequentialDecisionProblems.CoreTheory.Elem x sp
 >   xesp = SimpleProb.MonadicProperties.containerMonadSpec1
 
-** Reward function:
+We will take advantage of this fact for implementing |viableSpec1|
 
-> SequentialDecisionProblems.CoreTheory.Val = NonNegRational.NonNegRational
 
-> SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
->   if c == Z
->   then (fromInteger 1)
->   else if (S c) == nColumns
->        then (fromInteger 2)
->        else (fromInteger 0)
 
-> SequentialDecisionProblems.CoreTheory.plus = NonNegRational.BasicOperations.plus
-> SequentialDecisionProblems.CoreTheory.zero = fromInteger 0
 
-> SequentialDecisionProblems.CoreTheory.LTE = NonNegRational.Predicates.LTE
-> SequentialDecisionProblems.FullTheory.reflexiveLTE = NonNegRational.LTEProperties.reflexiveLTE
-> SequentialDecisionProblems.FullTheory.transitiveLTE = NonNegRational.LTEProperties.transitiveLTE
-> SequentialDecisionProblems.FullTheory.monotonePlusLTE = NonNegRational.LTEProperties.monotonePlusLTE
+
+
+
 
 ** M is measurable:
 
-> SequentialDecisionProblems.CoreTheory.meas = average
-> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
 
 * Viable and Reachable
