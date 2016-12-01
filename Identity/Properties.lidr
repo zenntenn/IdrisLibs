@@ -57,6 +57,13 @@ Container monad uniqueness:
 > %freeze uniqueElem -- frozen
 
 
+Eq
+
+> using (A : Type)
+>   implementation (Eq A) => Eq (Identity A) where
+>     (Id a) == (Id b) = a == b
+
+
 Show
 
 > using (A : Type)

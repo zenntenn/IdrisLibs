@@ -125,8 +125,7 @@ be
 2) Stencil-based.
 
 There are examples of computations that are not order independent and
-yet can be easily parallelized. Prominent examples can be found in
-sorting algorithms.
+yet can be easily parallelized. For instance, in sorting algorithms.
 
 But for model implementations which heavily rely on functions of type
 |List A -> List A| which are not order independent and stencil-based,

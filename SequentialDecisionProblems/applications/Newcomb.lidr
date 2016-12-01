@@ -230,6 +230,9 @@ in other words, expected value:
 > SequentialDecisionProblems.CoreTheory.meas = average
 > SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
+In order to complete the specification of our decision problem, we have
+to explain
+
 
 
 > {-
