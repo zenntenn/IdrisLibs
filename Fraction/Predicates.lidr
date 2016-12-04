@@ -3,6 +3,7 @@
 > import Fraction.Fraction
 > import PNat.PNat
 > import PNat.Operations
+> import Nat.Positive
 
 > %default total
 > %access public export

@@ -12,10 +12,10 @@
 > b = elem Z (Id Z)
 
 > B : Type
-> B = Elem Z (Id Z)
+> B = Elem (S Z) (Id Z)
 
 > b' : Bool
-> b' = decAsBool (decElem Z (Id Z))
+> b' = decAsBool (decElem (S Z) (Id Z))
 
 > main : IO ()
 > main = do putStrLn ("b  = " ++ show b)

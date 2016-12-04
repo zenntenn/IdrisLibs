@@ -231,7 +231,33 @@ in other words, expected value:
 > SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
 In order to complete the specification of our decision problem, we have
-to explain
+to implement the notions of viability and reachability
+
+-- To this end, it is useful to first show that, in any state, we can alway
+-- find a control for which the set of possible next states is not empty:
+
+> -- Viable : (n : Nat) -> State t -> Type
+> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
+
+> viableLemma : {t, n : Nat} -> 
+>               (xs : List (State t)) -> All (Viable n) xs
+
+> -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x 
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t = Z} {n} x _ = 
+>   MkSigma TakeOpaqueBox (ne, av) where
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts Z x TakeOpaqueBox)
+>     ne = ?lala -- nextsNonEmptyLemma {t} x
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S Z} n) (nexts Z x TakeOpaqueBox)
+>     av = s2 where
+>       s1 : List (State (S Z))
+>       s1 = support (nexts Z x TakeOpaqueBox)
+>       s2 : All (Viable {t = S Z} n) s1
+>       s2 = viableLemma {t = S Z} {n = n} s1
+
+> -- Reachable : State t' -> Type
+> SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
+
+
 
 
 
@@ -242,32 +268,12 @@ to explain
 Notice that |SimpleProb|s are never empty. Thus, at every decision step,
 there exists a control that yields non-empty next possible states
 
-> nextsNonEmptyLemma : {t : Nat} -> 
->                      (x : State t) -> 
->                      SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
-> nextsNonEmptyLemma {t} x = SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 {A = State (S t)} x sp xesp where
->   sp : SimpleProb (State (S t))  
->   sp = nexts t x Ahead
->   xesp : SequentialDecisionProblems.CoreTheory.Elem x sp
->   xesp = SimpleProb.MonadicProperties.containerMonadSpec1
+
 
 We will take advantage of this fact for implementing |viableSpec1|
 
 
-
-
-
-
-
-
-** M is measurable:
-
-
-
 * Viable and Reachable
-
-> -- Viable : (n : Nat) -> State t -> Type
-> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
 
 > viableLemma : {t : Nat} -> {n : Nat} ->
 >               (x : State t) -> 
@@ -280,9 +286,6 @@ We will take advantage of this fact for implementing |viableSpec1|
 >   ne = nextsNonEmptyLemma {t} x
 >   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
 >   av = viableLemma x
-
-> -- Reachable : State t' -> Type
-> SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 
 > -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where

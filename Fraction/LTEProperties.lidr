@@ -12,6 +12,7 @@
 > import Nat.LTEProperties
 > import Nat.LTProperties
 > import Nat.OperationsProperties
+> import Nat.Positive
 
 > %default total
 > %access export
