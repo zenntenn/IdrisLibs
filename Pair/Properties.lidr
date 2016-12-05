@@ -1,4 +1,4 @@
-> module Properties
+> module Pair.Properties
 
 > %default total
 > %access public export

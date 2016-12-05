@@ -1,4 +1,4 @@
-> module FunProperties
+> module Fun.Properties
 
 > import Syntax.PreorderReasoning
 

@@ -10,14 +10,102 @@ opts = "+RTS -K32000000 -RTS -p contrib -p effects"
 modules = --
           -- components without IdrisLibs import directives 
           --
-          Basic.Operations
+          Decidable.Predicates
+        , Fin.Operations
+        , Fun.Operations
+        , Fun.Predicates
+        , Pair.Properties
+        , Rel.Preorder
         , Sigma.Sigma
           --
           -- components with IdrisLibs import directives 
           --
         , Basic.Properties
+        , Basic.Operations
+        , BoundedNat.BoundedNat
+        , BoundedNat.Operations
+        , BoundedNat.Properties
+        , Decidable.Properties
+        , Equality.Properties
+        , Exists.Operations
         , Finite.Operations
         , Finite.Predicates
-        , Finite.Properties
+        , Finite.Properties        
+        , Fin.Properties
+        , Fraction.BasicOperations
+        , Fraction.BasicProperties
+        , Fraction.EqProperties
+        , Fraction.Fraction
+        , Fraction.LTEProperties
+        , Fraction.Normal
+        , Fraction.Normalize
+        , Fraction.NormalizeProperties
+        , Fraction.Predicates
+        , Functor.Operations
+        , Fun.Properties
+        , Identity.Operations
+        , Identity.Properties
+        , Isomorphism.Operations
+        , Isomorphism.Properties
+        , List.Operations
+        , List.Properties
+        , LocalEffect.Exception
+        , LocalEffect.StdIO
+        , Matrix.Matrix
+        , Matrix.Operations
+        , NatBasicProperties
+        , Nat.Coprime
+        , Nat.CoprimeProperties
+        , Nat.Divisor
+        , Nat.DivisorOperations
+        , Nat.DivisorProperties
+        , Nat.GCD
+        , Nat.GCDAlgorithm
+        , Nat.GCDEuclid
+        , Nat.GCDOperations
+        , Nat.GCDProperties
+        , Nat.LTEProperties
+        , Nat.LTProperties
+        , Nat.Operations
+        , Nat.OperationsProperties
+        , Nat.Positive
+        , Nat.Predicates
+        , NonNegRational.BasicOperations
+        , NonNegRational.BasicProperties
+        , NonNegRational.LTEProperties
+        , NonNegRational.MeasureProperties
+        , NonNegRational.Measures
+        , NonNegRational.NonNegRational
+        , NonNegRational.Predicates
+        , NoteOnOrderIndependenceAndLocality
+        , Num.Operations
+        , Num.Properties
+        , Num.Refinements
+        , Opt.Operations
+        , Pairs.Operations
+        , PNat.Operations
+        , PNat.PNat
+        , PNat.Properties
+        , Predicates
+        , Properties
+        , Rel.TotalPreorder
+        , Rel.TotalPreorderOperations
         , Sigma.Operations
         , Sigma.Properties
+        , SimpleProb.BasicOperations
+        , SimpleProb.BasicProperties
+        , SimpleProb.Measures
+        , SimpleProb.MonadicOperations
+        , SimpleProb.MonadicProperties
+        , SimpleProb.SimpleProb
+        , Subset.Operations
+        , Subset.Properties
+        , Test
+        , Test1
+        , Unique.Predicates
+        , Unique.Properties
+        , Unit.Properties
+        , Vect.Operations
+        , Vect.Properties
+        , Void.Properties
+        

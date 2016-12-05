@@ -1,4 +1,4 @@
-> module Decidable
+> module Decidable.Predicates
 
 
 > %default total 

@@ -8,7 +8,9 @@ libs:
 	find . \
   -not \( -path "./examples" -prune \) \
   -not \( -path "./papers" -prune \) \
+  -not \( -path "./projects" -prune \) \
   -not \( -path "./tmp" -prune \) \
+  -not \( -path "./AgentBasedModels" -prune \) \
   -not \( -path "./GenericSimpleProb" -prune \) \
   -not \( -path "./SequentialDecisionProblems" -prune \) \
   -not \( -path "./*/tests" -prune \) \
