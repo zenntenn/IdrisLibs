@@ -1,0 +1,23 @@
+package IdrisLibs
+
+sourceloc = git://gitlab.pik-potsdam.de/botta/IdrisLibs.git
+bugtracker = https://gitlab.pik-potsdam.de/botta/IdrisLibs/issues
+
+opts = "+RTS -K32000000 -RTS -p contrib -p effects"
+
+--pkgs = ‹packages›
+
+modules = --
+          -- components without IdrisLibs import directives 
+          --
+          Basic.Operations
+        , Sigma.Sigma
+          --
+          -- components with IdrisLibs import directives 
+          --
+        , Basic.Properties
+        , Finite.Operations
+        , Finite.Predicates
+        , Finite.Properties
+        , Sigma.Operations
+        , Sigma.Properties
