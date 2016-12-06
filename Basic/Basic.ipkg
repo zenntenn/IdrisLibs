@@ -3,7 +3,7 @@ package Basic
 sourceloc = git://gitlab.pik-potsdam.de/botta/IdrisLibs.git
 bugtracker = https://gitlab.pik-potsdam.de/botta/IdrisLibs/issues
 
-opts = "-i ../Basic --sourcepath ../Basic +RTS -K32000000 -RTS"
+opts = "-i .. --sourcepath .. +RTS -K32000000 -RTS"
 
 -- pkgs = 
 
