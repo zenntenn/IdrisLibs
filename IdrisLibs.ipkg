@@ -3,9 +3,9 @@ package IdrisLibs
 sourceloc = git://gitlab.pik-potsdam.de/botta/IdrisLibs.git
 bugtracker = https://gitlab.pik-potsdam.de/botta/IdrisLibs/issues
 
-opts = "+RTS -K32000000 -RTS -p contrib -p effects"
+opts = "+RTS -K32000000 -RTS"
 
---pkgs = ‹packages›
+pkgs = contrib, effects
 
 modules = --
           -- components without IdrisLibs import directives 
@@ -53,7 +53,7 @@ modules = --
         , LocalEffect.StdIO
         , Matrix.Matrix
         , Matrix.Operations
-        , NatBasicProperties
+        , Nat.BasicProperties
         , Nat.Coprime
         , Nat.CoprimeProperties
         , Nat.Divisor
@@ -77,7 +77,6 @@ modules = --
         , NonNegRational.Measures
         , NonNegRational.NonNegRational
         , NonNegRational.Predicates
-        , NoteOnOrderIndependenceAndLocality
         , Num.Operations
         , Num.Properties
         , Num.Refinements
@@ -86,8 +85,6 @@ modules = --
         , PNat.Operations
         , PNat.PNat
         , PNat.Properties
-        , Predicates
-        , Properties
         , Rel.TotalPreorder
         , Rel.TotalPreorderOperations
         , Sigma.Operations
@@ -100,8 +97,6 @@ modules = --
         , SimpleProb.SimpleProb
         , Subset.Operations
         , Subset.Properties
-        , Test
-        , Test1
         , Unique.Predicates
         , Unique.Properties
         , Unit.Properties

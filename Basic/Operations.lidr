@@ -1,4 +1,4 @@
-> module Basics.Operations
+> module Basic.Operations
 
 
 > %default total
