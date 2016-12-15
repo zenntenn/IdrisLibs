@@ -1,6 +1,7 @@
 > module SequentialDecisionProblems.applications.Main
 
 > import Decidable.Order
+> import Control.Isomorphism
 
 > import Data.Fin
 > import Data.Vect
@@ -61,8 +62,10 @@
 
 > -- %logging 5
 
-We specify Newcomb's problem as exemplified in [1] as a stochastic
-sequential decision problem.
+
+* Introduction
+
+We specify Newcomb's problem as exemplified in [1]:
 
   "In Newcomb's problem, an agent may choose to take an opaque box or to
   take both the opaque box and a transparent one. The transparent box
@@ -75,8 +78,16 @@ sequential decision problem.
   opaque box contains a million dollars. The prediction is reliable. The
   agent knows all these features of his decision problem."
 
-We model the problem as a stochastic SDP. At the first decision step,
-the agent can pick up either the opaque box or both boxes. 
+as a stochastic sequential decision problem. Thus, even though we are
+only interested in a single decision step, we have to define states,
+controls and the transition and reward functions for an arbitrary number
+of steps. We start with controls.
+
+
+* Controls
+
+At the first decision step, the agent can pick up either the opaque box
+or both boxes:
 
 > data Choice = TakeOpaqueBox | TakeBothBoxes
 
@@ -85,6 +96,42 @@ the agent can pick up either the opaque box or both boxes.
 In all subsequent decision steps, the agent has no relevant alternatives
  
 > SequentialDecisionProblems.CoreTheory.Ctrl (S n) _ = Unit
+
+For reasons that will become clear in section "Completing the problem
+specification" below, it is useful to show that |Choice| is finite. This
+means that there is a one-to-one correspondence between |Choice| and
+|Fin 2|:
+
+> to : Choice -> Fin 2
+> to TakeOpaqueBox =    FZ
+> to TakeBothBoxes = FS FZ
+
+> from : Fin 2 -> Choice
+> from             FZ   = TakeOpaqueBox
+> from         (FS FZ)  = TakeBothBoxes
+> from     (FS (FS  k)) = absurd k
+
+> toFrom : (k : Fin 2) -> to (from k) = k
+> toFrom             FZ   = Refl
+> toFrom         (FS FZ)  = Refl
+> toFrom     (FS (FS  k)) = absurd k
+
+> fromTo : (a : Choice) -> from (to a) = a
+> fromTo TakeOpaqueBox  = Refl
+> fromTo TakeBothBoxes = Refl
+
+> finiteChoice : Finite Choice
+> finiteChoice = MkSigma 2 (MkIso to from toFrom fromTo)
+> %freeze finiteChoice
+
+It will also be useful to know that |Choice| is non empty:
+
+> cardNotZChoice : CardNotZ finiteChoice
+> cardNotZChoice = cardNotZLemma finiteChoice TakeOpaqueBox
+> %freeze cardNotZChoice
+
+
+* States
 
 The states that the agent can observe are similarly trivial. At the
 first decision step, the agent can see 1000 dollars in the transparent
@@ -105,7 +152,7 @@ that the prediction is right and |p2| the probability that it is wrong
 with |p1 >> p2|:
 
 > n   :  Nat
-> n   =  99
+> n   =  2
 
 > p1  :  NonNegRational
 > p1  =  fromFraction (n, Element (S n) MkPositive)
@@ -127,9 +174,14 @@ This is in principle not necessary. But a naive implementation of
 < sumOne1 = Refl
 
 would take too long to type check. In fact, type checking |sumOne1|
-would lead to a stack overflow. In oder to define the transition
-function, we have to specify the kind of SDP at stake. Here, we have to
-do with a stochastic SDP and therefore |M = SimpleProb|:
+would lead to a stack overflow. 
+
+
+* Transition function
+
+In oder to define the transition function, we have to specify the kind
+of SDP at stake. Here, we have to do with a stochastic SDP and therefore
+|M = SimpleProb|:
 
 > SequentialDecisionProblems.CoreTheory.M = 
 >   SimpleProb.SimpleProb
@@ -168,8 +220,11 @@ current state:
 
 > SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = SimpleProb.MonadicOperations.ret s
 
-We can now procede to define the reward function for Newcomb's
-problem. The return type of |reward| is |NonNegRational|
+
+* Reward function
+
+We can now define the reward function for Newcomb's problem. The return
+type of |reward| is |NonNegRational|
 
 > SequentialDecisionProblems.CoreTheory.Val = NonNegRational.NonNegRational
 
@@ -193,19 +248,34 @@ Moreover, addition preserves comparisons that is |a `LTE` b -> a + c
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = NonNegRational.LTEProperties.monotonePlusLTE
 
 Having fully characterized |Val|, the return type of the reward
-function, we can now define the rewards for the first decision step in
-units of 1k dollars
+function, we can now define the rewards for the first decision step. We
+measure rewards in units of millions of dollars
 
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = 1000
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       = 0
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = 1001
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       = 1
+> oneMillion : NonNegRational
+> oneMillion = fromFraction (1, Element 1 MkPositive)
+
+> oneThousand : NonNegRational
+> -- oneThousand = fromFraction (1, Element 1000 MkPositive)
+> oneThousand = fromFraction (1, Element 10 MkPositive)
+
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = oneMillion + oneThousand
+> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       =       zero + oneThousand
 
 For all subsequent steps, rewards are simply zero:
 
-> SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = 0
+> SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = zero
 
-Next, we have to show that |SimpleProb| is a container monad:
+
+* Completing the problem specification
+
+To be able to apply the verified, generic backwards induction algorithm
+of |CoreTheory| to compute optimal policies for Newcomb's problem, we
+have to show that our problem fulfills a number of core
+properties. First, we have to show that |SimpleProb| is a container
+monad. This is easily done in terms of pre-defined |SimpleProb|
+operations:
 
 > SequentialDecisionProblems.CoreTheory.Elem = 
 >   SimpleProb.MonadicOperations.Elem
@@ -222,70 +292,54 @@ Next, we have to show that |SimpleProb| is a container monad:
 > SequentialDecisionProblems.CoreTheory.allElemSpec0 = 
 >   SimpleProb.MonadicProperties.containerMonadSpec3
 
-and explain how the decision maker accounts for uncertainties on rewards
-induced by uncertainties in the transition function. We first assume
-that the decision maker measures uncertain rewards by their average or,
-in other words, expected value:
+Second, we have to explain how the decision maker accounts for
+uncertainties on rewards induced by uncertainties in the transition
+function. We first assume that the decision maker measures uncertain
+rewards by their average or, in other words, expected value:
 
 > SequentialDecisionProblems.CoreTheory.meas = average
 > SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
-In order to complete the specification of our decision problem, we have
-to implement the notions of viability and reachability
-
--- To this end, it is useful to first show that, in any state, we can alway
--- find a control for which the set of possible next states is not empty:
+Further on, we have to implement the notions of viability and
+reachability. We start by positing that all states are viable for any
+number of steps:
 
 > -- Viable : (n : Nat) -> State t -> Type
 > SequentialDecisionProblems.CoreTheory.Viable n x = Unit
 
-> viableLemma : {t, n : Nat} -> 
->               (xs : List (State t)) -> All (Viable n) xs
+From this definition, it trivially follows that all elements of an
+arbitrary list of states are viable for an arbitrary number of steps:
+
+> viableLemma : {t, n : Nat} -> (xs : List (State t)) -> All (Viable n) xs
+> viableLemma  Nil      = Nil
+> viableLemma (x :: xs) = () :: (viableLemma xs)
+
+This fact and the (less trivial) result that simple probability
+distributions are never empty, see |nonEmptyLemma| in
+|MonadicProperties| in |SimpleProb|, allows us to show that the above
+definition of |Viable| fulfills |viableSpec1|:
 
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x 
-> SequentialDecisionProblems.CoreTheory.viableSpec1 {t = Z} {n} x _ = 
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t = Z} {n} () v = 
 >   MkSigma TakeOpaqueBox (ne, av) where
->     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts Z x TakeOpaqueBox)
->     ne = ?lala -- nextsNonEmptyLemma {t} x
->     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S Z} n) (nexts Z x TakeOpaqueBox)
->     av = s2 where
->       s1 : List (State (S Z))
->       s1 = support (nexts Z x TakeOpaqueBox)
->       s2 : All (Viable {t = S Z} n) s1
->       s2 = viableLemma {t = S Z} {n = n} s1
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts Z () TakeOpaqueBox)
+>     ne = nonEmptyLemma (nexts Z () TakeOpaqueBox)
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S Z} n) (nexts Z () TakeOpaqueBox)
+>     av = viableLemma {t = S Z} (support (nexts Z () TakeOpaqueBox))
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t = S m} {n} x v = 
+>   MkSigma () (ne, av) where
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts (S m) x ())
+>     ne = nonEmptyLemma (nexts (S m) x ())
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S (S m)} n) (nexts (S m) x ())
+>     av = viableLemma {t = S (S m)} (support (nexts (S m) x ()))
+
+For reachability, we proceed in a similar way. We say that all states
+are reachable
 
 > -- Reachable : State t' -> Type
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 
-
-
-
-
-> {-
-
-
-
-Notice that |SimpleProb|s are never empty. Thus, at every decision step,
-there exists a control that yields non-empty next possible states
-
-
-
-We will take advantage of this fact for implementing |viableSpec1|
-
-
-* Viable and Reachable
-
-> viableLemma : {t : Nat} -> {n : Nat} ->
->               (x : State t) -> 
->               SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
-> viableLemma (MkSigma n prf) = [()]
-
-> -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
-> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
->   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
->   ne = nextsNonEmptyLemma {t} x
->   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
->   av = viableLemma x
+which immediately implies |reachableSpec1|:
 
 > -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
@@ -295,12 +349,9 @@ We will take advantage of this fact for implementing |viableSpec1|
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
 
-
-* |cvalargmax| and |cvalmax| 
-
-We want to implement |cvalmax|, |cvalargmax|, |cvalmaxSpec| and |cvalargmaxSpec|. This
-can be easily done in terms of |Opt.max| and |Opt.argmax| if we can show
-that 
+Finally, we have to implement |cvalmax|, |cvalargmax|, |cvalmaxSpec| and
+|cvalargmaxSpec|. This can be easily done in terms of |Opt.max| and
+|Opt.argmax| if we can show that
 
 1) |LTE| is a *total* preorder 
 
@@ -315,7 +366,7 @@ The first condition trivially holds
 >                                    NonNegRational.LTEProperties.transitiveLTE 
 >                                    NonNegRational.LTEProperties.totalLTE
 
-Finiteness and non-zero cardinality of |GoodCtrl t x n|
+The finiteness and the non-zero cardinality of |GoodCtrl t x n|
 
 < finiteGoodCtrl : {t : Nat} -> {n : Nat} -> 
 <                  (x : State t) -> 
@@ -327,29 +378,30 @@ and
 <               (x : State t) -> (v : Viable {t = t} (S n) x) ->
 <               CardNotZ (finiteGoodCtrl {t} {n} x)
 
-follow from finiteness of |All|
+follow from the finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
 > SequentialDecisionProblems.Helpers.finiteAll = SimpleProb.MonadicProperties.finiteAll
 
-, finiteness of |Viable|
+, from the finiteness of |Viable|
 
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
 > SequentialDecisionProblems.Helpers.finiteViable _ = finiteUnit
 
-, finiteness of |NotEmpty|
+, from the finiteness of |NotEmpty|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
 > --                  Finite (SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x y))
 > SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
 
-and, finally, finiteness of controls
+and from the finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SequentialDecisionProblems.Helpers.finiteCtrl _ = finiteLeftAheadRight
+> SequentialDecisionProblems.Helpers.finiteCtrl {t = Z}   {n} _ = finiteChoice
+> SequentialDecisionProblems.Helpers.finiteCtrl {t = S m} {n} _ = finiteUnit
 > %freeze SequentialDecisionProblems.Helpers.finiteCtrl
 
 With these results in place, we have
@@ -366,20 +418,35 @@ With these results in place, we have
 > SequentialDecisionProblems.FullTheory.cvalargmaxSpec x r v ps =
 >   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
 
-
-* Decidability of Viable
+The last obligation that we have is to show that |Viable| is
+decidable. This is easily implementable:
 
 > dViable : {t : Nat} -> (n : Nat) -> (x : State t) -> Dec (Viable {t} n x)
 > dViable {t} n x = Yes ()
 
 
-* The computation:
+* Optimal policies, optimal decisions, ...
+
+With Necomb's problem fully specified as a SDP, we can apply the results
+of our |CoreTheory| and of the |FullTheory| to compute verified optimal
+policies, possible state-control sequences, etc.
+
+The interesting question is whether the decision maker will pick up only
+the opaque box or both boxes at the first decision step. All following
+decisions should be immaterial. Still, we want to assess that we get
+consistent results no matter how many decision steps we do. To this end,
+we need to be able to show the outcome of the decision process. This
+means implemeting functions to print states and controls:
 
 > -- showState : {t : Nat} -> State t -> String
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState {t = Z}  ()          = ""
+> SequentialDecisionProblems.Utils.showState {t = S n} Zero       = "0"
+> SequentialDecisionProblems.Utils.showState {t = S n} OneMillion = "1"
 
 > -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
-> SequentialDecisionProblems.Utils.showCtrl = show
+> SequentialDecisionProblems.Utils.showCtrl {t = Z}   {x = ()} TakeOpaqueBox = "Take opaque box"
+> SequentialDecisionProblems.Utils.showCtrl {t = Z}   {x = ()} TakeBothBoxes = "Take both boxes"
+> SequentialDecisionProblems.Utils.showCtrl {t = S n} {x}      ()            = ""
 
 > %freeze possibleStateCtrlSeqs
 > %freeze possibleRewards'
@@ -395,43 +462,41 @@ With these results in place, we have
 > computation =
 >   do putStr ("enter number of steps:\n")
 >      nSteps <- getNat
->      putStr ("enter initial column:\n")
->      x0 <- getLTB nColumns
->      case (dViable {t = Z} nSteps x0) of
->        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
->                       putStrLn ("computing optimal controls ...")
->                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
->                       putStrLn "possible state-control sequences:"
->                       putStr "  "
->                       putStrLn (show mxys)
->                       mvs <- pure (possibleRewards' mxys)
->                       putStrLn "possible rewards:"
->                       putStr "  "
->                       putStrLn (show mvs)
->                       mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
->                       putStrLn "possible state-control sequences and rewards:"
->                       putStr "  "
->                       putStrLn (show mxyvs)
->                       putStrLn "measure of possible rewards: "
->                       putStr "  "
->                       putStrLn (show (meas mvs))
->                       argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                       putStrLn "best possible state-control sequence: "
->                       putStr "  "
->                       putStrLn (show (fst argmaxmax))
->                       -- putStrLn "best possible reward: "
->                       -- putStr "  "
->                       -- putStrLn (show (snd argmaxmax))
->                       -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                       -- -- putStrLn "worst possible state-control sequence: "
->                       -- -- putStr "  "
->                       -- -- putStrLn (show (fst argminmin))
->                       -- -- putStrLn "worst possible reward: "
->                       -- -- putStr "  "
->                       -- -- putStrLn (show (snd argminmin))
->                       putStrLn ("done!")                       
->        (No _)   => putStrLn ("initial column non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
+>      case (dViable {t = Z} nSteps ()) of
+>        (Yes v) => do putStrLn ("computing optimal policies ...")
+>                      ps   <- pure (backwardsInduction Z nSteps)
+>                      putStrLn ("computing optimal controls ...")
+>                      mxys <- pure (possibleStateCtrlSeqs () () v ps)
+>                      putStrLn "possible state-control sequences:"
+>                      putStr "  "
+>                      putStrLn (show mxys)
+>                      -- mvs <- pure (possibleRewards' mxys)
+>                      -- putStrLn "possible rewards:"
+>                      -- putStr "  "
+>                      -- putStrLn (show mvs)
+>                      -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
+>                      -- putStrLn "possible state-control sequences and rewards:"
+>                      -- putStr "  "
+>                      -- putStrLn (show mxyvs)
+>                      -- putStrLn "measure of possible rewards: "
+>                      -- putStr "  "
+>                      -- putStrLn (show (meas mvs))
+>                      -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                      -- putStrLn "best possible state-control sequence: "
+>                      -- putStr "  "
+>                      -- putStrLn (show (fst argmaxmax))
+>                      -- putStrLn "best possible reward: "
+>                      -- putStr "  "
+>                      -- putStrLn (show (snd argmaxmax))
+>                      -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                      -- -- putStrLn "worst possible state-control sequence: "
+>                      -- -- putStr "  "
+>                      -- -- putStrLn (show (fst argminmin))
+>                      -- -- putStrLn "worst possible reward: "
+>                      -- -- putStr "  "
+>                      -- -- putStrLn (show (snd argminmin))
+>                      putStrLn ("done!")                       
+>        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
 > main : IO ()
 > main = run computation

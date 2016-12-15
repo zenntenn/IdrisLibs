@@ -436,7 +436,10 @@ optimal extension of |ps| and |ps| is optimal, then |p :: ps| is
 optimal.  This is Bellman's principle of optimality [1] which we will
 implement in |FullTheory|.
 
-The strong requirement of optimality implies that |p| is optimal for every state, therefore, the control obtained by applying |p| to a given state |x| must be optimal, i.e., it must maximise the function |cval x r v ps|:
+The strong requirement of optimality implies that |p| is optimal for
+every state, therefore, the control obtained by applying |p| to a given
+state |x| must be optimal, i.e., it must maximise the function |cval x r
+v ps|:
 
 > ||| 
 > cval  :  {t, n : Nat} -> 
@@ -448,17 +451,18 @@ The strong requirement of optimality implies that |p| is optimal for every state
 >   mx'  :  M (State (S t))
 >   mx'  =  nexts t x y
 
-Let |cvalargmax| be a function that delivers the control that leads to the maximal value of |cval x r v ps|:
+Let |cvalargmax| be a function that delivers the control that leads to
+the maximal value of |cval x r v ps|:
 
 > cvalargmax  :  {t, n : Nat} -> 
 >                (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
 >                (ps : PolicySeq (S t) n) -> GoodCtrl t x n
 
-The controls obtained by maximising |cval x r v ps|
-for each of the states |x : State t| will deliver a policy which is an
-optimal extension of |ps|.  Thus, the problem of maximising |val| has
-been reduced to the maximisation of |cval| for the states at time |t|.
-Therefore, the function that computes this optimal extension is:
+The controls obtained by maximising |cval x r v ps| for each of the
+states |x : State t| will deliver a policy which is an optimal extension
+of |ps|.  Thus, the problem of maximising |val| has been reduced to the
+maximisation of |cval| for the states at time |t|.  Therefore, the
+function that computes this optimal extension is:
 
 > ||| 
 > optExt  :  {t, n : Nat} -> 
