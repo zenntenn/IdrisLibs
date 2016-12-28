@@ -16,7 +16,6 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.Helpers
 
 > import List.Operations
 > import List.Properties
@@ -249,14 +248,14 @@ follow from finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
-> SequentialDecisionProblems.Helpers.finiteAll = List.Properties.finiteAll
+> SequentialDecisionProblems.Utils.finiteAll = List.Properties.finiteAll
 
 , finiteness of |Viable|
 
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
-> SequentialDecisionProblems.Helpers.finiteViable {t} {n = Z}    _ = finiteUnit
-> SequentialDecisionProblems.Helpers.finiteViable {t} {n = S m} x with (decLT (outl x) maxColumn)
+> SequentialDecisionProblems.Utils.finiteViable {t} {n = Z}    _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable {t} {n = S m} x with (decLT (outl x) maxColumn)
 >   | (Yes p) = finiteUnit -- s3 where
 >     -- s1 : Finite Unit
 >     -- s1 = finiteUnit
@@ -277,13 +276,13 @@ follow from finiteness of |All|
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
 > --                  Finite (SequentialDecisionProblems.CoreTheory.NonEmpty (nexts t x y))
-> SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = List.Properties.finiteNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = List.Properties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SequentialDecisionProblems.Helpers.finiteCtrl _ = finiteLeftAheadRight
-> %freeze SequentialDecisionProblems.Helpers.finiteCtrl
+> SequentialDecisionProblems.Utils.finiteCtrl _ = finiteLeftAheadRight
+> %freeze SequentialDecisionProblems.Utils.finiteCtrl
 
 With these results in place, we have
 

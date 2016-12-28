@@ -163,12 +163,22 @@
 >             Finite1 P -> (as : List A) -> Finite (All P as)
 > finiteAll = finiteAllLemma
 
+> ||| All is decidable
+> decidableAll : {A : Type} -> {P : A -> Type} -> 
+>                (dec : (a : A) -> Dec (P a)) -> (as : List A) -> Dec (All P as)
+> decidableAll = all
 
 > ||| NotEmpty is finite
 > finiteNonEmpty : {A : Type} -> (as : List A) -> Finite (List.Operations.NonEmpty as)
 > finiteNonEmpty  Nil      = finiteVoid
 > finiteNonEmpty (a :: as) = finiteUnit
 
+> ||| NotEmpty is decidable
+> decidableNonEmpty : {A : Type} -> (as : List A) -> Dec (List.Operations.NonEmpty as)
+> decidableNonEmpty {A} Nil       = No absurd
+> decidableNonEmpty {A} (a :: as) = Yes ()
+
+> ||| tagElem preserves length
 > tagElemPreservesLength : {A : Type} -> (as : List A) -> length (tagElem as) = length as
 > tagElemPreservesLength  Nil      = Refl
 > tagElemPreservesLength (a :: as) = ( length (tagElem (a :: as)) )

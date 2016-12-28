@@ -256,7 +256,7 @@ measure rewards in units of millions of dollars
 
 > oneThousand : NonNegRational
 > -- oneThousand = fromFraction (1, Element 1000 MkPositive)
-> oneThousand = fromFraction (1, Element 10 MkPositive)
+> oneThousand = fromFraction (1, Element 12 MkPositive)
 
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero

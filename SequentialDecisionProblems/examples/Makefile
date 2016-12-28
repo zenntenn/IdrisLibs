@@ -18,6 +18,9 @@ example4:
 example5: 
 	${IDRIS} ${IDRISFLAGS} Example5.lidr -o example5
 
+example6: 
+	${IDRIS} ${IDRISFLAGS} Example6.lidr -o example6
+
 clean:
 	rm example1 example2 example3 example4 example5
 	-find . -name '*.ibc' -delete

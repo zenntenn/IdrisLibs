@@ -16,7 +16,6 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.Helpers
 
 > import SimpleProb.SimpleProb
 > import SimpleProb.BasicOperations
@@ -217,26 +216,26 @@ follow from finiteness of |All|
 
 > -- finiteAll : {A : Type} -> {P : A -> Type} -> 
 > --             Finite1 P -> (ma : M A) -> Finite (All P ma)
-> SequentialDecisionProblems.Helpers.finiteAll = SimpleProb.MonadicProperties.finiteAll
+> SequentialDecisionProblems.Utils.finiteAll = SimpleProb.MonadicProperties.finiteAll
 
 , finiteness of |Viable|
 
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
-> SequentialDecisionProblems.Helpers.finiteViable _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
 
 , finiteness of |NotEmpty|
 
 > -- finiteNonEmpty : {t : Nat} -> {n : Nat} -> 
 > --                  (x : State t) -> (y : Ctrl t x) -> 
 > --                  Finite (SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x y))
-> SequentialDecisionProblems.Helpers.finiteNotEmpty {t} {n} x y = SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
 
 and, finally, finiteness of controls
 
 > -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SequentialDecisionProblems.Helpers.finiteCtrl _ = finiteLeftAheadRight
-> %freeze SequentialDecisionProblems.Helpers.finiteCtrl
+> SequentialDecisionProblems.Utils.finiteCtrl _ = finiteLeftAheadRight
+> %freeze SequentialDecisionProblems.Utils.finiteCtrl
 
 With these results in place, we have
 
