@@ -79,8 +79,14 @@
 > containerMonadSpec3 a  (a :: as) (pa :: pas)  Here        = pa
 > containerMonadSpec3 a' (a :: as) (pa :: pas) (There eprf) = containerMonadSpec3 a' as pas eprf
 
-
 > -- containerMonadSpec4 : {A : Type} -> (ma : M A) -> fmap outl (tagElem ma) = ma
+
+> -- containerMonadSpec5 : {A : Type} -> {P : A -> Type} -> 
+> --                       (as : List A) -> ((a : A) -> a `Elem` as -> P a) -> All P as 
+> -- containerMonadSpec5  Nil      _ = Nil
+> -- containerMonadSpec5 (a :: as) f = (f a Here) :: (containerMonadSpec5 as g) where
+> --   g : 
+
 
 
 * Specific container monad properties
