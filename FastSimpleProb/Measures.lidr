@@ -15,7 +15,7 @@
 
 > |||
 > average : SimpleProb Double -> Double
-> average = sumProds . toList 
+> -- average = sumProds . toList 
 
 
 > ||| |average| is monotone

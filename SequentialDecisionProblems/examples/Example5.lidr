@@ -45,7 +45,7 @@
 
 > -- %logging 5
 
-Like "SeqDecProbsExample4.lidr", but selecting "Left" yields a non-zero
+Like "Example4.lidr", but selecting "Left" yields a non-zero
 probablility to move "Ahead"!
 
 * The decision process:
