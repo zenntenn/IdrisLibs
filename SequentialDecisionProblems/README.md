@@ -35,6 +35,6 @@
 * [ViabilityDefaults](ViabilityDefaults.lidr) Default implementation of
   `Viable`. It can be overridden by more efficient, application-specific
   implementations, see for instance [Example5](examples/Example5.lidr)
-  vs. [Example5.NoViabilityDEfaults](examples/Example5.NoViabilityDEfaults.lidr).
+  vs. [Example5.NoViabilityDefaults](examples/Example5.NoViabilityDefaults.lidr).
 
 
