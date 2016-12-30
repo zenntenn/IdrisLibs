@@ -11,9 +11,6 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.StochasticDefaults
-> import SequentialDecisionProblems.OptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -27,26 +24,70 @@
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
+> import Sigma.Operations
+> import Sigma.Properties
 > import Nat.LTProperties
 > import NonNegRational.NonNegRational
 > import NonNegRational.BasicOperations
 > import NonNegRational.BasicProperties
 > import NonNegRational.Predicates
 > import NonNegRational.LTEProperties
+> import Finite.Predicates
+> import Finite.Operations
+> import Finite.Properties
+> import Void.Properties
+> import Unit.Properties
+> import Opt.Operations
+> import Rel.TotalPreorder
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
-> import Fraction.Fraction
-> import Fraction.Normal
-> import Nat.Positive
-> import List.Operations
 
 > -- %default total
 > %auto_implicits off
 
 > -- %logging 5
 
-Like "SeqDecProbsExample4.lidr", but selecting "Left" yields a non-zero
-probablility to move "Ahead"!
+We reimplement "Example2.lidr", this time with |M = SimpleProb|.
+
+* The monad M (SimpleProb):
+
+** SimpleProb is a monad:
+
+> SequentialDecisionProblems.CoreTheory.M = 
+>   SimpleProb
+
+> SequentialDecisionProblems.CoreTheory.fmap = 
+>   SimpleProb.MonadicOperations.fmap
+
+> SequentialDecisionProblems.Utils.ret = 
+>   SimpleProb.MonadicOperations.ret
+
+> SequentialDecisionProblems.Utils.bind = 
+>   SimpleProb.MonadicOperations.bind
+
+** M is a container monad:
+
+> SequentialDecisionProblems.CoreTheory.Elem = 
+>   SimpleProb.MonadicOperations.Elem
+
+> SequentialDecisionProblems.CoreTheory.NotEmpty = 
+>   SimpleProb.MonadicOperations.NonEmpty
+
+> SequentialDecisionProblems.CoreTheory.All = 
+>   SimpleProb.MonadicOperations.All
+
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 = 
+>   SimpleProb.MonadicProperties.elemNonEmptySpec0
+
+> SequentialDecisionProblems.CoreTheory.elemNotEmptySpec1 = 
+>   SimpleProb.MonadicProperties.elemNonEmptySpec1
+
+> SequentialDecisionProblems.CoreTheory.tagElem = 
+>   SimpleProb.MonadicOperations.tagElem
+
+> SequentialDecisionProblems.CoreTheory.allElemSpec0 = 
+>   SimpleProb.MonadicProperties.containerMonadSpec3
+
 
 * The decision process:
 
@@ -67,17 +108,11 @@ probablility to move "Ahead"!
 
 ** Transition function:
 
-> oo2  : NonNegRational
-> oo2  = fromFraction (1, Element 2 MkPositive)
-
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
 >   SimpleProb.MonadicOperations.ret (MkSigma maxColumn (ltIdS maxColumn))
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
->   MkSimpleProb [(MkSigma (S n) prf, oo2), 
->                 (MkSigma n (ltLemma1 n nColumns prf), oo2)] Refl
-
+>   SimpleProb.MonadicOperations.ret (MkSigma n (ltLemma1 n nColumns prf))
 > SequentialDecisionProblems.CoreTheory.nexts t x Ahead = SimpleProb.MonadicOperations.ret x
-
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = SimpleProb.MonadicOperations.ret (MkSigma (S n) (LTESucc p))
 >   | (No contra) = SimpleProb.MonadicOperations.ret (MkSigma  Z    (LTESucc LTEZero))
@@ -105,9 +140,6 @@ probablility to move "Ahead"!
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   NonNegRational.LTEProperties.monotonePlusLTE
 
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
->   NonNegRational.LTEProperties.totalPreorderLTE 
-
 ** Reward function:
 
 > SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
@@ -126,6 +158,7 @@ probablility to move "Ahead"!
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
 >   finiteLeftAheadRight
+> %freeze SequentialDecisionProblems.Utils.finiteCtrl
 
 ** Reachability
 
@@ -137,21 +170,76 @@ probablility to move "Ahead"!
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
 
+** Viability:
+
+> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
+
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
+>   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+>   ne = nonEmptyLemma (nexts t x Ahead) 
+>   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>   av = [()]
+
+> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
+
+> SequentialDecisionProblems.Utils.decidableViable _ = decidableUnit
+
+** |cvalargmax| and |cvalmax| 
+
+We want to implement |cvalmax|, |cvalargmax|, |cvalmaxSpec| and
+|cvalargmaxSpec|. This can be easily done in terms of |Opt.max| and
+|Opt.argmax| if we can show that
+
+1) |LTE| is a *total* preorder 
+
+2) |GoodCtrl t x n| is finite and, for every |t : Nat|, |x : State t|
+   such that |Viable (S n) x|, its cardinality is not zero.
+
+The first condition trivially holds, see
+|NonNegRational.LTEProperties|. Finiteness and non-zero cardinality of
+|GoodCtrl t x n|
+
+< finiteGoodCtrl : {t : Nat} -> {n : Nat} -> 
+<                  (x : State t) -> 
+<                  Finite (GoodCtrl t x n) 
+
+and
+
+< cnzGoodCtrl : {t : Nat} -> {n : Nat} -> 
+<               (x : State t) -> (v : Viable {t = t} (S n) x) ->
+<               CardNotZ (finiteGoodCtrl {t} {n} x)
+
+follow from finiteness of |Viable| (previous section ), finiteness of
+|All|
+
+> SequentialDecisionProblems.Utils.finiteAll = SimpleProb.MonadicProperties.finiteAll
+
+, finiteness of |NotEmpty|
+
+> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
+
+and finiteness of controls (see above). With these results in place, we have
+
+> SequentialDecisionProblems.FullTheory.cvalmax x r v ps =
+>   Opt.Operations.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+
+> SequentialDecisionProblems.CoreTheory.cvalargmax x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+
+> SequentialDecisionProblems.FullTheory.cvalmaxSpec x r v ps =
+>   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+
+> SequentialDecisionProblems.FullTheory.cvalargmaxSpec x r v ps =
+>   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+
 
 * The computation:
 
+> -- showState : {t : Nat} -> State t -> String
 > SequentialDecisionProblems.Utils.showState = show
-> SequentialDecisionProblems.Utils.showCtrl = show
 
-> %freeze possibleStateCtrlSeqs
-> %freeze possibleRewards'
-> %freeze possibleStateCtrlSeqsRewards'
-> %freeze meas
-> %freeze support
-> %freeze nonEmptyLemma
-> %freeze totalPreorderLTE
-> %freeze argmaxMax
-> %freeze argminMin
+> -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
+> SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
 > computation =
@@ -164,34 +252,7 @@ probablility to move "Ahead"!
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
->                       putStrLn "possible state-control sequences:"
->                       putStr "  "
 >                       putStrLn (show mxys)
->                       mvs <- pure (possibleRewards' mxys)
->                       putStrLn "possible rewards:"
->                       putStr "  "
->                       putStrLn (show mvs)
->                       -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
->                       -- putStrLn "possible state-control sequences and rewards:"
->                       -- putStr "  "
->                       -- putStrLn (show mxyvs)
->                       -- putStrLn "measure of possible rewards: "
->                       -- putStr "  "
->                       -- putStrLn (show (meas mvs))
->                       -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                       -- putStrLn "best possible state-control sequence: "
->                       -- putStr "  "
->                       -- putStrLn (show (fst argmaxmax))
->                       -- putStrLn "best possible reward: "
->                       -- putStr "  "
->                       -- putStrLn (show (snd argmaxmax))
->                       -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                       -- -- putStrLn "worst possible state-control sequence: "
->                       -- -- putStr "  "
->                       -- -- putStrLn (show (fst argminmin))
->                       -- -- putStrLn "worst possible reward: "
->                       -- -- putStr "  "
->                       -- -- putStrLn (show (snd argminmin))
 >                       putStrLn ("done!")                       
 >        (No _)   => putStrLn ("initial column non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
@@ -202,7 +263,6 @@ probablility to move "Ahead"!
 > {-
 
 > ---}
-
 
 -- Local Variables:
 -- idris-packages: ("effects")

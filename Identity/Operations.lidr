@@ -17,7 +17,25 @@
 > unwrap {a} (Id x) = x
 
 
-Identity is a container monad:
+* |Identity| is a functor:
+
+> ||| fmap
+> fmap : {A, B : Type} -> (A -> B) -> Identity A -> Identity B
+> fmap = map {f = Identity}
+
+
+* |Identity| is a monad:
+
+> ||| ret
+> ret : {A : Type} -> A -> Identity A
+> ret = pure
+
+> ||| bind
+> bind : {A, B : Type} -> Identity A -> (A -> Identity B) -> Identity B
+> bind = (>>=)
+
+
+* |Identity| is a container monad:
 
 > ||| Membership
 > Elem : {A : Type} -> A -> Identity A -> Type

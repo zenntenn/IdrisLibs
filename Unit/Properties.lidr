@@ -45,7 +45,11 @@
 > finiteUnit = MkSigma (S Z) iso where
 >   iso : Iso Unit (Fin (S Z))
 >   iso = MkIso toFin fromFin toFinFromFinLemma fromFinToFinLemma
-> %freeze finiteUnit
+
+
+> ||| Unit is decidable
+> decidableUnit : Dec Unit
+> decidableUnit = Yes MkUnit
 
 
 > {-

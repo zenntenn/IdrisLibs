@@ -2,8 +2,7 @@
 
 > import Decidable.Order
 
-> import Data.List
-> import Data.List.Quantifiers
+> import Control.Monad.Identity
 > import Effects
 > import Effect.Exception
 > import Effect.StdIO
@@ -11,34 +10,30 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.NonDeterministicDefaults
+> import SequentialDecisionProblems.DeterministicDefaults
 > import SequentialDecisionProblems.OptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
-> import List.Operations
-> import List.Properties
+> import Identity.Operations
+> import Identity.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
 > import Nat.LTEProperties
 > import Nat.LTProperties
-> import Nat.OperationsProperties
+> import Unit.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 
 > -- %default total
 > %auto_implicits off
 
-> -- %logging 5
 
-Like "Example2.lidr", but now |step t x y| is empty in states
-corresponding to |maxColumn|, no matter which |y| is selected! Thus,
-such states are not viable for more than zero steps. Attemps at making
-more than zero decision steps starting from |maxColumn| should be
-detected and rejected.
+The possibly simplest "cylinder" problem. |M| is the identity monad, the
+state space is constant and we can move to the left, ahead or to the
+right as we wish.
 
 * The decision process:
 
@@ -59,16 +54,14 @@ detected and rejected.
 ** Transition function:
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
->   [MkSigma maxColumn (ltIdS maxColumn)]
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left with (decLT (S n) maxColumn)
->   | (Yes p)     = [MkSigma n (ltLemma1 n nColumns prf)]
->   | (No contra) = []
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead with (decLT n maxColumn)
->   | (Yes p)     = [MkSigma n prf]
->   | (No contra) = []
+>   Id (MkSigma maxColumn (ltIdS maxColumn))
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
+>   Id (MkSigma n (ltLemma1 n nColumns prf))
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead =
+>   Id (MkSigma n prf)
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
->   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
->   | (No contra) = []
+>   | (Yes p)     = Id (MkSigma (S n) (LTESucc p))
+>   | (No contra) = Id (MkSigma  Z    (LTESucc LTEZero))
 
 ** |Val| and |LTE|:
 
@@ -83,16 +76,16 @@ detected and rejected.
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
 >   Prelude.Nat.LTE
-
+   
 > SequentialDecisionProblems.FullTheory.reflexiveLTE = 
 >   Nat.LTEProperties.reflexiveLTE
-
+   
 > SequentialDecisionProblems.FullTheory.transitiveLTE = 
 >   Nat.LTEProperties.transitiveLTE
-
+   
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   Nat.LTEProperties.monotoneNatPlusLTE
-
+   
 > SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
 >   Nat.LTEProperties.totalPreorderLTE 
 
@@ -107,21 +100,25 @@ detected and rejected.
 
 ** Measure:
 
-> SequentialDecisionProblems.CoreTheory.meas = sum
-> SequentialDecisionProblems.FullTheory.measMon = sumMon
+> SequentialDecisionProblems.CoreTheory.meas (Id x) = x
+> SequentialDecisionProblems.FullTheory.measMon f g prf (Id x) = prf x
 
 ** |Ctrl| is finite:
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
 >   finiteLeftAheadRight
 
-** Reachability
+** Reachability:
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
-> SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
->   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
->   all Nil = Nil
->   all (x :: xs) = () :: (all xs)
+> SequentialDecisionProblems.CoreTheory.reachableSpec1 x r y = ()
+
+** Viability
+
+> SequentialDecisionProblems.CoreTheory.Viable n x =  Unit
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
+> SequentialDecisionProblems.Utils.finiteViable x = finiteUnit
+> SequentialDecisionProblems.Utils.decidableViable x = Yes ()
 
 
 * The computation:
@@ -151,7 +148,3 @@ detected and rejected.
 > {-
 
 > ---}
-
--- Local Variables:
--- idris-packages: ("effects")
--- End:

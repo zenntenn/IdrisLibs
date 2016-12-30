@@ -22,6 +22,83 @@
 > %access public export
 
 
+> |||
+> argmaxMax : {A, B : Type} -> {R : B -> B -> Type} -> 
+>             TotalPreorder R -> 
+>             (fA : Finite A) -> 
+>             (ne : CardNotZ fA) -> 
+>             (f : A -> B) -> (A, B)
+> argmaxMax {A} {B} tp fA nefA f = max (extendLeftLemma tp) abs ltZn where
+>   n    : Nat
+>   n    = card fA
+>   ltZn : LT Z n
+>   ltZn = notZisgtZ nefA
+>   abs  : Vect n (A,B)
+>   abs  = map (pair (id, f)) (toVect fA)
+
+
+> |||
+> max : {A, B : Type} -> {R : B -> B -> Type} -> 
+>       TotalPreorder R -> 
+>       (fA : Finite A) -> 
+>       (ne : CardNotZ fA) -> 
+>       (f : A -> B) -> B
+> max tp fA nefA f = snd (argmaxMax tp fA nefA f)
+
+
+> |||
+> argmax : {A, B : Type} -> {R : B -> B -> Type} -> 
+>          TotalPreorder R -> 
+>          (fA : Finite A) -> 
+>          (ne : CardNotZ fA) -> 
+>          (f : A -> B) -> A
+> argmax tp fA nefA f = fst (argmaxMax tp fA nefA f)
+
+
+> |||
+> maxSpec : {A, B : Type} -> {R : B -> B -> Type} -> 
+>           (tp : TotalPreorder R) -> 
+>           (fA : Finite A) -> 
+>           (nefA : CardNotZ fA) -> 
+>           (f : A -> B) ->
+>           (a : A) -> R (f a) (max tp fA nefA f)
+> maxSpec {A} {B} {R} tp fA nefA f a = s4 where
+>   n    : Nat
+>   n    = card fA
+>   ltZn : LT Z n
+>   ltZn = notZisgtZ nefA
+>   abs  : Vect n (A,B)
+>   abs  = map (pair (id, f)) (toVect fA)
+>   s1   : Elem (a, f a) abs
+>   s1   = mapLemma (toVect fA) (pair (id, f)) a (toVectComplete fA a)
+>   s2   : (extendLeft R) (a, f a) (max (extendLeftLemma tp) abs ltZn) 
+>   s2   = maxLemma (extendLeftLemma tp) (a, f a) abs ltZn s1
+>   s3   : R (f a) (snd (max (extendLeftLemma tp) abs ltZn))
+>   s3   = s2
+>   s4   : R (f a) (max tp fA nefA f)
+>   s4   = s3
+
+
+> |||
+> argmaxSpec : {A, B : Type} -> {R : B -> B -> Type} -> 
+>              (tp : TotalPreorder R) -> 
+>              (fA : Finite A) -> 
+>              (nefA : CardNotZ fA) -> 
+>              (f : A -> B) ->
+>              (max tp fA nefA f) = f (argmax tp fA nefA f)
+> argmaxSpec {A} {B} tp fA nefA f = s3 where
+>   ab : (A,B)
+>   ab = argmaxMax tp fA nefA f
+>   s1 : Elem ab (map (pair (Prelude.Basics.id, f)) (toVect fA))
+>   s1 = maxElemLemma (extendLeftLemma tp) (map (pair (id, f)) (toVect fA)) (notZisgtZ nefA)
+>   s2 : f (fst ab) = snd ab
+>   s2 = mapIdfLemma (toVect fA) f ab s1
+>   s3 : max tp fA nefA f = f (argmax tp fA nefA f)
+>   s3 = sym s2
+
+
+> {-
+
 > argmaxMax : {A, B : Type} -> 
 >             TotalPreorder B -> 
 >             (fA : Finite A) -> 
@@ -160,3 +237,5 @@
 >   s3 = sym s2
 
 > -}
+
+> ---}

@@ -83,10 +83,6 @@
 
 > -- containerMonadSpec5 : {A : Type} -> {P : A -> Type} -> 
 > --                       (as : List A) -> ((a : A) -> a `Elem` as -> P a) -> All P as 
-> -- containerMonadSpec5  Nil      _ = Nil
-> -- containerMonadSpec5 (a :: as) f = (f a Here) :: (containerMonadSpec5 as g) where
-> --   g : 
-
 
 
 * Specific container monad properties
@@ -179,7 +175,7 @@
 > finiteNonEmpty  Nil      = finiteVoid
 > finiteNonEmpty (a :: as) = finiteUnit
 
-> ||| NotEmpty is decidable
+> ||| NonEmpty is decidable
 > decidableNonEmpty : {A : Type} -> (as : List A) -> Dec (List.Operations.NonEmpty as)
 > decidableNonEmpty {A} Nil       = No absurd
 > decidableNonEmpty {A} (a :: as) = Yes ()

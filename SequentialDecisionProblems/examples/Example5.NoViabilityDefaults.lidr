@@ -13,7 +13,6 @@
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.StochasticDefaults
 > import SequentialDecisionProblems.OptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -39,6 +38,8 @@
 > import Fraction.Normal
 > import Nat.Positive
 > import List.Operations
+> import Void.Properties
+> import Unit.Properties
 
 > -- %default total
 > %auto_implicits off
@@ -136,6 +137,20 @@ probablility to move "Ahead"!
 >     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
+
+** Viability:
+
+> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
+
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
+>   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+>   ne = nonEmptyLemma (nexts t x Ahead) 
+>   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>   av = [()]
+
+> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
+
+> SequentialDecisionProblems.Utils.decidableViable _ = decidableUnit
 
 
 * The computation:

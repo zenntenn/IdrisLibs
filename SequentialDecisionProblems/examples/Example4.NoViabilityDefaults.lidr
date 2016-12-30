@@ -1,7 +1,5 @@
 > module SequentialDecisionProblems.examples.Main
 
-> import Decidable.Order
-
 > import Data.List
 > import Data.List.Quantifiers
 > import Effects
@@ -11,21 +9,29 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.NonDeterministicDefaults
+> import SequentialDecisionProblems.StochasticDefaults
 > import SequentialDecisionProblems.OptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
-> import List.Operations
-> import List.Properties
+> import SimpleProb.SimpleProb
+> import SimpleProb.BasicOperations
+> import SimpleProb.BasicProperties
+> import SimpleProb.MonadicOperations
+> import SimpleProb.MonadicProperties
+> import SimpleProb.Measures
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
-> import Nat.LTEProperties
 > import Nat.LTProperties
-> import Nat.OperationsProperties
+> import NonNegRational.NonNegRational
+> import NonNegRational.BasicOperations
+> import NonNegRational.BasicProperties
+> import NonNegRational.Predicates
+> import NonNegRational.LTEProperties
+> import Void.Properties
+> import Unit.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 
@@ -34,16 +40,13 @@
 
 > -- %logging 5
 
-Like "Example2.lidr", but now |step t x y| is empty in states
-corresponding to |maxColumn|, no matter which |y| is selected! Thus,
-such states are not viable for more than zero steps. Attemps at making
-more than zero decision steps starting from |maxColumn| should be
-detected and rejected.
+We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 
 * The decision process:
 
 > maxColumn : Nat
 > maxColumn = 10
+> %freeze maxColumn
 
 > nColumns : Nat
 > nColumns = S maxColumn
@@ -59,56 +62,53 @@ detected and rejected.
 ** Transition function:
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
->   [MkSigma maxColumn (ltIdS maxColumn)]
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left with (decLT (S n) maxColumn)
->   | (Yes p)     = [MkSigma n (ltLemma1 n nColumns prf)]
->   | (No contra) = []
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead with (decLT n maxColumn)
->   | (Yes p)     = [MkSigma n prf]
->   | (No contra) = []
+>   SimpleProb.MonadicOperations.ret (MkSigma maxColumn (ltIdS maxColumn))
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
+>   SimpleProb.MonadicOperations.ret (MkSigma n (ltLemma1 n nColumns prf))
+> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = SimpleProb.MonadicOperations.ret x
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
->   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
->   | (No contra) = []
+>   | (Yes p)     = SimpleProb.MonadicOperations.ret (MkSigma (S n) (LTESucc p))
+>   | (No contra) = SimpleProb.MonadicOperations.ret (MkSigma  Z    (LTESucc LTEZero))
 
 ** |Val| and |LTE|:
 
 > SequentialDecisionProblems.CoreTheory.Val = 
->   Nat
+>   NonNegRational.NonNegRational
 
 > SequentialDecisionProblems.CoreTheory.plus = 
->   Prelude.Nat.plus
+>   NonNegRational.BasicOperations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
->   Z
+>   fromInteger 0
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
->   Prelude.Nat.LTE
+>   NonNegRational.Predicates.LTE
 
 > SequentialDecisionProblems.FullTheory.reflexiveLTE = 
->   Nat.LTEProperties.reflexiveLTE
+>   NonNegRational.LTEProperties.reflexiveLTE
 
 > SequentialDecisionProblems.FullTheory.transitiveLTE = 
->   Nat.LTEProperties.transitiveLTE
+>   NonNegRational.LTEProperties.transitiveLTE
 
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
->   Nat.LTEProperties.monotoneNatPlusLTE
+>   NonNegRational.LTEProperties.monotonePlusLTE
 
 > SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
->   Nat.LTEProperties.totalPreorderLTE 
+>   NonNegRational.LTEProperties.totalPreorderLTE 
 
 ** Reward function:
 
 > SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
 >   if c == Z
->   then (S Z)
+>   then (fromInteger 1)
 >   else if (S c) == nColumns
->        then (S (S Z))
->        else Z
+>        then (fromInteger 2)
+>        else (fromInteger 0)
 
 ** Measure:
 
-> SequentialDecisionProblems.CoreTheory.meas = sum
-> SequentialDecisionProblems.FullTheory.measMon = sumMon
+> SequentialDecisionProblems.CoreTheory.meas = average
+> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
 ** |Ctrl| is finite:
 
@@ -119,9 +119,25 @@ detected and rejected.
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
->   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
->   all Nil = Nil
->   all (x :: xs) = () :: (all xs)
+>   all : (sp : SimpleProb  (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) sp
+>   all sp = all' (support sp) where
+>     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
+>     all' Nil = Nil
+>     all' (x :: xs) = () :: (all' xs)
+
+** Viability:
+
+> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
+
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
+>   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+>   ne = nonEmptyLemma (nexts t x Ahead) 
+>   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>   av = [()]
+
+> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
+
+> SequentialDecisionProblems.Utils.decidableViable _ = decidableUnit
 
 
 * The computation:

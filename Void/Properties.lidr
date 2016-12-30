@@ -42,7 +42,11 @@
 > finiteVoid = MkSigma Z iso where
 >   iso : Iso Void (Fin Z)
 >   iso = MkIso toFin fromFin toFinFromFinLemma fromFinToFinLemma
-> %freeze finiteVoid
+
+
+> ||| Void is decidable
+> decidableVoid : Dec Void
+> decidableVoid = No void
 
 
 > {-

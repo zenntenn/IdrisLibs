@@ -133,10 +133,18 @@
 >             Finite1 P -> (sp : SimpleProb A) -> Finite (All P sp)
 > finiteAll f1P sp = List.Properties.finiteAll f1P (support sp)
 
+> ||| All is decidable
+> decidableAll : {A : Type} -> {P : A -> Type} -> 
+>                (dec : (a : A) -> Dec (P a)) -> (sp : SimpleProb A) -> Dec (All P sp)
+> decidableAll dec sp = List.Properties.decidableAll dec (support sp)
+
 > ||| NotEmpty is finite
 > finiteNonEmpty : {A : Type} -> (sp : SimpleProb A) -> Finite (SimpleProb.MonadicOperations.NonEmpty sp)
 > finiteNonEmpty sp = List.Properties.finiteNonEmpty (support sp)
 
+> ||| NotEmpty is decidable
+> decidableNonEmpty : {A : Type} -> (sp : SimpleProb A) -> Dec (SimpleProb.MonadicOperations.NonEmpty sp)
+> decidableNonEmpty sp = List.Properties.decidableNonEmpty (support sp)
 
 * |SimpleProb|s are never empty
 

@@ -1,5 +1,7 @@
 > module Nat.LTEProperties
 
+> import Rel.TotalPreorder
+
 > %default total
 > %auto_implicits on
 > %access export
@@ -54,6 +56,10 @@ LTE is decidable:
 >   | (Left  p) = Left  (LTESucc p)
 >   | (Right p) = Right (LTESucc p)
 > %freeze totalLTE
+
+> ||| LTE is a total preorder
+> totalPreorderLTE : TotalPreorder LTE
+> totalPreorderLTE = MkTotalPreorder LTE reflexiveLTE transitiveLTE totalLTE
 
 
 Properties of |LTE| and successor:

@@ -23,7 +23,8 @@
 > import Nat.LTEProperties
 > import Nat.OperationsProperties
 > -- import ListProperties 
- 
+> import Rel.TotalPreorder 
+
 > %default total
 > %access public export
 
@@ -46,6 +47,11 @@
 > totalLTE : (x, y : NonNegRational) -> Either (x `LTE` y) (y `LTE` x) 
 > totalLTE x y = totalLTE (toFraction x) (toFraction y)
 > %freeze totalLTE
+
+
+> ||| LTE is a total preorder
+> totalPreorderLTE : TotalPreorder NonNegRational.Predicates.LTE
+> totalPreorderLTE = MkTotalPreorder LTE reflexiveLTE transitiveLTE totalLTE
 
 
 Properties of |LTE| and |plus|:

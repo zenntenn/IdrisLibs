@@ -13,7 +13,6 @@
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.NonDeterministicDefaults
 > import SequentialDecisionProblems.OptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -23,9 +22,10 @@
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
+> import Nat.OperationsProperties
 > import Nat.LTEProperties
 > import Nat.LTProperties
-> import Nat.OperationsProperties
+> import Unit.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 
@@ -34,11 +34,8 @@
 
 > -- %logging 5
 
-Like "Example2.lidr", but now |step t x y| is empty in states
-corresponding to |maxColumn|, no matter which |y| is selected! Thus,
-such states are not viable for more than zero steps. Attemps at making
-more than zero decision steps starting from |maxColumn| should be
-detected and rejected.
+
+We reimplement "Example1.lidr", this time with |M = List|.
 
 * The decision process:
 
@@ -60,15 +57,12 @@ detected and rejected.
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
 >   [MkSigma maxColumn (ltIdS maxColumn)]
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left with (decLT (S n) maxColumn)
->   | (Yes p)     = [MkSigma n (ltLemma1 n nColumns prf)]
->   | (No contra) = []
-> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Ahead with (decLT n maxColumn)
->   | (Yes p)     = [MkSigma n prf]
->   | (No contra) = []
+> SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
+>   [MkSigma n (ltLemma1 n nColumns prf)]
+> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = [x]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
->   | (No contra) = []
+>   | (No contra) = [MkSigma  Z    (LTESucc LTEZero)]
 
 ** |Val| and |LTE|:
 
@@ -115,13 +109,36 @@ detected and rejected.
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
 >   finiteLeftAheadRight
 
-** Reachability
+** Reachability:
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
 >   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
 >   all Nil = Nil
 >   all (x :: xs) = () :: (all xs)
+
+** Viability:
+
+> SequentialDecisionProblems.CoreTheory.Viable n x =  Unit
+
+> nextsNotEmptyLemma : {t : Nat} -> 
+>                      (x : State t) -> 
+>                      SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+> nextsNotEmptyLemma {t} x = 
+>   SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 {A = State (S t)} x [x] Here
+
+> viableLemma : {t : Nat} -> {n : Nat} ->
+>               (x : State t) -> 
+>               SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+> viableLemma (MkSigma n prf) = [()]
+
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
+>   ne : NotEmpty (nexts t x Ahead)
+>   ne = nextsNotEmptyLemma {t} x
+>   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>   av = viableLemma x
+> SequentialDecisionProblems.Utils.finiteViable x = finiteUnit
+> SequentialDecisionProblems.Utils.decidableViable x = decidableUnit
 
 
 * The computation:
@@ -151,6 +168,7 @@ detected and rejected.
 > {-
 
 > ---}
+
 
 -- Local Variables:
 -- idris-packages: ("effects")

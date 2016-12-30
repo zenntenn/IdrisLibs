@@ -88,6 +88,31 @@ Filtering
 Searching
 
 > |||
+> argmaxMax : {A : Type} -> {R : A -> A -> Type} -> 
+>             TotalPreorder R -> Vect n A -> .(LT Z n) -> (Fin n, A)
+> argmaxMax {n = Z}       tp  Nil                p = absurd p
+> argmaxMax {n = S Z}     tp (a :: Nil)          _ = (FZ, a)
+> argmaxMax {n = S (S m)} tp (a' :: (a'' :: as)) _ with (argmaxMax tp (a'' :: as) (ltZS m))
+>   | (k, max) with (totalPre tp a' max)
+>     | (Left  _) = (FS k, max)
+>     | (Right _) = (FZ, a')
+
+
+> |||
+> argmax : {A : Type} -> {R : A -> A -> Type} -> 
+>          TotalPreorder R -> Vect n A -> .(LT Z n) -> Fin n
+> argmax tp as p = fst (argmaxMax tp as p)
+
+
+> |||
+> max : {A : Type} -> {R : A -> A -> Type} -> 
+>       TotalPreorder R -> Vect n A -> .(LT Z n) -> A
+> max tp as p = snd (argmaxMax tp as p)
+
+
+> {-
+
+> |||
 > argmaxMax : {A : Type} ->
 >             TotalPreorder A -> Vect n A -> .(LT Z n) -> (Fin n, A)
 > argmaxMax {n = Z}       tp  Nil                p = absurd p
@@ -108,6 +133,8 @@ Searching
 > max : {A : Type} ->
 >       TotalPreorder A -> Vect n A -> .(LT Z n) -> A
 > max tp as p = snd (argmaxMax tp as p)
+
+> -}
 
 
 Show

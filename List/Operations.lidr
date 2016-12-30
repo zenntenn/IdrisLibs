@@ -63,6 +63,30 @@
 * Reduction operators
 
 > |||
+> argmaxMax : {A, B : Type} -> {R : B -> B -> Type} -> 
+>             TotalPreorder R -> (abs : List (A, B)) -> List.Operations.NonEmpty abs -> (A, B)
+> argmaxMax tp       Nil                   p = absurd p
+> argmaxMax tp ((a, b) :: Nil)             _ = (a, b)
+> argmaxMax tp ((a, b) :: (a', b') :: abs) _ with (argmaxMax tp ((a', b') :: abs) ())
+>   | (argmax, max) with (totalPre tp b max)
+>     | (Left _)  = (argmax, max)
+>     | (Right _) = (a, b)
+
+
+> |||
+> argminMin : {A, B : Type} -> {R : B -> B -> Type} -> 
+>             TotalPreorder R -> (abs : List (A, B)) -> List.Operations.NonEmpty abs -> (A, B)
+> argminMin tp       Nil                   p = absurd p
+> argminMin tp ((a, b) :: Nil)             _ = (a, b)
+> argminMin tp ((a, b) :: (a', b') :: abs) _ with (argminMin tp ((a', b') :: abs) ())
+>   | (argmin, min) with (totalPre tp b min)
+>     | (Left _)  = (a, b)
+>     | (Right _) = (argmin, min)
+
+
+> {-
+
+> |||
 > argmaxMax : {A, B : Type} -> TotalPreorder B -> (abs : List (A, B)) -> List.Operations.NonEmpty abs -> (A, B)
 > argmaxMax tp       Nil                   p = absurd p
 > argmaxMax tp ((a, b) :: Nil)             _ = (a, b)
@@ -79,6 +103,8 @@
 >   | (argmin, min) with (totalPre tp b min)
 >     | (Left _)  = (a, b)
 >     | (Right _) = (argmin, min)
+
+> -}
 
 > |||
 > sumMapSnd : {A, B : Type} -> (Num B) => List (A, B) -> B

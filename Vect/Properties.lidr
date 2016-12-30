@@ -351,6 +351,67 @@ Filtering
 Max and argmax
 
 > |||
+> maxLemma : {A : Type} -> {R : A -> A -> Type} -> 
+>            (tp : TotalPreorder R) ->
+>            (a : A) -> (as : Vect n A) -> (p : LT Z n) -> a `Elem` as ->
+>            R a (max tp as p)
+> maxLemma {R} {n = Z}       tp a        Nil          p  _          = absurd p
+> maxLemma {R} {n = S Z}     tp a (a  :: Nil)         _  Here       = reflexive tp a
+> maxLemma {R} {n = S Z}     tp a (a' :: Nil)         _ (There prf) = absurd prf
+> maxLemma {R} {n = S (S m)} tp a (a :: (a'' :: as))  _  Here with (argmaxMax tp (a'' :: as) (ltZS m))
+>   | (k, max) with (totalPre tp a max)
+>     | (Left  p) = p
+>     | (Right _) = reflexive tp a
+> maxLemma {R} {n = S (S m)} tp a (a' :: (a'' :: as)) _ (There prf) with (argmaxMax tp (a'' :: as) (ltZS m)) proof itsEqual
+>   | (k, max) with (totalPre tp a' max)
+>     | (Left  _) = replace {P = \rec => R a (snd rec)}
+>                           (sym itsEqual)
+>                           (maxLemma {n = S m} tp a (a'' :: as) (ltZS m) prf)
+>     | (Right p) = s3 where
+>       s1 : R a (snd (Vect.Operations.argmaxMax tp (a'' :: as) (ltZS m)))
+>       s1 = maxLemma {n = S m} tp a (a'' :: as) (ltZS m) prf
+>       s2 : R (snd (Vect.Operations.argmaxMax tp (a'' :: as) (ltZS m))) a'
+>       s2 = replace {P = \rec => R (snd rec) a'} itsEqual p
+>       s3 : R a a'
+>       s3 = transitive tp a (snd (Vect.Operations.argmaxMax tp (a'' :: as) (ltZS m))) a' s1 s2
+> %freeze maxLemma
+
+
+> |||
+> argmaxLemma : {A : Type} -> {R : A -> A -> Type} -> 
+>               (tp : TotalPreorder R) ->
+>               (as : Vect n A) -> (p : LT Z n) ->
+>               index (argmax tp as p) as = max tp as p
+> argmaxLemma {n = Z}       tp  Nil              p = absurd p
+> argmaxLemma {n = S Z}     tp (a :: Nil)        p = Refl
+> argmaxLemma {n = S (S m)} tp (a' :: (a'' :: as)) p with (argmaxMax tp (a'' :: as) (ltZS m)) proof itsEqual
+>   | (k, max') with (totalPre tp a' max')
+>     | (Left   _) = assert_total (replace {P = \rec => Data.Vect.index (fst rec) (a'' :: as) = snd rec}
+>                                          (sym itsEqual)
+>                                          (argmaxLemma tp (a'' :: as) (ltZS m)))
+>     | (Right  _) = Refl
+> %freeze argmaxLemma
+
+
+> |||
+> maxElemLemma : {A : Type} -> {R : A -> A -> Type} -> 
+>                (tp : TotalPreorder R) ->
+>                (as : Vect n A) -> (p : LT Z n) ->
+>                Elem (max tp as p) as
+> maxElemLemma {n = Z}       tp  Nil                p = absurd p
+> maxElemLemma {n = S Z}     tp (a :: Nil)          p = Here
+> maxElemLemma {n = S (S m)} tp (a' :: (a'' :: as)) p with (argmaxMax tp (a'' :: as) (ltZS m)) proof itsEqual
+>   | (k, max) with (totalPre tp a' max)
+>     | (Left   _) = assert_total (replace {P = \ ZUZU => Elem ZUZU (a' :: (a'' :: as))}
+>                                          (cong {f = Prelude.Basics.snd} (sym itsEqual))
+>                                          (There {y = a'} (maxElemLemma tp (a'' :: as) (ltZS m))))
+>     | (Right  _) = Here
+> %freeze maxElemLemma
+
+
+> {-
+
+> |||
 > maxLemma : {A : Type} ->
 >            (tp : TotalPreorder A) ->
 >            (a : A) -> (as : Vect n A) -> (p : LT Z n) -> a `Elem` as ->
@@ -419,6 +480,7 @@ Max and argmax
 >     | (Right  _) = Here
 > %freeze maxElemLemma
 
+> -}
 
 > {-
 
