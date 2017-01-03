@@ -58,14 +58,14 @@ and |All| and |NotEmpty| are finite and decidable:
 > SequentialDecisionProblems.Utils.finiteAll = 
 >   Identity.Properties.finiteAll
 
-> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = 
->   Identity.Properties.finiteNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.finiteNotEmpty = 
+>   Identity.Properties.finiteNonEmpty
 
 > SequentialDecisionProblems.Utils.decidableAll = 
 >   Identity.Properties.decidableAll
 
-> SequentialDecisionProblems.Utils.decidableNotEmpty {t} {n} x y = 
->   Identity.Properties.decidableNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.decidableNotEmpty = 
+>   Identity.Properties.decidableNonEmpty
 
 
 > {-

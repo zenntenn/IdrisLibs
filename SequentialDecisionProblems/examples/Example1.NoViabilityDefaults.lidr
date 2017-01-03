@@ -117,8 +117,8 @@ right as we wish.
 
 > SequentialDecisionProblems.CoreTheory.Viable n x =  Unit
 > SequentialDecisionProblems.CoreTheory.viableSpec1 {t} x v = MkSigma Left (nonEmptyLemma (nexts t x Left), ())
-> SequentialDecisionProblems.Utils.finiteViable x = finiteUnit
-> SequentialDecisionProblems.Utils.decidableViable x = Yes ()
+> SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
+> SequentialDecisionProblems.Utils.decidableViable n x = Yes ()
 
 
 * The computation:
@@ -132,7 +132,7 @@ right as we wish.
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

@@ -28,17 +28,17 @@ n| are going to be deduced (see Utils) from finiteness of |All| and
 |NotEmpty| (see, for instance, NonDeterministicDefaults), finiteness of
 |Viable| (see ViabilityDefaults) and finiteness of controls.
 
-> SequentialDecisionProblems.FullTheory.cvalmax x r v ps =
->  Opt.Operations.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalmax {n} x r v ps =
+>  Opt.Operations.max totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.CoreTheory.cvalargmax x r v ps =
->   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.CoreTheory.cvalargmax {n} x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.FullTheory.cvalmaxSpec x r v ps = 
->   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalmaxSpec {n} x r v ps = 
+>   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.FullTheory.cvalargmaxSpec x r v ps =
->   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalargmaxSpec {n} x r v ps =
+>   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
 
 > {-

@@ -1,32 +1,26 @@
 > module SequentialDecisionProblems.examples.Main
 
-> import Decidable.Order
-
-> import Data.Fin
-> import Data.Vect
 > import Data.List
 > import Data.List.Quantifiers
-> import Data.So
-> import Control.Isomorphism
 > import Effects
 > import Effect.Exception
 > import Effect.StdIO
-> import Syntax.PreorderReasoning
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.NonDeterministicDefaults
 > -- import SequentialDecisionProblems.ReachabilityDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
 > import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.ViabilityDefaults
+
+> import SequentialDecisionProblems.examples.LeftAheadRight
 
 > import List.Operations
 > import List.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
-> import SequentialDecisionProblems.examples.LeftAheadRight
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
@@ -36,13 +30,13 @@
 > import Finite.Predicates
 > import Finite.Operations
 > import Finite.Properties
-> import Unique.Predicates
+> -- import Unique.Predicates
 > import Decidable.Predicates
 > import Decidable.Properties
 > import Unit.Properties
 > import Void.Properties
-> import Opt.Operations
-> import Rel.TotalPreorder
+> -- import Opt.Operations
+> -- import Rel.TotalPreorder
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 > import Fin.Operations
@@ -117,57 +111,59 @@ cannot be reached should be detected and rejected.
 >   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
 >   | (No contra) = []
 
-** Reward function:
+** |Val| and |LTE|:
 
-> SequentialDecisionProblems.CoreTheory.Val = Nat
+> SequentialDecisionProblems.CoreTheory.Val = 
+>   Nat
+
+> SequentialDecisionProblems.CoreTheory.plus = 
+>   Prelude.Nat.plus
+
+> SequentialDecisionProblems.CoreTheory.zero = 
+>   Z
+
+> SequentialDecisionProblems.CoreTheory.LTE = 
+>   Prelude.Nat.LTE
+
+> SequentialDecisionProblems.FullTheory.reflexiveLTE = 
+>   Nat.LTEProperties.reflexiveLTE
+
+> SequentialDecisionProblems.FullTheory.transitiveLTE = 
+>   Nat.LTEProperties.transitiveLTE
+
+> SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
+>   Nat.LTEProperties.monotoneNatPlusLTE
+
+> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+>   Nat.LTEProperties.totalPreorderLTE
+
+** Reward function:
 
 > SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
 >   if c == Z then S Z else Z
 
-> SequentialDecisionProblems.CoreTheory.plus = Prelude.Nat.plus
-> SequentialDecisionProblems.CoreTheory.zero = Z
-
-> SequentialDecisionProblems.CoreTheory.LTE = Prelude.Nat.LTE
-> SequentialDecisionProblems.FullTheory.reflexiveLTE = Nat.LTEProperties.reflexiveLTE
-> SequentialDecisionProblems.FullTheory.transitiveLTE = Nat.LTEProperties.transitiveLTE
-> SequentialDecisionProblems.FullTheory.monotonePlusLTE = Nat.LTEProperties.monotoneNatPlusLTE
-
-** M is measurable:
+** Measure:
 
 > SequentialDecisionProblems.CoreTheory.meas = sum
 > SequentialDecisionProblems.FullTheory.measMon = sumMon
 
-* Reachable
+** |Ctrl| is finite:
 
-> -- Reachable : State t' -> Type
+> SequentialDecisionProblems.Utils.finiteCtrl _ = 
+>   finiteLeftAheadRight
+
+** Reachability
+
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
-
-> -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
 >   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
 >   all Nil = Nil
 >   all (x :: xs) = MkUnit :: (all xs)
 
 
-* |cvalargmax| and |cvalmax| 
-
-> -- totalPreorderLTE : TotalPreorder SequentialDecisionProblems.CoreTheory.LTE
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
->   MkTotalPreorder Prelude.Nat.LTE
->                   Nat.LTEProperties.reflexiveLTE 
->                   Nat.LTEProperties.transitiveLTE 
->                   Nat.LTEProperties.totalLTE
-
-> -- finiteCtrl : {t : Nat} -> {n : Nat} -> (x : State t) -> Finite (Ctrl t x) 
-> SequentialDecisionProblems.Utils.finiteCtrl _ = finiteLeftAheadRight
-> %freeze SequentialDecisionProblems.Utils.finiteCtrl
-
 * The computation:
 
-> -- showState : {t : Nat} -> State t -> String
 > SequentialDecisionProblems.Utils.showState = show
-
-> -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
@@ -176,7 +172,7 @@ cannot be reached should be detected and rejected.
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

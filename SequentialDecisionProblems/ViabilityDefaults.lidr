@@ -28,15 +28,29 @@ compute a good control
 If users can show that ..., see |Utils|. For |M = List|, for instance,
 ... are implemented in |NonDeterministic Defaults|:
 
+> {-
 > -- finiteViable : {t : Nat} -> {n : Nat} -> 
 > --                (x : State t) -> Finite (Viable {t} n x)
 > SequentialDecisionProblems.Utils.finiteViable {t} {n = Z}   _ = finiteUnit
 > SequentialDecisionProblems.Utils.finiteViable {t} {n = S m} x = finiteGoodCtrl x
+> -}
 
+> -- finiteViable : {t : Nat} -> 
+> --                (n : Nat) -> (x : State t) -> Finite (Viable n x)
+> SequentialDecisionProblems.Utils.finiteViable Z     _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable (S m) x = finiteGoodCtrl m x
+
+> {-
 > -- decidableViable : {t : Nat} -> {n : Nat} -> 
 > --                   (x : State t) -> Dec (Viable {t} n x)
 > SequentialDecisionProblems.Utils.decidableViable {t} {n = Z}   _ = Yes MkUnit
 > SequentialDecisionProblems.Utils.decidableViable {t} {n = S m} x = decidableGoodCtrl x
+> -}
+
+> -- decidableViable : {t : Nat} -> 
+> --                   (n : Nat) -> (x : State t) -> Dec (Viable n x)
+> SequentialDecisionProblems.Utils.decidableViable  Z    _ = Yes MkUnit
+> SequentialDecisionProblems.Utils.decidableViable (S m) x = decidableGoodCtrl m x
 
 
 > {-

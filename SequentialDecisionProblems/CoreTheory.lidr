@@ -355,7 +355,7 @@ to be available, we can implement
 And finally
 
 >   val  :  {t, n : Nat} -> 
->           (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>           (x : State t) -> (r : Reachable x) -> (v : Viable n x) -> PolicySeq t n -> Val
 >   val {t} {n = Z} x r v ps = zero
 >   val {t} {n = S m} x r v (p :: ps) = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >     gy   :  GoodCtrl t x m
@@ -443,7 +443,7 @@ v ps|:
 
 > ||| 
 > cval  :  {t, n : Nat} -> 
->          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>          (x : State t) -> (r : Reachable x) -> (v : Viable (S n) x) ->
 >          (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
 > cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
 >   y    :  Ctrl t x
@@ -455,7 +455,7 @@ Let |cvalargmax| be a function that delivers the control that leads to
 the maximal value of |cval x r v ps|:
 
 > cvalargmax  :  {t, n : Nat} -> 
->                (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>                (x  : State t) -> (r : Reachable x) -> (v : Viable (S n) x) ->
 >                (ps : PolicySeq (S t) n) -> GoodCtrl t x n
 
 The controls obtained by maximising |cval x r v ps| for each of the

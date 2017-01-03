@@ -136,7 +136,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

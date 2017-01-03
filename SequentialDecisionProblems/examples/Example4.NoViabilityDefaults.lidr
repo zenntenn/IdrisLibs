@@ -135,9 +135,9 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
 >   av = [()]
 
-> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
 
-> SequentialDecisionProblems.Utils.decidableViable _ = decidableUnit
+> SequentialDecisionProblems.Utils.decidableViable n x = decidableUnit
 
 
 * The computation:
@@ -151,7 +151,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

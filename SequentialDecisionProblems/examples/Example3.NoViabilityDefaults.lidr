@@ -197,13 +197,13 @@ detected and rejected.
 >     av = viableLemma x 
 >   | (No _) = void v
 
-> SequentialDecisionProblems.Utils.finiteViable {t} {n = Z}   _ = finiteUnit
-> SequentialDecisionProblems.Utils.finiteViable {t} {n = S m} x with (decLT (outl x) maxColumn)
+> SequentialDecisionProblems.Utils.finiteViable  Z    _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable (S m) x with (decLT (outl x) maxColumn)
 >   | (Yes p) = finiteUnit
 >   | (No  c) = finiteVoid
 
-> SequentialDecisionProblems.Utils.decidableViable {t} {n = Z}   _ = decidableUnit
-> SequentialDecisionProblems.Utils.decidableViable {t} {n = S m} x with (decLT (outl x) maxColumn)
+> SequentialDecisionProblems.Utils.decidableViable  Z    _ = decidableUnit
+> SequentialDecisionProblems.Utils.decidableViable (S m) x with (decLT (outl x) maxColumn)
 >   | (Yes _) = decidableUnit
 >   | (No  _) = decidableVoid
 
@@ -219,7 +219,7 @@ detected and rejected.
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

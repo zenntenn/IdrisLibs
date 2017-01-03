@@ -62,14 +62,14 @@ and |All| and |NotEmpty| are finite and decidable:
 > SequentialDecisionProblems.Utils.finiteAll = 
 >   SimpleProb.MonadicProperties.finiteAll
 
-> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = 
->   SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.finiteNotEmpty = 
+>   SimpleProb.MonadicProperties.finiteNonEmpty
 
 > SequentialDecisionProblems.Utils.decidableAll = 
 >   SimpleProb.MonadicProperties.decidableAll
 
-> SequentialDecisionProblems.Utils.decidableNotEmpty {t} {n} x y = 
->   SimpleProb.MonadicProperties.decidableNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.decidableNotEmpty = 
+>   SimpleProb.MonadicProperties.decidableNonEmpty
 
 
 > {-
