@@ -18,6 +18,10 @@
   utilities for the computation of possible state-control trajectories,
   rewards, etc.
 
+* [TabBackwardsInduction](TabBackwardsInduction.lidr) A tabulated,
+  tail-recursive implementation of the generic backwards induction
+  algorithm of the core theory, see .Tab examples in (examples/).
+
 * [Helpers](Helpers.lidr) Obsolete, will soon disappear.
 
 * [DeterministicDefaults](DeterministicDefaults.lidr) Defaults for
@@ -29,12 +33,21 @@
 * [StochasticDefaults](StochasticDefaults.lidr) Defaults for
   stochastic SDPs, see [Example5](examples/Example5.lidr).
 
-* [OptDefaults.lidr](OptDefaults.lidr) Defaults for solving SDPs with
-  finite controls, see examples in [examples](examples/).
+* [CoreTheoryOptDefaults](CoreTheoryOptDefaults.lidr) Defaults for
+  solving SDPs with finite controls, see examples in
+  [examples](examples/).
+
+* [FullTheoryOptDefaults](FullTheoryOptDefaults.lidr) Defaults for
+  solving SDPs with finite controls, see examples in
+  [examples](examples/).
+
+* [TabBackwardsInductionOptDefaults](TabBackwardsInductionOptDefaults.lidr)
+  Defaults for solving SDPs with finite controls, see examples in
+  [examples](examples/).
 
 * [ViabilityDefaults](ViabilityDefaults.lidr) Default implementation of
   `Viable`. It can be overridden by more efficient, application-specific
   implementations, see for instance [Example5](examples/Example5.lidr)
   vs. [Example5.NoViabilityDefaults](examples/Example5.NoViabilityDefaults.lidr).
 
-
+* [README](README.md) This file
