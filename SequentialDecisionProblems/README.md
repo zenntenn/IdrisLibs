@@ -54,15 +54,21 @@
 
 * [README](README.md) This file
 
+
 ## Timeline
 
 * 2017-01-06: added a tabulated, tail-recursive implementation of the
   generic backwards induction algorithm from the core theory in
   [TabBackwardsInduction](TabBackwardsInduction.lidr) and examples in
-  [examples](examples/). The implementation naturally leads to the
-  following questions:
+  [examples](examples/).
+  
 
-    * Can we express the tabulated, tail-recursive implementation as an
+## Interesting questions, perhaps work for students?
+
+* 2017-01-06:
+
+    * Can we express the tabulated, tail-recursive implementation of
+       [TabBackwardsInduction](TabBackwardsInduction.lidr) as an
        instance of a general pattern?
 
     * The examples in [examples](examples/) suggest that, if the
@@ -75,3 +81,5 @@
       computation of trajectories for non-deterministic and stochastic
       problems can completely spoil this behavior and bring back the
       execution times of the naive implementation from the core theory.
+
+
