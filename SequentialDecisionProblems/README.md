@@ -63,7 +63,7 @@
   [examples](examples/).
   
 
-## Interesting questions, perhaps work for students?
+## Open questions
 
 * 2017-01-06:
 
