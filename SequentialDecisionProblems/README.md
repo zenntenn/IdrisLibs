@@ -82,4 +82,8 @@
       problems can completely spoil this behavior and bring back the
       execution times of the naive implementation from the core theory.
 
+    * Can we re-gain linear complexity by re-implementing `Viable` (and
+      the computation of trajectories) in a tabulated, tail-recursive
+      form?
+
 
