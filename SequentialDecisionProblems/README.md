@@ -1,5 +1,7 @@
 # SequentialDecisionProblems (SDPs)
 
+## Files
+
 * [CoreTheory](CoreTheory.lidr) The core theory of monadic sequential
   decision problems with a generic implementation of backwards induction
   for computing optimal policy sequences.
@@ -51,3 +53,24 @@
   vs. [Example5.NoViabilityDefaults](examples/Example5.NoViabilityDefaults.lidr).
 
 * [README](README.md) This file
+
+## Timeline
+
+* 2017-01-06: added a tabulated, tail-recursive implementation of the
+  generic backwards induction algorithm from the core theory in
+  [TabBackwardsInduction](TabBackwardsInduction.lidr) and examples in
+  [examples](examples/). The implementation naturally leads to the
+  following questions:
+
+** Can we express the tabulated, tail-recursive implementation as an
+   instance of a general pattern?
+
+** The examples in [examples](examples/) suggest that, if the
+   computation of `Viable` and `Reachable` is efficient (the
+   `.NonViabilityDefaults` examples), the tabulated implementation
+   indeed executes in liner time in the number of decision steps but ...
+
+** ... the default implementation of `Viable` and, likely, the
+   computation of trajectories for non-deterministic and stochastic
+   problems can completely spoil this behavior and bring back the
+   execution times of the naive implementation from the core theory.
