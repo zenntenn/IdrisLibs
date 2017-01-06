@@ -10,35 +10,26 @@
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
+> import SequentialDecisionProblems.TabBackwardsInduction
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.StochasticDefaults
+> import SequentialDecisionProblems.NonDeterministicDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
-> import SimpleProb.SimpleProb
-> import SimpleProb.BasicOperations
-> import SimpleProb.BasicProperties
-> import SimpleProb.MonadicOperations
-> import SimpleProb.MonadicProperties
-> import SimpleProb.Measures
+> import List.Operations
+> import List.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
+> import Nat.OperationsProperties
+> import Nat.LTEProperties
 > import Nat.LTProperties
-> import NonNegRational.NonNegRational
-> import NonNegRational.BasicOperations
-> import NonNegRational.BasicProperties
-> import NonNegRational.Predicates
-> import NonNegRational.LTEProperties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
-> import Fraction.Fraction
-> import Fraction.Normal
-> import Nat.Positive
-> import List.Operations
 > import Void.Properties
 > import Unit.Properties
 
@@ -47,8 +38,9 @@
 
 > -- %logging 5
 
-Like "SeqDecProbsExample4.lidr", but selecting "Left" yields a non-zero
-probablility to move "Ahead"!
+Like Example5, but |M| is |List| instead of |SimpleProb|. The idea is to
+use this example to test tabulation in a controlled environment and
+without the costs computations with non-negative rational numbers. 
 
 * The decision process:
 
@@ -69,46 +61,43 @@ probablility to move "Ahead"!
 
 ** Transition function:
 
-> oo2  : NonNegRational
-> oo2  = fromFraction (1, Element 2 MkPositive)
-
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
->   SimpleProb.MonadicOperations.ret (MkSigma maxColumn (ltIdS maxColumn))
+>   [MkSigma maxColumn (ltIdS maxColumn)]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
->   MkSimpleProb [(MkSigma (S n) prf, oo2), 
->                 (MkSigma n (ltLemma1 n nColumns prf), oo2)] Refl
+>   [MkSigma (S n) prf, MkSigma n (ltLemma1 n nColumns prf)]
 
-> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = SimpleProb.MonadicOperations.ret x
+> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = 
+>   [x]
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
->   | (Yes p)     = SimpleProb.MonadicOperations.ret (MkSigma (S n) (LTESucc p))
->   | (No contra) = SimpleProb.MonadicOperations.ret (MkSigma  Z    (LTESucc LTEZero))
+>   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
+>   | (No contra) = [MkSigma  Z    (LTESucc LTEZero)]
 
 ** |Val| and |LTE|:
 
 > SequentialDecisionProblems.CoreTheory.Val = 
->   NonNegRational.NonNegRational
+>   Nat
 
 > SequentialDecisionProblems.CoreTheory.plus = 
->   NonNegRational.BasicOperations.plus
+>   Prelude.Nat.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
->   fromInteger 0
+>   Z
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
->   NonNegRational.Predicates.LTE
+>   Prelude.Nat.LTE
 
-> SequentialDecisionProblems.FullTheory.reflexiveLTE = 
->   NonNegRational.LTEProperties.reflexiveLTE
+> SequentialDecisionProblems.FullTheory.reflexiveLTE =
+>   Nat.LTEProperties.reflexiveLTE
 
-> SequentialDecisionProblems.FullTheory.transitiveLTE = 
->   NonNegRational.LTEProperties.transitiveLTE
+> SequentialDecisionProblems.FullTheory.transitiveLTE =
+>   Nat.LTEProperties.transitiveLTE
 
-> SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
->   NonNegRational.LTEProperties.monotonePlusLTE
+> SequentialDecisionProblems.FullTheory.monotonePlusLTE =
+>   Nat.LTEProperties.monotoneNatPlusLTE
 
 > SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
->   NonNegRational.LTEProperties.totalPreorderLTE 
+>   Nat.LTEProperties.totalPreorderLTE 
 
 ** Reward function:
 
@@ -121,8 +110,13 @@ probablility to move "Ahead"!
 
 ** Measure:
 
-> SequentialDecisionProblems.CoreTheory.meas = average
-> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
+> SequentialDecisionProblems.CoreTheory.meas = sum
+> SequentialDecisionProblems.FullTheory.measMon = sumMon
+
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
 
 ** |Ctrl| is finite:
 
@@ -133,21 +127,31 @@ probablility to move "Ahead"!
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
->   all : (sp : SimpleProb  (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) sp
->   all sp = all' (support sp) where
->     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
->     all' Nil = Nil
->     all' (x :: xs) = () :: (all' xs)
+>   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
+>   all Nil = Nil
+>   all (x :: xs) = () :: (all xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
 ** Viability:
 
 > SequentialDecisionProblems.CoreTheory.Viable n x = Unit
 
+> nextsNotEmptyLemma : {t : Nat} -> 
+>                      (x : State t) -> 
+>                      SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+> nextsNotEmptyLemma {t} x = 
+>   SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 {A = State (S t)} x [x] Here
+
+> viableLemma : {t : Nat} -> {n : Nat} ->
+>               (x : State t) -> 
+>               SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+> viableLemma (MkSigma n prf) = [()]
+
 > SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
->   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
->   ne = nonEmptyLemma (nexts t x Ahead) 
+>   ne : NotEmpty (nexts t x Ahead)
+>   ne = nextsNotEmptyLemma {t} x
 >   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
->   av = [()]
+>   av = viableLemma x
 
 > SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
 
@@ -159,16 +163,6 @@ probablility to move "Ahead"!
 > SequentialDecisionProblems.Utils.showState = show
 > SequentialDecisionProblems.Utils.showCtrl = show
 
-> %freeze possibleStateCtrlSeqs
-> %freeze possibleRewards'
-> %freeze possibleStateCtrlSeqsRewards'
-> %freeze meas
-> %freeze support
-> %freeze nonEmptyLemma
-> %freeze totalPreorderLTE
-> %freeze argmaxMax
-> %freeze argminMin
-
 > computation : { [STDIO] } Eff ()
 > computation =
 >   do putStr ("enter number of steps:\n")
@@ -177,7 +171,7 @@ probablility to move "Ahead"!
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn "possible state-control sequences:"

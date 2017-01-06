@@ -12,7 +12,8 @@
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.NonDeterministicDefaults
-> import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.CoreTheoryOptDefaults
+> import SequentialDecisionProblems.FullTheoryOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -87,7 +88,7 @@ We reimplement "Example1.lidr", this time with |M = List|.
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   Nat.LTEProperties.monotoneNatPlusLTE
 
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
 >   Nat.LTEProperties.totalPreorderLTE 
 
 ** Reward function:

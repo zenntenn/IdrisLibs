@@ -9,7 +9,8 @@
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.DeterministicDefaults
-> import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.CoreTheoryOptDefaults
+> import SequentialDecisionProblems.FullTheoryOptDefaults
 > import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
@@ -84,7 +85,7 @@ right as we wish.
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   Nat.LTEProperties.monotoneNatPlusLTE
    
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
 >   Nat.LTEProperties.totalPreorderLTE 
 
 ** Reward function:

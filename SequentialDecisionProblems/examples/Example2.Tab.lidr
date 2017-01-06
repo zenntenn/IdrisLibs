@@ -1,5 +1,7 @@
 > module SequentialDecisionProblems.examples.Main
 
+> import Decidable.Order
+
 > import Data.List
 > import Data.List.Quantifiers
 > import Effects
@@ -9,45 +11,40 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.StochasticDefaults
+> import SequentialDecisionProblems.TabBackwardsInduction
+> import SequentialDecisionProblems.NonDeterministicDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
+> import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
-> import SimpleProb.SimpleProb
-> import SimpleProb.BasicOperations
-> import SimpleProb.BasicProperties
-> import SimpleProb.MonadicOperations
-> import SimpleProb.MonadicProperties
-> import SimpleProb.Measures
+> import List.Operations
+> import List.Properties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
+> import Nat.LTEProperties
 > import Nat.LTProperties
-> import NonNegRational.NonNegRational
-> import NonNegRational.BasicOperations
-> import NonNegRational.BasicProperties
-> import NonNegRational.Predicates
-> import NonNegRational.LTEProperties
-> import Void.Properties
-> import Unit.Properties
+> import Nat.OperationsProperties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
+> import Unit.Properties
 
 > -- %default total
 > %auto_implicits off
 
 > -- %logging 5
 
-We reimplement "Example2.lidr", this time with |M = SimpleProb|.
+
+We reimplement "Example1.lidr", this time with |M = List|.
 
 * The decision process:
 
 > maxColumn : Nat
 > maxColumn = 10
-> %freeze maxColumn
 
 > nColumns : Nat
 > nColumns = S maxColumn
@@ -63,53 +60,58 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 ** Transition function:
 
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
->   SimpleProb.MonadicOperations.ret (MkSigma maxColumn (ltIdS maxColumn))
+>   [MkSigma maxColumn (ltIdS maxColumn)]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
->   SimpleProb.MonadicOperations.ret (MkSigma n (ltLemma1 n nColumns prf))
-> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = SimpleProb.MonadicOperations.ret x
+>   [MkSigma n (ltLemma1 n nColumns prf)]
+> SequentialDecisionProblems.CoreTheory.nexts t x Ahead = [x]
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
->   | (Yes p)     = SimpleProb.MonadicOperations.ret (MkSigma (S n) (LTESucc p))
->   | (No contra) = SimpleProb.MonadicOperations.ret (MkSigma  Z    (LTESucc LTEZero))
+>   | (Yes p)     = [MkSigma (S n) (LTESucc p)]
+>   | (No contra) = [MkSigma  Z    (LTESucc LTEZero)]
 
 ** |Val| and |LTE|:
 
 > SequentialDecisionProblems.CoreTheory.Val = 
->   NonNegRational.NonNegRational
+>   Nat
 
 > SequentialDecisionProblems.CoreTheory.plus = 
->   NonNegRational.BasicOperations.plus
+>   Prelude.Nat.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
->   fromInteger 0
+>   Z
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
->   NonNegRational.Predicates.LTE
+>   Prelude.Nat.LTE
 
 > SequentialDecisionProblems.FullTheory.reflexiveLTE = 
->   NonNegRational.LTEProperties.reflexiveLTE
+>   Nat.LTEProperties.reflexiveLTE
 
 > SequentialDecisionProblems.FullTheory.transitiveLTE = 
->   NonNegRational.LTEProperties.transitiveLTE
+>   Nat.LTEProperties.transitiveLTE
 
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
->   NonNegRational.LTEProperties.monotonePlusLTE
+>   Nat.LTEProperties.monotoneNatPlusLTE
 
 > SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
->   NonNegRational.LTEProperties.totalPreorderLTE 
+>   Nat.LTEProperties.totalPreorderLTE 
 
 ** Reward function:
 
 > SequentialDecisionProblems.CoreTheory.reward t x y (MkSigma c _) =
 >   if c == Z
->   then (fromInteger 1)
+>   then (S Z)
 >   else if (S c) == nColumns
->        then (fromInteger 2)
->        else (fromInteger 0)
+>        then (S (S Z))
+>        else Z
 
 ** Measure:
 
-> SequentialDecisionProblems.CoreTheory.meas = average
-> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
+> SequentialDecisionProblems.CoreTheory.meas = sum
+> SequentialDecisionProblems.FullTheory.measMon = sumMon
+
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
 
 ** |Ctrl| is finite:
 
@@ -120,25 +122,10 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
->   all : (sp : SimpleProb  (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) sp
->   all sp = all' (support sp) where
->     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
->     all' Nil = Nil
->     all' (x :: xs) = () :: (all' xs)
-
-** Viability:
-
-> SequentialDecisionProblems.CoreTheory.Viable n x = Unit
-
-> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x _ = MkSigma Ahead (ne, av) where
->   ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
->   ne = nonEmptyLemma (nexts t x Ahead) 
->   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
->   av = [()]
-
-> SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
-
-> SequentialDecisionProblems.Utils.decidableViable n x = decidableUnit
+>   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
+>   all Nil = Nil
+>   all (x :: xs) = () :: (all xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
 
 * The computation:
@@ -154,7 +141,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn (show mxys)
@@ -168,6 +155,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 > {-
 
 > ---}
+
 
 -- Local Variables:
 -- idris-packages: ("effects")

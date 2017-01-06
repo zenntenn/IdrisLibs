@@ -12,7 +12,8 @@
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.NonDeterministicDefaults
-> import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.CoreTheoryOptDefaults
+> import SequentialDecisionProblems.FullTheoryOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -23,7 +24,6 @@
 > import BoundedNat.Properties
 > import Sigma.Sigma
 > import Sigma.Operations
-> -- import Sigma.Properties
 > import Nat.OperationsProperties
 > import Nat.LTEProperties
 > import Nat.LTProperties
@@ -96,7 +96,7 @@ detected and rejected.
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   Nat.LTEProperties.monotoneNatPlusLTE
 
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
 >   Nat.LTEProperties.totalPreorderLTE 
 
 ** Reward function:

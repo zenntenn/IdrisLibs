@@ -10,11 +10,12 @@
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
+> import SequentialDecisionProblems.TabBackwardsInduction
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.NonDeterministicDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
-> import SequentialDecisionProblems.ViabilityDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -24,9 +25,12 @@
 > import BoundedNat.Operations
 > import BoundedNat.Properties
 > import Sigma.Sigma
+> import Sigma.Operations
+> import Nat.OperationsProperties
 > import Nat.LTEProperties
 > import Nat.LTProperties
-> import Nat.OperationsProperties
+> import Unit.Properties
+> import Void.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 
@@ -111,18 +115,105 @@ detected and rejected.
 > SequentialDecisionProblems.CoreTheory.meas = sum
 > SequentialDecisionProblems.FullTheory.measMon = sumMon
 
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
+
 ** |Ctrl| is finite:
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
 >   finiteLeftAheadRight
 
-** Reachability
+** Reachability:
 
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
 >   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
 >   all Nil = Nil
 >   all (x :: xs) = () :: (all xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
+
+** Viability:
+
+> nextsLemma0 : {t : Nat} -> 
+>               (x : State t) -> (outl x `LT` maxColumn) -> nexts t x Ahead = [x]
+> nextsLemma0 {t} (MkSigma i prf) p with (decLT i maxColumn)
+>   | (Yes _) = Refl
+>   | (No contra) = void (contra p)
+
+> nextsLemma1 : {t : Nat} -> 
+>               (x : State t) -> (outl x `LT` maxColumn) -> 
+>               SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+> nextsLemma1 {t} x prf with (decLT (outl x) maxColumn)
+>   | (Yes p) = s3 where
+>     s1 : SequentialDecisionProblems.CoreTheory.NotEmpty [x] 
+>     s1 = SequentialDecisionProblems.CoreTheory.elemNotEmptySpec0 x [x] Here
+>     s2 : [x] = nexts t x Ahead
+>     s2 = sym (nextsLemma0 x p)
+>     s3 : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Ahead)
+>     s3 = replace s2 s1
+>   | (No contra) = void (contra prf)
+
+> SequentialDecisionProblems.CoreTheory.Viable  Z    _ = Unit
+> SequentialDecisionProblems.CoreTheory.Viable (S n) x with (decLT (outl x) maxColumn)
+>   | (Yes _) = Unit
+>   | (No  _) = Void
+
+> viableLemma0 : {t : Nat} -> {x : State t} -> Viable Z x = Unit
+> viableLemma0 = Refl
+
+> viableLemma1 : {t : Nat} -> {n : Nat} -> {x : State t} -> 
+>                (outl x) `Prelude.Nat.LT` maxColumn -> Viable (S n) x = Unit
+> viableLemma1 {t} {n} {x} prf with (decLT (outl x) maxColumn)
+>   | (Yes _) = Refl
+>   | (No contra) = void (contra prf)
+
+> viableLemma2 : {t : Nat} -> {n : Nat} -> {x : State t} -> 
+>                Not ((outl x) `Prelude.Nat.LT` maxColumn) -> Viable (S n) x = Void
+> viableLemma2 {t} {n} {x} prf with (decLT (outl x) maxColumn)
+>   | (Yes p) = void (prf p)
+>   | (No _) = Refl
+
+> viableLemma : {t : Nat} -> {n : Nat} ->
+>               (x : State t) -> 
+>               SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+> viableLemma {t} {n = Z} (MkSigma i prf) with (decLT i maxColumn)
+>   | (Yes p) = res where
+>     res : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} Z) [MkSigma i prf]
+>     res = v :: Nil where
+>       v : Viable {t = S t} Z (MkSigma i prf)
+>       v with (decLT i maxColumn)
+>         | (Yes _) = MkUnit
+>         | (No  contra) = void (contra p)
+>   | (No  _) = Nil
+> viableLemma {t} {n = S m} (MkSigma i prf) with (decLT i maxColumn)
+>   | (Yes p) = res where
+>     res : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} (S m)) [MkSigma i prf]
+>     res = v :: Nil where
+>       v : Viable {t = S t} (S m) (MkSigma i prf)
+>       v with (decLT i maxColumn)
+>         | (Yes _) = MkUnit
+>         | (No  contra) = void (contra p)
+>   | (No  _) = Nil
+
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x v with (decLT (outl x) maxColumn)
+>   | (Yes prf) = MkSigma Ahead (ne, av) where
+>     ne : NotEmpty (nexts t x Ahead)
+>     ne = nextsLemma1 x prf
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
+>     av = viableLemma x 
+>   | (No _) = void v
+
+> SequentialDecisionProblems.Utils.finiteViable  Z    _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable (S m) x with (decLT (outl x) maxColumn)
+>   | (Yes p) = finiteUnit
+>   | (No  c) = finiteVoid
+
+> SequentialDecisionProblems.Utils.decidableViable  Z    _ = decidableUnit
+> SequentialDecisionProblems.Utils.decidableViable (S m) x with (decLT (outl x) maxColumn)
+>   | (Yes _) = decidableUnit
+>   | (No  _) = decidableVoid
 
 
 * The computation:
@@ -138,7 +229,7 @@ detected and rejected.
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn (show mxys)

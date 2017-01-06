@@ -180,9 +180,9 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >   av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Ahead)
 >   av = [()]
 
-> SequentialDecisionProblems.Utils.finiteViable _ = finiteUnit
+> SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
 
-> SequentialDecisionProblems.Utils.decidableViable _ = decidableUnit
+> SequentialDecisionProblems.Utils.decidableViable n x = decidableUnit
 
 ** |cvalargmax| and |cvalmax| 
 
@@ -216,21 +216,21 @@ follow from finiteness of |Viable| (previous section ), finiteness of
 
 , finiteness of |NotEmpty|
 
-> SequentialDecisionProblems.Utils.finiteNotEmpty {t} {n} x y = SimpleProb.MonadicProperties.finiteNonEmpty (nexts t x y)
+> SequentialDecisionProblems.Utils.finiteNotEmpty = SimpleProb.MonadicProperties.finiteNonEmpty
 
 and finiteness of controls (see above). With these results in place, we have
 
-> SequentialDecisionProblems.FullTheory.cvalmax x r v ps =
->   Opt.Operations.max totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalmax {n} x r v ps =
+>   Opt.Operations.max totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.CoreTheory.cvalargmax x r v ps =
->   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.CoreTheory.cvalargmax {n} x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.FullTheory.cvalmaxSpec x r v ps =
->   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalmaxSpec {n} x r v ps =
+>   Opt.Operations.maxSpec totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
-> SequentialDecisionProblems.FullTheory.cvalargmaxSpec x r v ps =
->   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl x) (cardNotZGoodCtrl x v) (cval x r v ps)
+> SequentialDecisionProblems.FullTheory.cvalargmaxSpec {n} x r v ps =
+>   Opt.Operations.argmaxSpec totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (cval x r v ps)
 
 
 * The computation:
@@ -247,7 +247,7 @@ and finiteness of controls (see above). With these results in place, we have
 >      nSteps <- getNat
 >      putStr ("enter initial column:\n")
 >      x0 <- getLTB nColumns
->      case (decidableViable {t = Z} {n = nSteps} x0) of
+>      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
 >                       ps   <- pure (backwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")

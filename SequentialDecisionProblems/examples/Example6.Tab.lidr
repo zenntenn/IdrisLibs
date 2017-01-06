@@ -9,10 +9,11 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
+> import SequentialDecisionProblems.TabBackwardsInduction
 > import SequentialDecisionProblems.NonDeterministicDefaults
-> -- import SequentialDecisionProblems.ReachabilityDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 > import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
@@ -148,6 +149,11 @@ cannot be reached should be detected and rejected.
 > SequentialDecisionProblems.CoreTheory.meas = sum
 > SequentialDecisionProblems.FullTheory.measMon = sumMon
 
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
+
 ** |Ctrl| is finite:
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
@@ -160,6 +166,7 @@ cannot be reached should be detected and rejected.
 >   all : (xs : List (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) xs
 >   all Nil = Nil
 >   all (x :: xs) = MkUnit :: (all xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
 
 * The computation:
@@ -175,7 +182,7 @@ cannot be reached should be detected and rejected.
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn (show mxys)

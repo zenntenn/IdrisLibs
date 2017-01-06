@@ -10,7 +10,8 @@
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.StochasticDefaults
-> import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.CoreTheoryOptDefaults
+> import SequentialDecisionProblems.FullTheoryOptDefaults
 > import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
@@ -92,7 +93,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   NonNegRational.LTEProperties.monotonePlusLTE
 
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
 >   NonNegRational.LTEProperties.totalPreorderLTE 
 
 ** Reward function:

@@ -1,5 +1,7 @@
 > module SequentialDecisionProblems.examples.Main
 
+> import Decidable.Order
+
 > import Data.List
 > import Data.List.Quantifiers
 > import Effects
@@ -8,10 +10,12 @@
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
+> import SequentialDecisionProblems.TabBackwardsInduction
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.StochasticDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -31,17 +35,22 @@
 > import NonNegRational.BasicProperties
 > import NonNegRational.Predicates
 > import NonNegRational.LTEProperties
-> import Void.Properties
-> import Unit.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
+> import Fraction.Fraction
+> import Fraction.Normal
+> import Nat.Positive
+> import List.Operations
+> import Void.Properties
+> import Unit.Properties
 
 > -- %default total
 > %auto_implicits off
 
 > -- %logging 5
 
-We reimplement "Example2.lidr", this time with |M = SimpleProb|.
+Like "SeqDecProbsExample4.lidr", but selecting "Left" yields a non-zero
+probablility to move "Ahead"!
 
 * The decision process:
 
@@ -62,11 +71,17 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 
 ** Transition function:
 
+> oo2  : NonNegRational
+> oo2  = fromFraction (1, Element 2 MkPositive)
+
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma Z prf) Left =
 >   SimpleProb.MonadicOperations.ret (MkSigma maxColumn (ltIdS maxColumn))
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma (S n) prf) Left =
->   SimpleProb.MonadicOperations.ret (MkSigma n (ltLemma1 n nColumns prf))
+>   MkSimpleProb [(MkSigma (S n) prf, oo2), 
+>                 (MkSigma n (ltLemma1 n nColumns prf), oo2)] Refl
+
 > SequentialDecisionProblems.CoreTheory.nexts t x Ahead = SimpleProb.MonadicOperations.ret x
+
 > SequentialDecisionProblems.CoreTheory.nexts t (MkSigma n prf) Right with (decLT n maxColumn)
 >   | (Yes p)     = SimpleProb.MonadicOperations.ret (MkSigma (S n) (LTESucc p))
 >   | (No contra) = SimpleProb.MonadicOperations.ret (MkSigma  Z    (LTESucc LTEZero))
@@ -111,6 +126,11 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 > SequentialDecisionProblems.CoreTheory.meas = average
 > SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
+
 ** |Ctrl| is finite:
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
@@ -125,6 +145,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
 ** Viability:
 
@@ -154,10 +175,37 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
+>                       putStrLn "possible state-control sequences:"
+>                       putStr "  "
 >                       putStrLn (show mxys)
+>                       mvs <- pure (possibleRewards' mxys)
+>                       putStrLn "possible rewards:"
+>                       putStr "  "
+>                       putStrLn (show mvs)
+>                       -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
+>                       -- putStrLn "possible state-control sequences and rewards:"
+>                       -- putStr "  "
+>                       -- putStrLn (show mxyvs)
+>                       -- putStrLn "measure of possible rewards: "
+>                       -- putStr "  "
+>                       -- putStrLn (show (meas mvs))
+>                       -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                       -- putStrLn "best possible state-control sequence: "
+>                       -- putStr "  "
+>                       -- putStrLn (show (fst argmaxmax))
+>                       -- putStrLn "best possible reward: "
+>                       -- putStr "  "
+>                       -- putStrLn (show (snd argmaxmax))
+>                       -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                       -- -- putStrLn "worst possible state-control sequence: "
+>                       -- -- putStr "  "
+>                       -- -- putStrLn (show (fst argminmin))
+>                       -- -- putStrLn "worst possible reward: "
+>                       -- -- putStr "  "
+>                       -- -- putStrLn (show (snd argminmin))
 >                       putStrLn ("done!")                       
 >        (No _)   => putStrLn ("initial column non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
@@ -168,6 +216,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 > {-
 
 > ---}
+
 
 -- Local Variables:
 -- idris-packages: ("effects")

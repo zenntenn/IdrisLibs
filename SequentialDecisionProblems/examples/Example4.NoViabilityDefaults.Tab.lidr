@@ -8,10 +8,12 @@
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
+> import SequentialDecisionProblems.TabBackwardsInduction
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.StochasticDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
@@ -111,6 +113,11 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 > SequentialDecisionProblems.CoreTheory.meas = average
 > SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
 
+** |State| is finite:
+
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+>   finiteLTB nColumns
+
 ** |Ctrl| is finite:
 
 > SequentialDecisionProblems.Utils.finiteCtrl _ = 
@@ -125,6 +132,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >     all' : (xs : List (State (S t))) -> Data.List.Quantifiers.All (Reachable {t' = S t}) xs
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
+> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
 ** Viability:
 
@@ -154,7 +162,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 >      x0 <- getLTB nColumns
 >      case (decidableViable {t = Z} nSteps x0) of
 >        (Yes v0) => do putStrLn ("computing optimal policies ...")
->                       ps   <- pure (backwardsInduction Z nSteps)
+>                       ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                       putStrLn ("computing optimal controls ...")
 >                       mxys <- pure (possibleStateCtrlSeqs x0 () v0 ps)
 >                       putStrLn (show mxys)

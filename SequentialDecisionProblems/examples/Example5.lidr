@@ -12,7 +12,8 @@
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.StochasticDefaults
-> import SequentialDecisionProblems.OptDefaults
+> import SequentialDecisionProblems.CoreTheoryOptDefaults
+> import SequentialDecisionProblems.FullTheoryOptDefaults
 > import SequentialDecisionProblems.ViabilityDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
@@ -105,7 +106,7 @@ probablility to move "Ahead"!
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
 >   NonNegRational.LTEProperties.monotonePlusLTE
 
-> SequentialDecisionProblems.OptDefaults.totalPreorderLTE = 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
 >   NonNegRational.LTEProperties.totalPreorderLTE 
 
 ** Reward function:
