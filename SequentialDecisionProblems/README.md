@@ -62,16 +62,16 @@
   [examples](examples/). The implementation naturally leads to the
   following questions:
 
-  ** Can we express the tabulated, tail-recursive implementation as an
-     instance of a general pattern?
+    * Can we express the tabulated, tail-recursive implementation as an
+       instance of a general pattern?
 
-  ** The examples in [examples](examples/) suggest that, if the
-     computation of `Viable` and `Reachable` is efficient (the
-     `.NonViabilityDefaults` examples), the tabulated implementation
-     indeed executes in liner time in the number of decision steps but
-     ...
+    * The examples in [examples](examples/) suggest that, if the
+      computation of `Viable` and `Reachable` is efficient (the
+      `.NonViabilityDefaults` examples), the tabulated implementation
+      indeed executes in liner time in the number of decision steps but
+      ...
 
-  ** ... the default implementation of `Viable` and, likely, the
-     computation of trajectories for non-deterministic and stochastic
-     problems can completely spoil this behavior and bring back the
-     execution times of the naive implementation from the core theory.
+    * ... the default implementation of `Viable` and, likely, the
+      computation of trajectories for non-deterministic and stochastic
+      problems can completely spoil this behavior and bring back the
+      execution times of the naive implementation from the core theory.
