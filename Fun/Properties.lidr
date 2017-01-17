@@ -3,7 +3,9 @@
 > import Syntax.PreorderReasoning
 
 > import Fun.Operations
+> import Fun.Predicates
 > import Pair.Properties
+> import Finite.Predicates
 
 
 > %default total
@@ -103,6 +105,16 @@ Properties of cross
 > |||
 > crossIdAnyFstLemma : fst ((cross Prelude.Basics.id f) (a,b)) = a
 > crossIdAnyFstLemma {a} {b} {f} = Refl
+
+
+* Properties of extensional equality
+
+> {-
+> finiteDecidableExtEq : {A, B : Type} -> 
+>                        (f : A -> B) -> (g : A -> B) -> 
+>                        Finite A -> DecEq B -> Dec (ExtEq f g)
+> -}
+
 
 
 > {-

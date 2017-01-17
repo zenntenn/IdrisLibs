@@ -5,6 +5,7 @@
 > import Double.Predicates
 > import Double.Postulates
 > import NonNegDouble.NonNegDouble
+> import NonNegDouble.Constants
 > import Pairs.Operations
 
 > %default total
@@ -13,7 +14,8 @@
 
 > ||| 
 > toDouble : NonNegDouble -> Double
-> toDouble = getWitness -- PairsOperations.Subset.getWitness
+> -- toDouble (Element x _) = x
+> toDouble = getWitness
 
 
 > ||| 
@@ -31,7 +33,12 @@
 > mult (Element x px) (Element y py) = Element (x * y) (multPreservesNonNegativity px py)
 
 
+> ||| Division of positive double precision floating point numbers
+> div : NonNegDouble -> NonNegDouble -> NonNegDouble
+> div (Element x px) (Element y py) = Element (x / y) (divPreservesNonNegativity px py)
+
+
 > ||| 
 > fromNat : (n : Nat) -> NonNegDouble
-> fromNat  Z    = Element 0.0 (MkNonNegative Oh) 
-> fromNat (S m) = plus (Element 1.0 (MkNonNegative Oh)) (fromNat m)
+> fromNat  Z    = zero
+> fromNat (S m) = one `plus` (fromNat m)
