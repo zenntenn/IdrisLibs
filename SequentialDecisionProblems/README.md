@@ -24,16 +24,20 @@
   tail-recursive implementation of the generic backwards induction
   algorithm of the core theory, see .Tab examples in (examples/).
 
-* [Helpers](Helpers.lidr) Obsolete, will soon disappear.
-
 * [DeterministicDefaults](DeterministicDefaults.lidr) Defaults for
   deterministic SDPs, see [Example1](examples/Example1.lidr).
 
 * [NonDeterministicDefaults](NonDeterministicDefaults.lidr) Defaults for
   non-deterministic SDPs, see [Example2](examples/Example2.lidr).
 
-* [StochasticDefaults](StochasticDefaults.lidr) Defaults for
-  stochastic SDPs, see [Example5](examples/Example5.lidr).
+* [StochasticDefaults](StochasticDefaults.lidr) Defaults for stochastic
+  SDPs with probabilities represented by non-negative rational numbers,
+  see [Example5](examples/Example5.lidr).
+
+* [FastStochasticDefaults](FastStochasticDefaults.lidr) Defaults for
+  stochastic SDPs with probabilities represented by non-negative double
+  precision floating point numbers, see
+  [Example5](examples/Example5.lidr).
 
 * [CoreTheoryOptDefaults](CoreTheoryOptDefaults.lidr) Defaults for
   solving SDPs with finite controls, see examples in
@@ -57,6 +61,25 @@
 
 ## Timeline
 
+* 2017-01-19: added an implementation of Newcomb's problem in which
+  probabilities are represented by non-negative double precision
+  floating point numbers. In spite of the many postulates (see
+  [Double.Postulates](Double/Postulates.lidr),
+  [Double.LTEPostulates](Double/LTEPostulates.lidr),
+  [NonNegDouble.Postulates](NonNegDouble/Postulates.lidr) and
+  [FastSimpleProb.Measures](FastSimpleProb/Measures.lidr)), the program
+  can be compiled (perhaps a nice proof of concept for erasure?)  and
+  executes much faster than the correspondent implementation based on
+  non-negative rational numbers, see
+  [FastNewcomb](applications/FastNewcomb.lidr)
+  vs. [Newcomb](applications/Newcomb.lidr)
+
+* 2017-01-19: added
+  [FastStochasticDefaults](FastStochasticDefaults.lidr) for stochastic
+  SDPs with probabilities represented by non-negative double precision
+  floating point numbers (NonNegDouble) instead of non-negative rational
+  numbers (NonNegRational).
+
 * 2017-01-06: added a tabulated, tail-recursive implementation of the
   generic backwards induction algorithm from the core theory in
   [TabBackwardsInduction](TabBackwardsInduction.lidr) and examples in
@@ -64,6 +87,12 @@
   
 
 ## Open questions
+
+* 2017-01-19: Can we reduce the number of postulates on double-precision
+  floating point numbers necessary for implementing simple probability
+  distributions to a minimal number of core postulates? The only feature
+  which is actually needed for computations is a decision procedure for
+  x <= y for arbitrary (x, y ; Double).
 
 * 2017-01-06:
 
