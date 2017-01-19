@@ -12,7 +12,6 @@ libs:
   -not \( -path "./tmp" -prune \) \
   -not \( -path "./AgentBasedModels" -prune \) \
   -not \( -path "./GenericSimpleProb" -prune \) \
-  -not \( -path "./SequentialDecisionProblems" -prune \) \
   -not \( -path "./*/tests" -prune \) \
   -not \( -path "./*/open_issues" -prune \) \
   -name '*.lidr' | xargs -n 1 ${IDRIS} ${IDRISFLAGS} --check

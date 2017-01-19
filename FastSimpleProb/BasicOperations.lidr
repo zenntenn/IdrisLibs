@@ -45,9 +45,9 @@
 >   sum    : NonNegDouble
 >   sum    = sumMapSnd aps
 >   oosum  : NonNegDouble
->   oosum  = oneNonNegDouble / sum
+>   oosum  = one / sum
 >   poosum : Positive (toDouble oosum)
->   poosum = divPreservesPositivity positiveOneNonNegDouble psum
+>   poosum = divPreservesPositivity positiveOne psum
 
 
 > |||
@@ -82,14 +82,14 @@
 > ||| uniform probability distribution
 > mkSimpleProb : {A : Type} -> (as : List A) -> List.Operations.NonEmpty as -> SimpleProb A
 > mkSimpleProb      Nil              prf = absurd prf
-> mkSimpleProb {A} (a :: Nil)        _   = MkSimpleProb [(a, oneNonNegDouble)] positiveOneNonNegDouble
+> mkSimpleProb {A} (a :: Nil)        _   = MkSimpleProb [(a, one)] positiveOne
 > mkSimpleProb {A} (a :: (a' :: as)) _   = MkSimpleProb aps prf where
 >   ps' : SimpleProb A
 >   ps' = assert_total (mkSimpleProb (a' :: as) ())
 >   aps : List (A, NonNegDouble)
->   aps = (a, oneNonNegDouble) :: (toList ps')
+>   aps = (a, one) :: (toList ps')
 >   prf : Positive (toDouble (sumMapSnd aps))
->   prf = sumMapSndConsLemma1 a 1.0 positiveOneNonNegDouble (MkNonNegative Oh) (toList ps')
+>   prf = sumMapSndConsLemma1 a 1.0 positiveOne (MkNonNegative Oh) (toList ps')
 
 
 > {-

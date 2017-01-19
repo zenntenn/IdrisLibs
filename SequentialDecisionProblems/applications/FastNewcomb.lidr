@@ -3,6 +3,7 @@
 > import Data.Fin
 > import Data.List
 > import Data.List.Quantifiers
+> import Data.So
 > import Control.Isomorphism
 > import Effects
 > import Effect.Exception
@@ -11,27 +12,30 @@
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
 > import SequentialDecisionProblems.Utils
-> import SequentialDecisionProblems.StochasticDefaults
+> import SequentialDecisionProblems.FastStochasticDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
 
 > import SequentialDecisionProblems.examples.LeftAheadRight
 
-> import SimpleProb.SimpleProb
-> import SimpleProb.BasicOperations
-> import SimpleProb.BasicProperties
-> import SimpleProb.MonadicOperations
-> import SimpleProb.MonadicProperties
-> import SimpleProb.Measures
+> import FastSimpleProb.SimpleProb
+> import FastSimpleProb.BasicOperations
+> import FastSimpleProb.BasicProperties
+> import FastSimpleProb.MonadicOperations
+> import FastSimpleProb.MonadicProperties
+> import FastSimpleProb.Measures
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
 > import Nat.LTProperties
-> import NonNegRational.NonNegRational
-> import NonNegRational.BasicOperations
-> import NonNegRational.BasicProperties
-> import NonNegRational.Predicates
-> import NonNegRational.LTEProperties
+> import Double.Predicates
+> import NonNegDouble.NonNegDouble
+> import NonNegDouble.BasicOperations
+> import NonNegDouble.BasicProperties
+> import NonNegDouble.Predicates
+> import NonNegDouble.LTEProperties
+> import NonNegDouble.Measures
+> import NonNegDouble.MeasureProperties
 > import Finite.Predicates
 > import Finite.Operations
 > import Finite.Properties
@@ -138,88 +142,62 @@ boxes, the opaque box will likely be empty. Let |p1| be the probability
 that the prediction is right and |p2| the probability that it is wrong
 with |p1 >> p2|:
 
-> n   :  Nat
-> n   =  99
+> p   :  Double
+> p   =  99
 
-> p1  :  NonNegRational
-> p1  =  fromFraction (n, Element (S n) MkPositive)
-> p2  :  NonNegRational
-> p2  =  fromFraction (1, Element (S n) MkPositive)
-
-We postulate that the sum of the probabilities of |[(x1, p1), (x2, p2)]|
-and |[(x1, p2), (x2, p1)]| is one: 
-
-> postulate sumOne1 : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
->                     sumMapSnd [(x1, p1), (x2, p2)] = 1
-
-> postulate sumOne2 : {t : Nat} -> {x1 : State t} -> {x2 : State t} -> 
->                     sumMapSnd [(x1, p2), (x2, p1)] = 1
-
-This is in principle not necessary. But a naive implementation of
-|sumOne1|
-
-< sumOne1 = Refl
-
-would take too long to type check. In fact, type checking |sumOne1|
-would lead to a stack overflow. 
+> p1  :  NonNegDouble
+> p1  =  Element (p   / (p + 1.0)) (MkNonNegative Oh)
+> p2  :  NonNegDouble
+> p2  =  Element (1.0 / (p + 1.0)) (MkNonNegative Oh)
 
 
 * Transition function
 
-As it turns out, we have to
-
-> %freeze n
-> %freeze fromFraction
-
-to actuallly be able to use the |sumOne1| and |sumOne2| postulates in
-the implementation of the transition function. The alternative is,
-again, a stack overflow during type checking. With these preliminaries
-in place, we can define the transition function for Newcomb's
-problem. Selecting the opaque box at decision step zero yields one
-million dollars in the opaque box with probability |p1| and zero dollars
-with probability |p2| (with |p1 >> p2|):
+Selecting the opaque box at decision step zero yields one million
+dollars in the opaque box with probability |p1| and zero dollars with
+probability |p2| (with |p1 >> p2|):
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeOpaqueBox =
->   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (sumOne1 {t = 1} {x1 = OneMillion} {x2 = Zero})
+>   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (MkPositive Oh)
 
 Conversely, selecting both boxes yields one million dollars in the
 opaque box with probability |p2| and zero dollars with probability |p1|:
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeBothBoxes =
->   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (sumOne2 {t = 1} {x1 = OneMillion} {x2 = Zero})
+>   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (MkPositive Oh)
 
 At all subsequent decision steps, nothing interesting happens. There are
 no options to decide upon and the transition function simply returns the
 current state:
 
-> SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = SimpleProb.MonadicOperations.ret s
+> SequentialDecisionProblems.CoreTheory.nexts (S n) s _ = FastSimpleProb.MonadicOperations.ret s
 
 
 * |Val| and |LTE|:
 
 > SequentialDecisionProblems.CoreTheory.Val = 
->   NonNegRational.NonNegRational
+>   NonNegDouble.NonNegDouble
 
 > SequentialDecisionProblems.CoreTheory.plus = 
->   NonNegRational.BasicOperations.plus
+>   NonNegDouble.BasicOperations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
 >   fromInteger 0
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
->   NonNegRational.Predicates.LTE
+>   NonNegDouble.Predicates.LTE
 
 > SequentialDecisionProblems.FullTheory.reflexiveLTE = 
->   NonNegRational.LTEProperties.reflexiveLTE
+>   NonNegDouble.LTEProperties.reflexiveLTE
 
 > SequentialDecisionProblems.FullTheory.transitiveLTE = 
->   NonNegRational.LTEProperties.transitiveLTE
+>   NonNegDouble.LTEProperties.transitiveLTE
 
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
->   NonNegRational.LTEProperties.monotonePlusLTE
+>   NonNegDouble.LTEProperties.monotonePlusLTE
 
 > SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
->   NonNegRational.LTEProperties.totalPreorderLTE 
+>   NonNegDouble.LTEProperties.totalPreorderLTE 
 
 
 * Reward function
@@ -227,12 +205,11 @@ current state:
 We can now define the reward function for Newcomb's problem. We measure
 rewards in units of millions of dollars
 
-> oneMillion : NonNegRational
-> oneMillion = fromFraction (1, Element 1 MkPositive)
+> oneMillion : NonNegDouble
+> oneMillion = Element 1.0 (MkNonNegative Oh)
 
-> oneThousand : NonNegRational
-> -- oneThousand = fromFraction (1, Element 1000 MkPositive)
-> oneThousand = fromFraction (1, Element 12 MkPositive)
+> oneThousand : NonNegDouble
+> oneThousand = Element 0.001 (MkNonNegative Oh)
 
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero

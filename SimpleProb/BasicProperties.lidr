@@ -16,7 +16,7 @@
 
 > %default total
 > %access public export
-> -- %auto_implicits off
+> %auto_implicits on
 
 
 > |||

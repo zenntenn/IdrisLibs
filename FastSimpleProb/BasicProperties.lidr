@@ -14,7 +14,7 @@
 
 > %default total
 > %access public export
-> %auto_implicits off
+> %auto_implicits on
 
 
 > |||
@@ -32,6 +32,11 @@
 >                             (sp : SimpleProb A) ->
 >                             length (support sp) = length (weights sp)
 > lengthSupportWeightsLemma sp = lengthLemma (toList sp) fst snd                           
+
+
+> ||| SimpleProb is an implementation of Show
+> implementation Show a => Show (SimpleProb a) where
+>   show sp = show (toList sp)
 
 
 > {-

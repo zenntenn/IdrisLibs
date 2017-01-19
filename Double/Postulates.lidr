@@ -43,3 +43,27 @@
 > postulate 
 > LTinLTE : {x, y : Double} -> So (x < y) -> So (x <= y)
 
+
+> |||
+> postulate 
+> EQinLTE : {x, y : Double} -> So (x == y) -> So (x <= y)
+
+
+> |||
+> postulate 
+> gtLT : {x, y : Double} -> So (x > y) -> So (y < x)
+
+
+> |||
+> postulate 
+> compareLT : {x, y : Double} -> LT = compare x y -> So (x < y)
+
+
+> |||
+> postulate 
+> compareEQ : {x, y : Double} -> EQ = compare x y -> So (x == y)
+
+
+> |||
+> postulate 
+> compareGT : {x, y : Double} -> GT = compare x y -> So (x > y)

@@ -4,6 +4,7 @@
 
 > import Double.Predicates
 > import Double.Postulates
+> import Double.LTEPostulates
 > import So.Properties
 
 > %default total

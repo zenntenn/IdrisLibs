@@ -6,6 +6,7 @@
 > import FastSimpleProb.BasicOperations
 > import FastSimpleProb.MonadicOperations
 > import NonNegDouble.NonNegDouble
+> import NonNegDouble.Predicates
 > import NonNegDouble.BasicProperties
 > import List.Operations
 
@@ -22,8 +23,8 @@
 > ||| |average| is monotone
 > postulate monotoneAverage : {A : Type} ->
 >                             (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
->                             (p : (a : A) -> So (f a <= g a)) ->
->                             (as : SimpleProb A) ->
->                             So (average (fmap f as) <= average (fmap g as))
+>                             (p : (a : A) -> f a `LTE` g a) ->
+>                             (sp : SimpleProb A) ->
+>                             average (fmap f sp) `LTE` average (fmap g sp)
  
  

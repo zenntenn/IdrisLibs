@@ -1,6 +1,6 @@
 > module SequentialDecisionProblems.examples.Main
 
-> import Decidable.Order
+> -- import Decidable.Order
 
 > import Data.List
 > import Data.List.Quantifiers
@@ -39,7 +39,7 @@
 > import Fraction.Normal
 > import Nat.Positive
 > import List.Operations
-> import Void.Properties
+> -- import Void.Properties
 > import Unit.Properties
 
 > -- %default total

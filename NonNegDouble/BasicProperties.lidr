@@ -63,6 +63,34 @@
 * Properties of |toDouble|:
 
 > ||| 
+> toDoublePlusLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x + y) = (toDouble x) + (toDouble y)
+> toDoublePlusLemma (Element x px) (Element y py) = 
+>     ( toDouble ((Element x px) + (Element y py)) )
+>   ={ Refl }=
+>     ( toDouble (plus (Element x px) (Element y py)) )
+>   ={ Refl }=
+>     ( toDouble (Element (x + y) (plusPreservesNonNegativity px py)) )
+>   ={ Refl }=
+>     ( x + y )
+>   ={ Refl }=
+>     ( (toDouble (Element x px)) + (toDouble (Element y py)) )
+>   QED
+
+> ||| 
+> toDoubleMultLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x * y) = (toDouble x) * (toDouble y)
+> toDoubleMultLemma (Element x px) (Element y py) = 
+>     ( toDouble ((Element x px) * (Element y py)) )
+>   ={ Refl }=
+>     ( toDouble (mult (Element x px) (Element y py)) )
+>   ={ Refl }=
+>     ( toDouble (Element (x * y) (multPreservesNonNegativity px py)) )
+>   ={ Refl }=
+>     ( x * y )
+>   ={ Refl }=
+>     ( (toDouble (Element x px)) * (toDouble (Element y py)) )
+>   QED
+
+> ||| 
 > toDoubleDivLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x / y) = (toDouble x) / (toDouble y)
 > toDoubleDivLemma (Element x px) (Element y py) = 
 >     ( toDouble ((Element x px) / (Element y py)) )

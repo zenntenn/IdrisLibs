@@ -16,3 +16,10 @@
 >   MkPositive : {x : Double} -> So (0.0 < x) -> Positive x
 
 
+* LTE
+
+> |||
+> data LTE : Double -> Double -> Type where
+>   MkLTE : (x : Double) -> (y : Double) -> So (x <= y) -> LTE x y
+
+
