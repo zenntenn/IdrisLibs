@@ -131,6 +131,26 @@
 >   s4 = s3
 
 
+* Properies of |fmap| and |toList|
+
+> |||
+> toListFmapLemma : {A, B : Type} -> 
+>                   (f : A -> B) -> (sp : SimpleProb A) ->
+>                   toList (fmap f sp) = fmap (cross f id) (toList sp)
+> toListFmapLemma f (MkSimpleProb aps psum) = 
+>     ( toList (fmap f (MkSimpleProb aps psum)) )
+>   ={ Refl }=
+>     ( toList (MkSimpleProb 
+>               (fmap (cross f id) aps) 
+>               (replace {P = \ X => Positive (toDouble X)} (cong {f = sum} (sym (mapSndMapCrossAnyIdLemma f aps))) psum)) )
+>   ={ Refl }=  
+>     ( fmap (cross f id) aps )
+>   ={ Refl }=
+>     ( fmap (cross f id) (toList (MkSimpleProb aps psum)) )
+>   QED
+
+
+
 > {-
 
 > ---}

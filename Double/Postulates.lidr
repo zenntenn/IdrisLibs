@@ -3,6 +3,7 @@
 > import Data.So
 
 > import Double.Predicates
+> import So.Properties
 
 > %default total
 > %access public export
@@ -39,31 +40,13 @@
 >                          Positive x -> Positive y -> Positive (x / y)
 
 
-> |||
-> postulate 
-> LTinLTE : {x, y : Double} -> So (x < y) -> So (x <= y)
-
-
-> |||
-> postulate 
-> EQinLTE : {x, y : Double} -> So (x == y) -> So (x <= y)
-
+* Postulates on Ord methods
 
 > |||
 > postulate 
 > gtLT : {x, y : Double} -> So (x > y) -> So (y < x)
 
-
-> |||
 > postulate 
-> compareLT : {x, y : Double} -> LT = compare x y -> So (x < y)
+> notCompareEQ : {x, y : Double} -> Not (So (x == y)) -> Not (EQ = compare x y)
 
 
-> |||
-> postulate 
-> compareEQ : {x, y : Double} -> EQ = compare x y -> So (x == y)
-
-
-> |||
-> postulate 
-> compareGT : {x, y : Double} -> GT = compare x y -> So (x > y)

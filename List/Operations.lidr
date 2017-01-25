@@ -119,6 +119,10 @@
 > mvMult abs f = concat (map (mapIdRightMult . (cross f id)) abs)
 
 > |||
+> prods : {B : Type} -> (Num B) => List (B, B) -> List B
+> prods = map (uncurry (*))
+
+> |||
 > sumProds : {B : Type} -> (Num B) => List (B, B) -> B
 > sumProds Nil = 0
 > sumProds ((b,b') :: bbs) = b * b' + sumProds bbs

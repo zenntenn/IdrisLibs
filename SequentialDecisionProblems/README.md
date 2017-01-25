@@ -92,7 +92,7 @@
   floating point numbers necessary for implementing simple probability
   distributions to a minimal number of core postulates? The only feature
   which is actually needed for computations is a decision procedure for
-  x <= y for arbitrary (x, y ; Double).
+  x <= y for arbitrary (x, y : Double).
 
 * 2017-01-06:
 

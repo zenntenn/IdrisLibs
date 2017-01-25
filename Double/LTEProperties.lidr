@@ -5,6 +5,7 @@
 > import Double.Predicates
 > import Double.Postulates
 > import Double.LTEPostulates
+> import Double.Properties
 > import Rel.TotalPreorder
 
 > %default total
@@ -19,7 +20,6 @@
 >   | LT = Left  (MkLTE x y (LTinLTE (compareLT prf)))
 >   | EQ = Left  (MkLTE x y (EQinLTE (compareEQ prf)))
 >   | GT = Right (MkLTE y x (LTinLTE (gtLT (compareGT prf))))
-
 
 > ||| LTE is a total preorder
 > totalPreorderLTE : TotalPreorder Double.Predicates.LTE
