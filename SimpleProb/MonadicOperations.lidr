@@ -31,6 +31,15 @@
 >   aps' : List (B, NonNegRational)
 >   aps' = map (cross f id) aps
 >   s1p' : sumMapSnd aps' = 1
+>   s1p' = trans s1 (trans s2 s3) where
+>     s1 : sumMapSnd aps' = sum (map snd aps')
+>     s1 = Refl
+>     s2 : sum (map snd aps') = sum (map snd aps)
+>     s2 = cong (mapSndMapCrossAnyIdLemma f aps)
+>     s3 : sum (map snd aps) = 1
+>     s3 = s1p
+>     
+> {-  
 >   s1p' = ( sumMapSnd aps' )
 >        ={ Refl }=
 >          ( sum (map snd aps') )
@@ -41,7 +50,7 @@
 >        ={ s1p }=
 >          ( 1 )
 >        QED
-
+> -}
 
 * |SimpleProb| is a monad:
 

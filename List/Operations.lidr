@@ -63,6 +63,16 @@
 * Reduction operators
 
 > |||
+> max : {A : Type} -> {R : A -> A -> Type} -> 
+>       TotalPreorder R -> (as : List A) -> List.Operations.NonEmpty as -> A
+> max tp       Nil        p = absurd p
+> max tp (a :: Nil)       _ = a
+> max tp (a :: a' :: abs) _ with (max tp (a' :: abs) ())
+>   | m with (totalPre tp a m)
+>     | (Left _)  = m
+>     | (Right _) = a
+
+> |||
 > argmaxMax : {A, B : Type} -> {R : B -> B -> Type} -> 
 >             TotalPreorder R -> (abs : List (A, B)) -> List.Operations.NonEmpty abs -> (A, B)
 > argmaxMax tp       Nil                   p = absurd p
@@ -72,6 +82,15 @@
 >     | (Left _)  = (argmax, max)
 >     | (Right _) = (a, b)
 
+> |||
+> min : {A : Type} -> {R : A -> A -> Type} -> 
+>       TotalPreorder R -> (as : List A) -> List.Operations.NonEmpty as -> A
+> min tp       Nil        p = absurd p
+> min tp (a :: Nil)       _ = a
+> min tp (a :: a' :: abs) _ with (min tp (a' :: abs) ())
+>   | m with (totalPre tp a m)
+>     | (Left _)  = a
+>     | (Right _) = m
 
 > |||
 > argminMin : {A, B : Type} -> {R : B -> B -> Type} -> 

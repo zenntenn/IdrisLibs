@@ -25,8 +25,8 @@
 > import Sigma.Sigma
 
 > %default total
-> -- %access public export
-> %access export
+> %access public export
+> -- %access export
 > %auto_implicits off
 
 
@@ -173,6 +173,22 @@
 >   s4 : NonEmpty sp
 >   s4 = s3
 
+
+> |||
+> toListFmapLemma : {A, B : Type} -> 
+>                   (f : A -> B) -> (sp : SimpleProb A) ->
+>                   toList (fmap f sp) = fmap (cross f id) (toList sp)
+> toListFmapLemma f (MkSimpleProb aps s1p) = 
+>     ( toList (fmap f (MkSimpleProb aps s1p)) )
+>   ={ Refl }=
+>     ( toList (MkSimpleProb 
+>               (fmap (cross f id) aps) 
+>               (trans Refl (trans (cong (mapSndMapCrossAnyIdLemma f aps)) s1p))) )
+>   ={ Refl }=  
+>     ( fmap (cross f id) aps )
+>   ={ Refl }=
+>     ( fmap (cross f id) (toList (MkSimpleProb aps s1p)) )
+>   QED
 
 
 > {-

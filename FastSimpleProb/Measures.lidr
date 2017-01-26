@@ -15,17 +15,37 @@
 > import NonNegDouble.MeasureProperties
 > import NonNegDouble.LTEProperties
 > import List.Operations
+> import List.Properties
 > import Fun.Operations
+> import Rel.TotalPreorder
 
 > %default total
 > %access public export
 > %auto_implicits off
 
 
-> |||
+* Measures
+
+> ||| Worst
+> worst : SimpleProb NonNegDouble -> NonNegDouble
+> worst sp = List.Operations.min totalPreorderLTE xs ne where
+>   xs : List NonNegDouble
+>   xs = map fst (toList sp)
+>   ne : List.Operations.NonEmpty xs
+>   ne = mapPreservesNonEmpty fst (toList sp) (nonEmptyLemma1 sp)
+
+> ||| Average
 > average : SimpleProb NonNegDouble -> NonNegDouble
 > average = average . (map (uncurry (*))) . toList
 
+> ||| Expected value
+> expectedValue : SimpleProb NonNegDouble -> NonNegDouble
+> expectedValue = average
+
+
+* Monotonicity of measures
+
+> |||
 > monotoneUncurryMultCrossId : {A : Type} ->
 >                              (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
 >                              (p : (a : A) -> f a `LTE` g a) ->
@@ -39,6 +59,13 @@
 >   s3 : uncurry (*) ((cross f id) (a, x)) `LTE` uncurry (*) ((cross g id) (a, x))
 >   s3 = s2
 
+> ||| |worst| is monotone
+> postulate
+> monotoneWorst : {A : Type} ->
+>                 (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
+>                 (p : (a : A) -> f a `LTE` g a) ->
+>                 (sp : SimpleProb A) ->
+>                  worst (fmap f sp) `LTE` worst (fmap g sp)
 
 > ||| |average| is monotone
 > monotoneAverage : {A : Type} ->
@@ -81,3 +108,11 @@
 >   s5  = replace {P = \ X => average (map (uncurry (*)) (toList (fmap f sp))) `LTE` average X} s3 s4
 >   s6  : average (fmap f sp) `LTE` average (fmap g sp)
 >   s6  = s5
+
+> ||| |expectedValue| is monotone
+> monotoneExpectedValue : {A : Type} ->
+>                         (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
+>                         (p : (a : A) -> f a `LTE` g a) ->
+>                         (sp : SimpleProb A) ->
+>                         expectedValue (fmap f sp) `LTE` expectedValue (fmap g sp)
+> monotoneExpectedValue = monotoneAverage
