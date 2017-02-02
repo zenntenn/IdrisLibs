@@ -1,7 +1,0 @@
-> module Double.LTEPostulates
-
-> {-
-
-> ---}
- 
- 
