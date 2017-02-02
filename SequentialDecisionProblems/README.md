@@ -61,6 +61,9 @@
 
 ## Timeline
 
+* 2017-02-02: cleanup. Removed Double.LTEPostulates and
+  Double.LTEProperties.
+
 * 2017-01-19: added an implementation of Newcomb's problem in which
   probabilities are represented by non-negative double precision
   floating point numbers. In spite of the many postulates (see
