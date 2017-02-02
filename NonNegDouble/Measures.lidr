@@ -14,7 +14,6 @@
 > average : List NonNegDouble -> NonNegDouble
 > average xs = (sum xs) * ( one / fromNat (length xs))
 
-
 > {-
 
 > ---}

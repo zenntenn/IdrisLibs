@@ -8,7 +8,10 @@
 > import FastSimpleProb.BasicOperations
 > import FastSimpleProb.BasicProperties
 > import FastSimpleProb.MonadicOperations
+> import FastSimpleProb.Predicates
+> -- import FastSimpleProb.MonadicPostulates
 > import NonNegDouble.NonNegDouble
+> import NonNegDouble.Postulates
 > import NonNegDouble.Constants
 > import NonNegDouble.BasicOperations
 > import NonNegDouble.BasicProperties
@@ -149,7 +152,6 @@
 >   ={ Refl }=
 >     ( fmap (cross f id) (toList (MkSimpleProb aps psum)) )
 >   QED
-
 
 
 > {-

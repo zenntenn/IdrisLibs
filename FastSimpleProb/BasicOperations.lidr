@@ -30,8 +30,8 @@
 
 > |||
 > rescale : {A : Type} -> 
->           SimpleProb A -> (p : NonNegDouble) -> Positive (toDouble p) -> SimpleProb A
-> rescale {A} (MkSimpleProb aps psum) p pp = MkSimpleProb aps' psum' where
+>           (p : NonNegDouble) -> Positive (toDouble p) -> SimpleProb A -> SimpleProb A
+> rescale {A} p pp (MkSimpleProb aps psum) = MkSimpleProb aps' psum' where
 >   aps'  : List (A, NonNegDouble)
 >   aps'  = mapIdRightMult (aps, p)
 >   psum' : Positive (toDouble (sumMapSnd aps'))
@@ -41,28 +41,13 @@
 > |||
 > normalize : {A : Type} -> 
 >             SimpleProb A -> SimpleProb A
-> normalize {A} (MkSimpleProb aps psum) = rescale (MkSimpleProb aps psum) oosum poosum where
->   sum    : NonNegDouble
->   sum    = sumMapSnd aps
->   oosum  : NonNegDouble
->   oosum  = one / sum
->   poosum : Positive (toDouble oosum)
->   poosum = divPreservesPositivity positiveOne psum
-> {-            
-> normalize {A} (MkSimpleProb               Nil  psum) = MkSimpleProb        Nil  psum
-> normalize {A} (MkSimpleProb        (ap :: Nil) psum) = MkSimpleProb (ap :: Nil) psum
-> normalize {A} (MkSimpleProb (ap :: ap' :: aps) psum) = rescale (MkSimpleProb aps' psum') oosum' poosum' where
->   aps'    : List (A, NonNegDouble)
->   aps'    = discardBySndZero (ap :: ap' :: aps)
->   sum'    : NonNegDouble
->   sum'    = sumMapSnd aps'
->   psum'   : Positive sum'
->   psum'   = ?kika  
->   oosum'  : NonNegDouble
->   oosum'  = one / sum'
->   poosum' : Positive (toDouble oosum')
->   poosum' = divPreservesPositivity positiveOne psum'
-> -}
+> normalize (MkSimpleProb aps psum) = 
+>   let p  : NonNegDouble
+>          = one / (sumMapSnd aps) in
+>   let pp : Positive (toDouble p)
+>          = divPreservesPositivity positiveOne psum in 
+>   rescale p pp (MkSimpleProb aps psum) 
+
 
 > |||
 > weights : {A : Type} -> SimpleProb A -> List NonNegDouble
