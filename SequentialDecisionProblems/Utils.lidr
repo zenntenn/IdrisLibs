@@ -228,9 +228,9 @@ We apply these patterns, for instance, in |ViabilityDefaults|.
 >       show' : {t : Nat} -> {n : Nat} -> StateCtrlSeq t n -> String
 >       show' xys = "[" ++ show'' "" xys ++ "]" where
 >         show'' : {t' : Nat} -> {n' : Nat} -> String -> StateCtrlSeq t' n' -> String
->         show'' {t'} {n' =   Z}      acc (Nil x)      =
->           acc ++ "(" ++ showState x ++ " ** " ++ " " ++ ")" 
->         show'' {t'} {n' = S m'} acc (xy :: xys)    = 
+>         show'' {t'} {n' = Z}    acc (Nil x)     =
+>           acc ++ "(" ++ showState x ++ " ** " ++ " " ++ ")"
+>         show'' {t'} {n' = S m'} acc (xy :: xys) = 
 >           show'' {t' = S t'} {n' = m'} (acc ++ showStateCtrl xy ++ ", ") xys
 
 > |||

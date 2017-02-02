@@ -34,6 +34,10 @@
 >   ne : List.Operations.NonEmpty xs
 >   ne = mapPreservesNonEmpty fst (toList sp) (nonEmptyLemma1 sp)
 
+> ||| Sum
+> sum : SimpleProb NonNegDouble -> NonNegDouble
+> sum = Prelude.Foldable.sum . (map (uncurry (*))) . toList . normalize
+
 > ||| Average
 > average : SimpleProb NonNegDouble -> NonNegDouble
 > average = average . (map (uncurry (*))) . toList
@@ -66,6 +70,14 @@
 >                 (p : (a : A) -> f a `LTE` g a) ->
 >                 (sp : SimpleProb A) ->
 >                  worst (fmap f sp) `LTE` worst (fmap g sp)
+
+> ||| |sum| is monotone
+> postulate
+> monotoneSum : {A : Type} ->
+>               (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
+>               (p : (a : A) -> f a `LTE` g a) ->
+>               (sp : SimpleProb A) ->
+>               sum (fmap f sp) `LTE` sum (fmap g sp)
 
 > ||| |average| is monotone
 > monotoneAverage : {A : Type} ->

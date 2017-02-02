@@ -230,8 +230,8 @@ rewards induced by uncertainties in the transition function. We first
 assume that the decision maker measures uncertain rewards by their
 average or, in other words, expected value:
 
-> SequentialDecisionProblems.CoreTheory.meas = average
-> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
+> SequentialDecisionProblems.CoreTheory.meas = worst -- expectedValue
+> SequentialDecisionProblems.FullTheory.measMon = monotoneWorst -- monotoneExpectedValue
 
 Further on, we have to implement the notions of viability and
 reachability. We start by positing that all states are viable for any

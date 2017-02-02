@@ -4,6 +4,7 @@
 
 > import Double.Predicates
 > import Double.Postulates
+> import Double.Properties
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
 > import Pairs.Operations
@@ -13,8 +14,12 @@
 
 
 > ||| 
+> mkNonNegDouble : (x : Double) -> {auto prf : 0.0 `LTE` x} -> NonNegDouble 
+> mkNonNegDouble x {prf} = Element x prf
+
+
+> ||| 
 > toDouble : NonNegDouble -> Double
-> -- toDouble (Element x _) = x
 > toDouble = getWitness
 
 
@@ -25,20 +30,26 @@
 
 > ||| Addition of positive double precision floating point numbers
 > plus : NonNegDouble -> NonNegDouble -> NonNegDouble
-> plus (Element x px) (Element y py) = Element (x + y) (plusPreservesNonNegativity px py)
+> plus (Element x nnx) (Element y nny) = Element (x + y) (plusPreservesNonNegativity nnx nny)
 
 
 > ||| Multiplication of positive double precision floating point numbers
 > mult : NonNegDouble -> NonNegDouble -> NonNegDouble
-> mult (Element x px) (Element y py) = Element (x * y) (multPreservesNonNegativity px py)
+> mult (Element x nnx) (Element y nny) = Element (x * y) (multPreservesNonNegativity nnx nny)
 
 
 > ||| Division of positive double precision floating point numbers
 > div : NonNegDouble -> NonNegDouble -> NonNegDouble
-> div (Element x px) (Element y py) = Element (x / y) (divPreservesNonNegativity px py)
+> div (Element x nnx) (Element y nny) = Element (x / y) (divPreservesNonNegativity nnx nny)
 
 
 > ||| 
 > fromNat : (n : Nat) -> NonNegDouble
 > fromNat  Z    = zero
 > fromNat (S m) = one `plus` (fromNat m)
+
+
+> {-
+
+
+> ---}

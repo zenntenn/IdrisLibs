@@ -22,6 +22,8 @@
 > soElim True  Oh = Refl
 > soElim False Oh impossible
 
+** Or
+
 > |||
 > soOrIntro1 : (b1 : Bool) -> (b2 : Bool) -> So b1 -> So (b1 || b2)
 > soOrIntro1 True _  Oh = Oh
@@ -51,6 +53,23 @@
 > soOrElim2 True  False Oh Oh = Oh
 > soOrElim2 False True  Oh Oh impossible
 > soOrElim2 False False Oh Oh impossible
+
+** And
+
+> |||
+> soAndElim1 : (b1 : Bool) -> (b2 : Bool) -> So (b1 && b2) -> So b1
+> soAndElim1 True  True  Oh = Oh
+> soAndElim1 True  False Oh impossible
+> soAndElim1 False True  Oh impossible
+> soAndElim1 False False Oh impossible
+
+> |||
+> soAndElim2 : (b1 : Bool) -> (b2 : Bool) -> So (b1 && b2) -> So b2
+> soAndElim2 True  True  Oh = Oh
+> soAndElim2 True  False Oh impossible
+> soAndElim2 False True  Oh impossible
+> soAndElim2 False False Oh impossible
+
 
 
 * Counter factuals

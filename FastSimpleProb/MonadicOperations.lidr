@@ -47,7 +47,7 @@
 
 > |||
 > bind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
-> bind {A} {B} (MkSimpleProb aps psum) f = MkSimpleProb bps' psum' where
+> bind {A} {B} (MkSimpleProb aps psum) f = normalize (MkSimpleProb bps' psum') where
 >   f' : A -> List (B, NonNegDouble)
 >   f' a = toList (normalize (f a))
 >   psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))

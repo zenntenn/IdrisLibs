@@ -25,6 +25,14 @@
 > %access public export
 
 
+* |Fin n| is finite
+
+> finiteFin : {n : Nat} -> Finite (Fin n)
+> finiteFin {n} = MkSigma n isoRefl
+
+
+* Representations of finite types
+
 > -- toVectComplete : {A : Type} -> (f : Fin n -> A) -> (k : Fin n) -> Elem (f k) (toVect f)
 
 
@@ -64,7 +72,7 @@
 > %freeze toVectInjective1 -- frozen
 
 
-Non empty finite types
+* Non empty finite types
 
 > |||
 > cardNotZLemma : {A : Type} -> (fA : Finite A) -> A -> CardNotZ fA
@@ -233,7 +241,6 @@ This is the core result:
 which can be packaged up as what we aimed for at the beginning:
 
 > finiteDecLemma2 : {A : Type} -> {P : A -> Type} ->
->                   Finite A -> Dec1 P -> Dec (Exists P)
-> finiteDecLemma2 {P} (Evidence n iso) dP = finiteDecHelper n iso P dP
+>                   Finitea2 {P} (Evidence n iso) dP = finiteDecHelper n iso P dP
 
 > ---}

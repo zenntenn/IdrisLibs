@@ -22,6 +22,7 @@
 > import Unique.Predicates
 > import Finite.Predicates
 > import Sigma.Sigma
+> import Pairs.Operations
 
 > %default total
 > %access public export

@@ -11,10 +11,10 @@
 
 > ||| 
 > zero : NonNegDouble
-> zero = Element 0.0 (MkNonNegative Oh)
+> zero = Element 0.0 (MkLTE Oh)
 
 
 > ||| 
 > one : NonNegDouble
-> one = Element 1.0 (MkNonNegative Oh)
+> one = Element 1.0 (MkLTE Oh)
 

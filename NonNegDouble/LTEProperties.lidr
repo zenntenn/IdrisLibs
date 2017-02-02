@@ -6,9 +6,8 @@
 > import NonNegDouble.BasicOperations
 > import NonNegDouble.BasicProperties
 > import Double.Predicates
-> import Double.LTEPostulates
+> import Double.Postulates
 > import Double.Properties
-> import Double.LTEProperties
 > import Rel.TotalPreorder 
 
 > %default total

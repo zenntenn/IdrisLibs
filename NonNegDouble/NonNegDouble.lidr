@@ -10,4 +10,5 @@
 
 > ||| Non negative double precision floating point numbers as sigma types
 > NonNegDouble : Type
-> NonNegDouble = Subset Double NonNegative
+> -- NonNegDouble = Subset Double NonNegative
+> NonNegDouble = Subset Double (\ x => 0.0 `LTE` x)

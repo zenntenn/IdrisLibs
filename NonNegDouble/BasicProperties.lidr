@@ -21,9 +21,9 @@
 > ||| zero is not positive
 > notPositiveZero : Not (Positive (toDouble NonNegDouble.Constants.zero))
 > notPositiveZero = s3 where
->   s0 : toDouble (Element 0.0 (MkNonNegative Oh)) = 0.0
+>   s0 : toDouble (Element 0.0 (MkLTE Oh)) = 0.0
 >   s0 = Refl
->   s1 : Element 0.0 (MkNonNegative Oh) = NonNegDouble.Constants.zero
+>   s1 : Element 0.0 (MkLTE Oh) = NonNegDouble.Constants.zero
 >   s1 = Refl
 >   s2 : toDouble NonNegDouble.Constants.zero = 0.0
 >   s2 = replace {P = \ X => toDouble X = 0.0} s1 s0  
@@ -32,7 +32,7 @@
 
 > ||| one is positive
 > positiveOne : Positive (toDouble NonNegDouble.Constants.one)
-> positiveOne = MkPositive Oh
+> positiveOne = MkLT Oh
 
 
 * Implementations:
@@ -115,8 +115,6 @@
 >   s1 = sym (toDoubleDivLemma x y)
 >   s2 : Positive ((toDouble x) / (toDouble y))
 >   s2 = Double.Postulates.divPreservesPositivity pdx pdy
-
-
 
 
 > {-

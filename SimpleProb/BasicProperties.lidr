@@ -44,7 +44,6 @@
 > implementation Show a => Show (SimpleProb a) where
 >   show sp = show (toList sp)
 
-
 > {-
 
 > ---}

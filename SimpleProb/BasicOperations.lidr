@@ -105,6 +105,10 @@
 >         ( 1 )
 >       QED
 
+> |||
+> showlong : Show a => SimpleProb a -> String
+> showlong sp = showlong (toList sp) 
+
 
 
 

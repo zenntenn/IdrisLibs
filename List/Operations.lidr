@@ -59,6 +59,12 @@
 >     show'  Here     = "Here"
 >     show' (There p) = "There" ++ show' p
 
+> showlong : Show a => List a -> String
+> showlong xs = "[" ++ show' "" xs ++ "]" where                                                                             
+>   show' acc []        = acc                                                                                         
+>   show' acc [x]       = acc ++ show x                                                                               
+>   show' acc (x :: xs) = show' (acc ++ show x ++ ",\n") xs
+
 
 * Reduction operators
 

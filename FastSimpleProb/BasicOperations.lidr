@@ -48,7 +48,21 @@
 >   oosum  = one / sum
 >   poosum : Positive (toDouble oosum)
 >   poosum = divPreservesPositivity positiveOne psum
-
+> {-            
+> normalize {A} (MkSimpleProb               Nil  psum) = MkSimpleProb        Nil  psum
+> normalize {A} (MkSimpleProb        (ap :: Nil) psum) = MkSimpleProb (ap :: Nil) psum
+> normalize {A} (MkSimpleProb (ap :: ap' :: aps) psum) = rescale (MkSimpleProb aps' psum') oosum' poosum' where
+>   aps'    : List (A, NonNegDouble)
+>   aps'    = discardBySndZero (ap :: ap' :: aps)
+>   sum'    : NonNegDouble
+>   sum'    = sumMapSnd aps'
+>   psum'   : Positive sum'
+>   psum'   = ?kika  
+>   oosum'  : NonNegDouble
+>   oosum'  = one / sum'
+>   poosum' : Positive (toDouble oosum')
+>   poosum' = divPreservesPositivity positiveOne psum'
+> -}
 
 > |||
 > weights : {A : Type} -> SimpleProb A -> List NonNegDouble
@@ -89,7 +103,11 @@
 >   aps : List (A, NonNegDouble)
 >   aps = (a, one) :: (toList ps')
 >   prf : Positive (toDouble (sumMapSnd aps))
->   prf = sumMapSndConsLemma1 a 1.0 positiveOne (MkNonNegative Oh) (toList ps')
+>   prf = sumMapSndConsLemma1 a 1.0 positiveOne (MkLTE Oh) (toList ps')
+
+> ||| 
+> showlong : {A : Type} -> Show A => SimpleProb A -> String
+> showlong sp = showlong (toList sp) 
 
 
 > {-

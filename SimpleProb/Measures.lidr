@@ -52,15 +52,12 @@
 >   s3 : uncurry (*) ((cross f id) (a, x)) `LTE` uncurry (*) ((cross g id) (a, x))
 >   s3 = s2
 
-
 > ||| |average| is monotone
-> -- postulate 
 > monotoneAverage : {A : Type} ->
 >                   (f : A -> NonNegRational) -> (g : A -> NonNegRational) ->
 >                   (p : (a : A) -> f a `LTE` g a) ->
 >                   (as : SimpleProb A) ->
 >                   average (fmap f as) `LTE` average (fmap g as) 
-> --{-                  
 > monotoneAverage {A} f g p sp = s6 where
 >   f'  : (A, NonNegRational) -> NonNegRational
 >   f'  = uncurry (*) . (cross f id)
@@ -96,7 +93,6 @@
 >   s5  = replace {P = \ X => average (map (uncurry (*)) (toList (fmap f sp))) `LTE` average X} s3 s4
 >   s6  : average (fmap f sp) `LTE` average (fmap g sp)
 >   s6  = s5
-> ---}  
 
 > ||| |expectedValue| is monotone
 > monotoneExpectedValue : {A : Type} ->
