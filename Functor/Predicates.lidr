@@ -4,6 +4,19 @@
 > %access public export
 > %hide elem
 
+* Naturality
+
+> Natural : {F, G : Type -> Type} -> 
+>           (Functor F) => (Functor G) =>
+>           (t : {A : Type} -> F A -> G A) -> 
+>           Type 
+>            
+> Natural {F} {G} t = {A, B : Type} -> 
+>                     (f : A -> B) ->
+>                     (x : F A) -> 
+>                     t (map f x) = map f  (t x) 
+
+
 * Monotonicity
 
 > |||

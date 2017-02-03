@@ -27,13 +27,9 @@
 
 * Measures
 
-> |||
-> average : SimpleProb NonNegRational -> NonNegRational
-> average = average . (map (uncurry (*))) . toList 
-
 > ||| Expected value
 > expectedValue : SimpleProb NonNegRational -> NonNegRational
-> expectedValue = average
+> expectedValue = Prelude.Foldable.sum . (map (uncurry (*))) . toList
 
 
 * Monotonicity of measures
@@ -52,13 +48,12 @@
 >   s3 : uncurry (*) ((cross f id) (a, x)) `LTE` uncurry (*) ((cross g id) (a, x))
 >   s3 = s2
 
-> ||| |average| is monotone
-> monotoneAverage : {A : Type} ->
->                   (f : A -> NonNegRational) -> (g : A -> NonNegRational) ->
->                   (p : (a : A) -> f a `LTE` g a) ->
->                   (as : SimpleProb A) ->
->                   average (fmap f as) `LTE` average (fmap g as) 
-> monotoneAverage {A} f g p sp = s6 where
+> monotoneExpectedValue : {A : Type} ->
+>                         (f : A -> NonNegRational) -> (g : A -> NonNegRational) ->
+>                         (p : (a : A) -> f a `LTE` g a) ->
+>                         (as : SimpleProb A) ->
+>                         expectedValue (fmap f as) `LTE` expectedValue (fmap g as) 
+> monotoneExpectedValue {A} f g p sp = s6 where
 >   f'  : (A, NonNegRational) -> NonNegRational
 >   f'  = uncurry (*) . (cross f id)
 >   g'  : (A, NonNegRational) -> NonNegRational
@@ -67,8 +62,8 @@
 >   p'  = monotoneUncurryMultCrossId f g p 
 >   aps : List (A, NonNegRational)
 >   aps = toList sp
->   s1  : average (map f' aps) `LTE` average (map g' aps)
->   s1  = monotoneAverage {A = (A, NonNegRational)} f' g' p' aps 
+>   s1  : Prelude.Foldable.sum (map f' aps) `LTE` Prelude.Foldable.sum (map g' aps)
+>   s1  = monotoneSum {A = (A, NonNegRational)} f' g' p' aps 
 >   s2  : map f' aps = map (uncurry (*)) (toList (fmap f sp))
 >   s2  = ( map f' aps )
 >       ={ Refl }=
@@ -87,18 +82,11 @@
 >       ={ cong (sym (toListFmapLemma g sp)) }=
 >         ( map (uncurry (*)) (toList (fmap g sp)) )
 >       QED
->   s4  : average (map (uncurry (*)) (toList (fmap f sp))) `LTE` average (map g' aps)
->   s4  = replace {P = \ X => average X `LTE` (average (map g' aps))} s2 s1
->   s5  : average (map (uncurry (*)) (toList (fmap f sp))) `LTE` average (map (uncurry (*)) (toList (fmap g sp)))
->   s5  = replace {P = \ X => average (map (uncurry (*)) (toList (fmap f sp))) `LTE` average X} s3 s4
->   s6  : average (fmap f sp) `LTE` average (fmap g sp)
+>   s4  : Prelude.Foldable.sum (map (uncurry (*)) (toList (fmap f sp))) `LTE` Prelude.Foldable.sum (map g' aps)
+>   s4  = replace {P = \ X => Prelude.Foldable.sum X `LTE` (Prelude.Foldable.sum (map g' aps))} s2 s1
+>   s5  : Prelude.Foldable.sum (map (uncurry (*)) (toList (fmap f sp))) `LTE` Prelude.Foldable.sum (map (uncurry (*)) (toList (fmap g sp)))
+>   s5  = replace {P = \ X => Prelude.Foldable.sum (map (uncurry (*)) (toList (fmap f sp))) `LTE` Prelude.Foldable.sum X} s3 s4
+>   s6  : expectedValue (fmap f sp) `LTE` expectedValue (fmap g sp)
 >   s6  = s5
 
-> ||| |expectedValue| is monotone
-> monotoneExpectedValue : {A : Type} ->
->                         (f : A -> NonNegRational) -> (g : A -> NonNegRational) ->
->                         (p : (a : A) -> f a `LTE` g a) ->
->                         (sp : SimpleProb A) ->
->                         expectedValue (fmap f sp) `LTE` expectedValue (fmap g sp)
-> monotoneExpectedValue = monotoneAverage
 

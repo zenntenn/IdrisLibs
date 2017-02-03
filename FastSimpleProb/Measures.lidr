@@ -37,7 +37,7 @@
 >   ne : List.Operations.NonEmpty xs
 >   ne = mapPreservesNonEmpty fst (toList sp) (nonEmptyLemma1 sp)
 
-> ||| Expected value
+> ||| Sum
 > sum : SimpleProb NonNegDouble -> NonNegDouble
 > sum = Prelude.Foldable.sum . (map (uncurry (*))) . toList
 
@@ -54,9 +54,9 @@
 >   s1 : meas (fmap f (normalize sp)) `LTE` meas (fmap g (normalize sp))
 >   s1 = mmeas A f g p (normalize sp)
 >   s2 : meas (normalize (fmap f sp)) `LTE` meas (fmap g (normalize sp))
->   s2 = replace {P = \ X => meas X `LTE` meas (fmap g (normalize sp))} (sym (fmapNormalizeLemma f sp)) s1
+>   s2 = replace {P = \ X => meas X `LTE` meas (fmap g (normalize sp))} (sym (normalizeNatural f sp)) s1
 >   s3 : meas (normalize (fmap f sp)) `LTE` meas (normalize (fmap g sp))
->   s3 = replace {P = \ X => meas (normalize (fmap f sp)) `LTE` meas X} (sym (fmapNormalizeLemma g sp)) s2
+>   s3 = replace {P = \ X => meas (normalize (fmap f sp)) `LTE` meas X} (sym (normalizeNatural g sp)) s2
 
 
 * Monotonicity of measures

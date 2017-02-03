@@ -8,8 +8,9 @@
 > import FastSimpleProb.BasicOperations
 > import FastSimpleProb.BasicProperties
 > import FastSimpleProb.MonadicOperations
+> import FastSimpleProb.MonadicPostulates
 > import FastSimpleProb.Predicates
-> -- import FastSimpleProb.MonadicPostulates
+> import FastSimpleProb.Functor
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Postulates
 > import NonNegDouble.Constants
@@ -26,6 +27,8 @@
 > import Finite.Predicates
 > import Sigma.Sigma
 > import Pairs.Operations
+> import Functor.Predicates
+
 
 > %default total
 > %access public export
@@ -33,7 +36,7 @@
 > %auto_implicits off
 
 
-* Properties of |support| and |ret|:
+* Monadic properties of |support|, |normalize|:
 
 > |||
 > supportRetLemma : {A : Type} -> 
@@ -50,6 +53,10 @@
 >                   ={ Refl }=
 >                     ( ret a )
 >                   QED 
+
+> ||| |normalize| is a natural transformation
+> normalizeNatural : Natural {F = SimpleProb} {G = SimpleProb} normalize
+> normalizeNatural = fmapNormalizeLemma
 
 
 * |SimpleProb| is a container monad:

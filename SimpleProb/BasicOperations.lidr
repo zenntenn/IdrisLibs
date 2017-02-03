@@ -106,12 +106,8 @@
 >       QED
 
 > |||
-> showlong : Show a => SimpleProb a -> String
+> showlong : {A : Type} -> Show A => SimpleProb A -> String
 > showlong sp = showlong (toList sp) 
-
-
-
-
 
 
 > {-
