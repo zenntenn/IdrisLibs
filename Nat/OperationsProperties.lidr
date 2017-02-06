@@ -477,13 +477,13 @@ Properties of |mult|:
 Properties of |sum|:
 
 > ||| |sum| is monotone
-> sumMon : {A : Type} ->
+> sumMon : (A : Type) ->
 >          (f : A -> Nat) -> (g : A -> Nat) ->
 >          (p : (a : A) -> f a `LTE` g a) ->
 >          (as : List A) ->
 >          sum (map f as) `LTE` sum (map g as) 
-> sumMon f g p Nil = LTEZero
-> sumMon f g p (a :: as) = s5 where
+> sumMon A f g p Nil = LTEZero
+> sumMon A f g p (a :: as) = s5 where
 >   s1 : sum (map f (a :: as)) = f a + sum (map f as)
 >   s1 = Refl
 >   s2 : sum (map g (a :: as)) = g a + sum (map g as)
@@ -491,7 +491,7 @@ Properties of |sum|:
 >   s3 : f a `LTE` g a
 >   s3 = p a
 >   s4 : sum (map f as) `LTE` sum (map g as)
->   s4 = sumMon f g p as
+>   s4 = sumMon A f g p as
 >   s5 : sum (map f (a :: as)) `LTE` sum (map g (a :: as))
 >   s5 = monotoneNatPlusLTE s3 s4
 > %freeze sumMon

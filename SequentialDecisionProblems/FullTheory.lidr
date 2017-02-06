@@ -43,7 +43,7 @@ decision maker measures the possible rewards entailed by (lists,
 probability distributions, etc. of) possible next states is required to
 fulfill a monotonicity condition:
 
-> measMon  :  {A : Type} ->
+> measMon  :  (A : Type) ->
 >             (f : A -> Val) -> (g : A -> Val) ->
 >             ((a : A) -> (f a) `LTE` (g a)) ->
 >             (ma : M A) -> meas (fmap f ma) `LTE` meas (fmap g ma)
@@ -153,7 +153,7 @@ non-implementable.
 >         v'  : Viable m x'
 >         v'  = allElemSpec0 x' mx' av' x'emx'
 >     s3 : meas (fmap f' (tagElem mx')) `LTE` meas (fmap f (tagElem mx'))
->     s3 = measMon f' f s2 (tagElem mx')
+>     s3 = measMon (PossibleNextState x (ctrl gy')) f' f s2 (tagElem mx')
 >     s4 : val x r v (p' :: ps') `LTE` val x r v (p' :: ps)
 >     s4 = s3
 >     s5 : val x r v (p' :: ps) `LTE` val x r v (p :: ps)

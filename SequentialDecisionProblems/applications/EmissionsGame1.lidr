@@ -217,8 +217,8 @@ induced by uncertainties in the transition function. We first assume
 that the decision maker measures uncertain rewards by their expected
 value:
 
-> SequentialDecisionProblems.CoreTheory.meas = sum -- expectedValue
-> SequentialDecisionProblems.FullTheory.measMon = monotoneSum -- monotoneExpectedValue
+> SequentialDecisionProblems.CoreTheory.meas = FastSimpleProb.Measures.expectedValue
+> SequentialDecisionProblems.FullTheory.measMon = FastSimpleProb.Measures.monotoneExpectedValue
 
 Further on, we have to implement the notions of viability and
 reachability. We start by positing that all states are viable for any

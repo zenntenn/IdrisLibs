@@ -110,8 +110,8 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 
 ** Measure:
 
-> SequentialDecisionProblems.CoreTheory.meas = average
-> SequentialDecisionProblems.FullTheory.measMon = monotoneAverage
+> SequentialDecisionProblems.CoreTheory.meas = expectedValue
+> SequentialDecisionProblems.FullTheory.measMon = monotoneExpectedValue
 
 ** |State| is finite:
 

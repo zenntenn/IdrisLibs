@@ -23,6 +23,7 @@
 > import FastSimpleProb.BasicProperties
 > import FastSimpleProb.MonadicOperations
 > import FastSimpleProb.MonadicProperties
+> import FastSimpleProb.MeasuresPostulates
 > import FastSimpleProb.Measures
 > import Sigma.Sigma
 > import Sigma.Operations
@@ -146,9 +147,9 @@ with |p1 >> p2|:
 > p   =  99
 
 > p1  :  NonNegDouble
-> p1  =  Element (p   / (p + 1.0)) (MkNonNegative Oh)
+> p1  =  mkNonNegDouble (p   / (p + 1.0))
 > p2  :  NonNegDouble
-> p2  =  Element (1.0 / (p + 1.0)) (MkNonNegative Oh)
+> p2  =  mkNonNegDouble (1.0 / (p + 1.0))
 
 
 * Transition function
@@ -158,13 +159,13 @@ dollars in the opaque box with probability |p1| and zero dollars with
 probability |p2| (with |p1 >> p2|):
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeOpaqueBox =
->   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (MkPositive Oh)
+>   MkSimpleProb [(OneMillion, p1), (Zero, p2)] (MkLT Oh)
 
 Conversely, selecting both boxes yields one million dollars in the
 opaque box with probability |p2| and zero dollars with probability |p1|:
 
 > SequentialDecisionProblems.CoreTheory.nexts Z () TakeBothBoxes =
->   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (MkPositive Oh)
+>   MkSimpleProb [(OneMillion, p2), (Zero, p1)] (MkLT Oh)
 
 At all subsequent decision steps, nothing interesting happens. There are
 no options to decide upon and the transition function simply returns the
@@ -206,10 +207,10 @@ We can now define the reward function for Newcomb's problem. We measure
 rewards in units of millions of dollars
 
 > oneMillion : NonNegDouble
-> oneMillion = Element 1.0 (MkNonNegative Oh)
+> oneMillion = mkNonNegDouble 1.0
 
 > oneThousand : NonNegDouble
-> oneThousand = Element 0.001 (MkNonNegative Oh)
+> oneThousand = mkNonNegDouble 0.001
 
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
 > SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero

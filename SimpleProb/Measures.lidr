@@ -48,12 +48,12 @@
 >   s3 : uncurry (*) ((cross f id) (a, x)) `LTE` uncurry (*) ((cross g id) (a, x))
 >   s3 = s2
 
-> monotoneExpectedValue : {A : Type} ->
+> monotoneExpectedValue : (A : Type) ->
 >                         (f : A -> NonNegRational) -> (g : A -> NonNegRational) ->
 >                         (p : (a : A) -> f a `LTE` g a) ->
 >                         (as : SimpleProb A) ->
 >                         expectedValue (fmap f as) `LTE` expectedValue (fmap g as) 
-> monotoneExpectedValue {A} f g p sp = s6 where
+> monotoneExpectedValue A f g p sp = s6 where
 >   f'  : (A, NonNegRational) -> NonNegRational
 >   f'  = uncurry (*) . (cross f id)
 >   g'  : (A, NonNegRational) -> NonNegRational

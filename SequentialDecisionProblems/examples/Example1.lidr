@@ -100,7 +100,7 @@ right as we wish.
 ** Measure:
 
 > SequentialDecisionProblems.CoreTheory.meas (Id x) = x
-> SequentialDecisionProblems.FullTheory.measMon f g prf (Id x) = prf x
+> SequentialDecisionProblems.FullTheory.measMon X f g prf (Id x) = prf x
 
 ** |Ctrl| is finite:
 
