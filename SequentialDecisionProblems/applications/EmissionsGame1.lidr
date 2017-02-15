@@ -26,6 +26,7 @@
 > import FastSimpleProb.MonadicOperations
 > import FastSimpleProb.MonadicProperties
 > import FastSimpleProb.Measures
+> import FastSimpleProb.MeasuresProperties
 > import Sigma.Sigma
 > import Double.Predicates
 > import Double.Postulates
@@ -94,9 +95,10 @@ that |State| is finite:
 > -- The probabilities of staying in a good world and of entering a bad 
 > -- world when the cumulated emissions are below the critical threshold 
 > p1  :  NonNegDouble
-> p1  =  mkNonNegDouble 100.0
+> p1  =  mkNonNegDouble 99.0
 > p1' :  NonNegDouble
-> p1' =  mkNonNegDouble   0.0
+> p1' =  mkNonNegDouble  1.0
+
 
 > -- The probabilities of staying in a good world and of entering a bad 
 > -- world when the cumulated emissions are above the critical threshold 
@@ -217,8 +219,8 @@ induced by uncertainties in the transition function. We first assume
 that the decision maker measures uncertain rewards by their expected
 value:
 
-> SequentialDecisionProblems.CoreTheory.meas = FastSimpleProb.Measures.expectedValue
-> SequentialDecisionProblems.FullTheory.measMon = FastSimpleProb.Measures.monotoneExpectedValue
+> SequentialDecisionProblems.CoreTheory.meas = expectedValue
+> SequentialDecisionProblems.FullTheory.measMon = monotoneExpectedValue
 
 Further on, we have to implement the notions of viability and
 reachability. We start by positing that all states are viable for any

@@ -25,6 +25,7 @@
 > import SimpleProb.MonadicOperations
 > import SimpleProb.MonadicProperties
 > import SimpleProb.Measures
+> import SimpleProb.MeasuresProperties
 > import BoundedNat.BoundedNat
 > import BoundedNat.Operations
 > import BoundedNat.Properties

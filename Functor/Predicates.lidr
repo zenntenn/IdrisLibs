@@ -7,7 +7,7 @@
 
 * Naturality
 
-> {-
+> ||| What it means for a transformation to be natural
 > Natural : {F, G : Type -> Type} -> 
 >           (Functor F) => (Functor G) =>
 >           (t : {A : Type} -> F A -> G A) -> 
@@ -17,8 +17,8 @@
 >                     (f : A -> B) ->
 >                     (x : F A) -> 
 >                     t (map f x) = map f  (t x) 
-> -}
 
+> {-
 > ||| What it means for a transformation to be natural
 > Natural : {F, G : Type -> Type} -> 
 >           (Functor F) => (Functor G) =>
@@ -29,6 +29,7 @@
 >                     (f : A -> B) ->
 >                     (x : F A) -> 
 >                     t B (map f x) = map f (t A x) 
+> -}
 
 
 * Monotonicity
@@ -41,7 +42,7 @@
 >            Type
 >            
 > Monotone {B} {C} {F} LTE_B LTE_C measure =
->   (A : Type) ->
+>   {A : Type} ->
 >   (f : A -> B) -> 
 >   (g : A -> B) -> 
 >   (p : (a : A) -> f a `LTE_B` g a) -> 
