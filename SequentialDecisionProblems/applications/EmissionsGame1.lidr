@@ -89,14 +89,14 @@ that |State| is finite:
 
 > -- The critical threshold
 > cr : Double
-> cr = 2.0
+> cr = 0.0
 
 > -- The probabilities of staying in a good world and of entering a bad 
 > -- world when the cumulated emissions are below the critical threshold 
 > p1  :  NonNegDouble
-> p1  =  mkNonNegDouble 90
+> p1  =  mkNonNegDouble 100.0
 > p1' :  NonNegDouble
-> p1' =  mkNonNegDouble 10
+> p1' =  mkNonNegDouble   0.0
 
 > -- The probabilities of staying in a good world and of entering a bad 
 > -- world when the cumulated emissions are above the critical threshold 
