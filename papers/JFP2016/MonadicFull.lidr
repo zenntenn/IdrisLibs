@@ -107,7 +107,7 @@ extensions. Anything more general risks being non-implementable.
 
 
 > optExtLemma  :  (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
-> optExtLemma {t} {n} ps p' x r v = s6 where
+> optExtLemma {t} {n} ps p' x r v = s5 where
 >   p     :  Policy t (S n)
 >   p     =  optExt ps
 >   gy    :  GoodCtrl t x n
@@ -122,26 +122,21 @@ extensions. Anything more general risks being non-implementable.
 >   y'    =  ctrl gy'
 >   av'   :  All (Viable n) (nexts t x y')
 >   av'   =  allViable gy'
->   g     :  GoodCtrl t x n -> Val
->   g     =  cval x r v ps
 >   f     :  PossibleNextState x (ctrl gy) -> Val
 >   f     =  sval x r v gy ps
 >   f'    :  PossibleNextState x (ctrl gy') -> Val
 >   f'    =  sval x r v gy' ps
->   s1    :  g gy' `LTE` cvalmax x r v ps
+>   s1    :  cval x r v ps gy' `LTE` cvalmax x r v ps
 >   s1    =  cvalmaxSpec x r v ps gy'
->   s2    :  g gy' `LTE` g (cvalargmax x r v ps)
->   s2    =  replace {P = \ z => (g gy' `LTE` z)} (cvalargmaxSpec x r v ps) s1
+>   s2    :  cval x r v ps gy' `LTE` cval x r v ps (cvalargmax x r v ps)
+>   s2    =  replace {P = \ z => (cval x r v ps gy' `LTE` z)} (cvalargmaxSpec x r v ps) s1
 >   -- the rest of the steps are for the (sort of) human reader
->   s3    :  g gy' `LTE` g gy
+>   s3    :  cval x r v ps gy' `LTE` cval x r v ps gy
 >   s3    =  s2
->   s4    :  cval x r v ps gy' `LTE` cval x r v ps gy
+>   s4    :  meas (fmap f' (tagElem (nexts t x y'))) `LTE` meas (fmap f (tagElem (nexts t x y)))
 >   s4    =  s3
->   s5    :  meas (fmap f' (tagElem (nexts t x y'))) `LTE` meas (fmap f (tagElem (nexts t x y)))
+>   s5    :  val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 >   s5    =  s4
->   s6    :  val x r v (p' :: ps) `LTE` val x r v (p :: ps)
->   s6    =  s5
-
 
 ** Correctness of backwards induction
 

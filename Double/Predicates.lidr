@@ -6,6 +6,12 @@
 > %access public export
 > %auto_implicits on
 
+* EQ
+
+> |||
+> data EQ : Double -> Double -> Type where
+>   MkEQ : {x : Double} -> {y : Double} -> So (x == y) -> EQ x y
+
 
 * LT
 

@@ -19,15 +19,16 @@
 >                       (t : {A : Type} -> F A -> F A) -> 
 >                       Natural t -> 
 >                       Monotone LTE_B LTE_C (measure . t)
->
 > monotoneNaturalLemma LTE_B LTE_C m mm t nt = mmt where
 >   mmt f g p x = let s1 = mm f g p (t x) in
 >                 let s2 = replace {P = \ X => m X `LTE_C` m (map g (t x))} (sym (nt f x)) s1 in
 >                 let s3 = replace {P = \ X => m (t (map f x)) `LTE_C` m X} (sym (nt g x)) s2 in
 >                 s3
+
 > {-
 > monotoneNaturalLemma {B} {C} {F} LTE_B LTE_C m mm t nt = mmt where
->   mmt : Monotone {B} {C} {F} LTE_B LTE_C (m . (t B))
+>   mmt : Monotone {B} {C} {F} LTE_B LTE_C (m . (t {A = B}))
+>   mmt = ?lala
 >   mmt A f g p x = s3 where
 >     s1 : m (map f (t A x)) `LTE_C` m (map g (t A x))
 >     s1 = mm A f g p (t A x)

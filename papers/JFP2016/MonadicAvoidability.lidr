@@ -38,8 +38,7 @@ states:
 > reachableFromLemma {t'' = Z}     {t = S m}   x'' x (prf1 , prf2)         = void (uninhabited (sym prf1))
 > reachableFromLemma {t'' = S t'}  {t = S t'}  x'' x (Left (Refl , prf2))  = eqInLTE (S t') (S t') Refl
 > reachableFromLemma {t'' = S t'}  {t = t}     x'' x (Right (MkSigma x' (prf1 , prf2)))  = s2 where
->     s1  :  t' `GTE` t
->     s1  =  reachableFromLemma x' x prf1
+>     s1  :  t' `GTE` t;;    s1  =  reachableFromLemma x' x prf1
 >     s2  :  S t' `GTE` t
 >     s2  =  idSuccPreservesLTE t t' s1
 

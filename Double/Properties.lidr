@@ -8,10 +8,20 @@
 > import So.Properties
 > import Ordering.Properties
 > import Rel.TotalPreorder
+> import So.Properties
 
 > %default total
 > %access public export
 > %auto_implicits on
+
+
+* Decidability of EQ
+
+> |||
+> decEQ : (x : Double) -> (y : Double) -> Dec (x `EQ` y)
+> decEQ x y with (decSo (x == y))
+>   | Yes p = Yes (MkEQ p)
+>   | No contra = No (\ (MkEQ p) => contra p)
 
 
 * Properties of Ord methods
