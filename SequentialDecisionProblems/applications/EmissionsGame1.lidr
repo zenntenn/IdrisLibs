@@ -92,68 +92,79 @@ that |State| is finite:
 > cr : Double
 > cr = 0.0
 
-> -- The probabilities of staying in a good world and of entering a bad 
-> -- world when the cumulated emissions are below the critical threshold 
+> -- The probabilities of staying in a good world and of entering a bad
+> -- world when the cumulated emissions are below the critical threshold
 > p1  :  NonNegDouble
 > p1  =  mkNonNegDouble 99.0
 > p1' :  NonNegDouble
 > p1' =  mkNonNegDouble  1.0
 
 
-> -- The probabilities of staying in a good world and of entering a bad 
-> -- world when the cumulated emissions are above the critical threshold 
+> -- The probabilities of staying in a good world and of entering a bad
+> -- world when the cumulated emissions are above the critical threshold
 > p2  :  NonNegDouble
 > p2  =  mkNonNegDouble 0.1
 > p2' :  NonNegDouble
 > p2' =  mkNonNegDouble 0.9
 
-> -- The transition function: good world, freezing emissions
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Freeze = sp where
->   sp : SimpleProb (State (S t))
->   sp with (decLTE (fromFin e) cr)
->     | Yes _ = MkSimpleProb [((weaken e, Good), p1 ), ((weaken e, Bad), p1')] (MkLT Oh)
->     |  No _ = MkSimpleProb [((weaken e, Good), p2 ), ((weaken e, Bad), p2')] (MkLT Oh)
+> cases : {a : Type} -> Double -> Double -> a -> a -> a
+> cases d1 d2 y n with (decLTE d1 d2)
+>     | Yes _ = y
+>     |  No _ = n
 
-> -- The transition function: good world, increasing emissions
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Increase = sp where
->   sp : SimpleProb (State (S t))
->   sp with (decLTE (fromFin e) cr)
->     | Yes _ = MkSimpleProb [((FS e, Good), p1 ), ((FS e, Bad), p1')] (MkLT Oh)
->     |  No _ = MkSimpleProb [((FS e, Good), p2 ), ((FS e, Bad), p2')] (MkLT Oh)
+> goodDist :  {t : Nat} -> Fin (S (S t)) ->
+>             (p : Double) -> {auto prf1 : LTE 0.0 p} ->
+>                             {auto prf2 : LTE 0.0 (100+negate p)} ->
+>                             {auto prf3 : LT  0.0 (p+((100+negate p)+0))} ->
+>	      SimpleProb (State (S t))
+> goodDist i p {prf1} {prf2} {prf3} =
+>     MkSimpleProb [((i, Good), mkNonNegDouble p ),
+>                   ((i, Bad),  mkNonNegDouble (100+negate p))]
+>   	           (prf3)
+
+> spFreeze : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
+> spFreeze t e = cases (fromFin e) cr (goodDist (weaken e) 99) (goodDist (weaken e) 10)
+> spInc : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
+> spInc t e = cases (fromFin e) cr (goodDist (FS e) 99) (goodDist (FS e) 10)
+
+> -- The transition function: good world, freezing emissions
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Freeze   = spFreeze t e
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Increase = spInc t e
+
 
 > -- The transition function: bad world, freezing emissions
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Freeze = 
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Freeze =
 >   MkSimpleProb [((weaken e, Bad), one)] positiveOne
 
 > -- The transition function: bad world, increasing emissions
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Increase = 
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Increase =
 >   MkSimpleProb [((    FS e, Bad), one)] positiveOne
 
 * |Val| and |LTE|:
 
-> SequentialDecisionProblems.CoreTheory.Val = 
+> SequentialDecisionProblems.CoreTheory.Val =
 >   NonNegDouble.NonNegDouble
 
-> SequentialDecisionProblems.CoreTheory.plus = 
+> SequentialDecisionProblems.CoreTheory.plus =
 >   NonNegDouble.BasicOperations.plus
 
-> SequentialDecisionProblems.CoreTheory.zero = 
+> SequentialDecisionProblems.CoreTheory.zero =
 >   fromInteger 0
 
-> SequentialDecisionProblems.CoreTheory.LTE = 
+> SequentialDecisionProblems.CoreTheory.LTE =
 >   NonNegDouble.Predicates.LTE
 
-> SequentialDecisionProblems.FullTheory.reflexiveLTE = 
+> SequentialDecisionProblems.FullTheory.reflexiveLTE =
 >   NonNegDouble.LTEProperties.reflexiveLTE
 
-> SequentialDecisionProblems.FullTheory.transitiveLTE = 
+> SequentialDecisionProblems.FullTheory.transitiveLTE =
 >   NonNegDouble.LTEProperties.transitiveLTE
 
-> SequentialDecisionProblems.FullTheory.monotonePlusLTE = 
+> SequentialDecisionProblems.FullTheory.monotonePlusLTE =
 >   NonNegDouble.LTEProperties.monotonePlusLTE
 
-> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE = 
->   NonNegDouble.LTEProperties.totalPreorderLTE 
+> SequentialDecisionProblems.CoreTheoryOptDefaults.totalPreorderLTE =
+>   NonNegDouble.LTEProperties.totalPreorderLTE
 
 
 * Reward function
@@ -173,11 +184,11 @@ Emitting greenhouse gases also brings benefits. These are a fraction of
 the step benefits in a good world and freezing emissions brings less
 benefits than increasing emissions:
 
-> -- Ratio between freezing emissions benefits and step benefits (in a good world) 
+> -- Ratio between freezing emissions benefits and step benefits (in a good world)
 > freezeOverGoodBenefits : NonNegDouble
 > freezeOverGoodBenefits = mkNonNegDouble 0.1
 
-> -- Ratio between increasing emissions benefits and step benefits (in a good world) 
+> -- Ratio between increasing emissions benefits and step benefits (in a good world)
 > increaseOverGoodBenefits : NonNegDouble
 > increaseOverGoodBenefits = mkNonNegDouble 0.3
 
@@ -194,19 +205,19 @@ benefits than increasing emissions:
 > freezeBenefitsLTEincreaseBenefits = MkLTE Oh
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_, Good) = 
+> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_, Good) =
 >   one                       + one * freezeOverGoodBenefits
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_, Good) = 
+> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_, Good) =
 >   one                       + one * increaseOverGoodBenefits
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_,  Bad) = 
+> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_,  Bad) =
 >   one * badOverGoodBenefits + one * freezeOverGoodBenefits
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_,  Bad) = 
+> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_,  Bad) =
 >   one * badOverGoodBenefits + one * increaseOverGoodBenefits
 
 
@@ -241,8 +252,8 @@ distributions are never empty, see |nonEmptyLemma| in
 |MonadicProperties| in |SimpleProb|, allows us to show that the above
 definition of |Viable| fulfills |viableSpec1|:
 
-> -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x 
-> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} s v = 
+> -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x
+> SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} s v =
 >   MkSigma Freeze (ne, av) where
 >     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t s Freeze)
 >     ne = nonEmptyLemma (nexts t s Freeze)
@@ -275,13 +286,13 @@ and decidability of |Reachable|:
 
 Finally, we have to show that controls are finite
 
-> -- finiteCtrl : {t : Nat} -> (x : State t) -> Finite (Ctrl t x) 
+> -- finiteCtrl : {t : Nat} -> (x : State t) -> Finite (Ctrl t x)
 > SequentialDecisionProblems.Utils.finiteCtrl _ = finiteFreezeOrIncrease
 
 and, in order to use the fast, tail-recursive tabulated version of
 backwards induction, that states are finite:
 
-> SequentialDecisionProblems.TabBackwardsInduction.finiteState t = 
+> SequentialDecisionProblems.TabBackwardsInduction.finiteState t =
 >   finitePair (finiteFin) (finiteGoodOrBad)
 
 
@@ -293,10 +304,10 @@ etc. To this end, we need to be able to show the outcome of the decision
 process. This means implemeting functions to print states and controls:
 
 > -- showState : {t : Nat} -> State t -> String
-> SequentialDecisionProblems.Utils.showState {t} (e, Good) = 
->   "(" ++ show (finToNat e) ++ ",Good)" 
-> SequentialDecisionProblems.Utils.showState {t} (e, Bad) = 
->   "(" ++ show (finToNat e) ++ ",Bad)" 
+> SequentialDecisionProblems.Utils.showState {t} (e, Good) =
+>   "(" ++ show (finToNat e) ++ ",Good)"
+> SequentialDecisionProblems.Utils.showState {t} (e, Bad) =
+>   "(" ++ show (finToNat e) ++ ",Bad)"
 
 > -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} Freeze = "Freeze"
@@ -310,7 +321,7 @@ process. This means implemeting functions to print states and controls:
 >      case (decidableViable {t = Z} nSteps (FZ, Good)) of
 >        (Yes v) => do putStrLn ("computing optimal policies ...")
 >                      -- ps   <- pure (backwardsInduction Z nSteps)
->                      ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)                      
+>                      ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                      putStrLn ("computing optimal controls ...")
 >                      mxys <- pure (possibleStateCtrlSeqs (FZ, Good) () v ps)
 >                      putStrLn "possible state-control sequences:"
@@ -341,7 +352,7 @@ process. This means implemeting functions to print states and controls:
 >                      -- -- putStrLn "worst possible reward: "
 >                      -- -- putStr "  "
 >                      -- -- putStrLn (show (snd argminmin))
->                      putStrLn ("done!")                       
+>                      putStrLn ("done!")
 >        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
 > main : IO ()
@@ -356,5 +367,3 @@ process. This means implemeting functions to print states and controls:
 -- Local Variables:
 -- idris-packages: ("effects")
 -- End:
- 
- 
