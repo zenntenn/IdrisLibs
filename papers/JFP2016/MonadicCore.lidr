@@ -125,34 +125,25 @@
 
 > mutual
 
+>   val  :  {t, n : Nat} -> 
+>           (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
+>   val {t} {n = Z} x r v ps           =  zero
+>   val {t} {n = S m} x r v (p :: ps)  =  meas (fmap (sval x r v gy ps) (tagElem mx')) where
+>     gy   : GoodCtrl t x m;;   gy   = p x r v
+>     y    : Ctrl t x;;         y    = ctrl gy
+>     mx'  : M (State (S t));;  mx'  = nexts t x y
+>
 >   sval  :  {t, m : Nat} -> 
 >            (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
 >            (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
 >            PossibleNextState x (ctrl gy) -> Val
 >   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = reward t x y x' `plus` val x' r' v' ps where
->     y    :  Ctrl t x
->     y    =  ctrl gy
->     mx'  :  M (State (S t))
->     mx'  =  nexts t x y
->     ar'  :  All Reachable mx'
->     ar'  =  reachableSpec1 x r y
->     av'  :  All (Viable m) mx'
->     av'  =  allViable gy
->     r'   :  Reachable x'
->     r'   =  allElemSpec0 x' mx' ar' x'emx'
->     v'   :  Viable m x'
->     v'   =  allElemSpec0 x' mx' av' x'emx'
-
->   val  :  {t, n : Nat} -> 
->           (x : State t) -> Reachable x -> Viable n x -> PolicySeq t n -> Val
->   val {t} {n = Z} x r v ps           =  zero
->   val {t} {n = S m} x r v (p :: ps)  =  meas (fmap (sval x r v gy ps) (tagElem mx')) where
->     gy   :  GoodCtrl t x m
->     gy   =  p x r v
->     y    :  Ctrl t x
->     y    =  ctrl gy
->     mx'  :  M (State (S t))
->     mx'  =  nexts t x y
+>     y    : Ctrl t x;;            y    = ctrl gy
+>     mx'  : M (State (S t));;     mx'  = nexts t x y
+>     ar'  : All Reachable mx';;   ar'  = reachableSpec1 x r y
+>     av'  : All (Viable m) mx';;  av'  = allViable gy
+>     r'   : Reachable x';;        r'   = allElemSpec0 x' mx' ar' x'emx'
+>     v'   : Viable m x';;         v'   = allElemSpec0 x' mx' av' x'emx'
 
 
 * Optimality of policy sequences
@@ -176,10 +167,8 @@
 >          (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
 >          (ps : PolicySeq (S t) n) -> GoodCtrl t x n -> Val
 > cval {t} x r v ps gy = meas (fmap (sval x r v gy ps) (tagElem mx')) where
->   y    :  Ctrl t x
->   y    =  ctrl gy
->   mx'  :  M (State (S t))
->   mx'  =  nexts t x y
+>   y    : Ctrl t x;;         y    = ctrl gy
+>   mx'  : M (State (S t));;  mx'  = nexts t x y
 
 > cvalargmax  :  {t, n : Nat} -> 
 >                (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
@@ -188,8 +177,7 @@
 > optExt : {t, n : Nat} -> 
 >          PolicySeq (S t) n -> Policy t (S n)
 > optExt {t} {n} ps = p where
->   p : Policy t (S n)
->   p x r v = cvalargmax x r v ps
+>   p : Policy t (S n);;  p x r v = cvalargmax x r v ps
 
 
 * Generic machine checkable backwards induction
@@ -197,8 +185,7 @@
 > backwardsInduction : (t : Nat) -> (n : Nat) -> PolicySeq t n
 > backwardsInduction t  Z     =  Nil
 > backwardsInduction t (S n)  =  optExt ps :: ps where
->   ps  :  PolicySeq (S t) n
->   ps  =  backwardsInduction (S t) n
+>   ps : PolicySeq (S t) n;;  ps = backwardsInduction (S t) n
 
 > {-
 

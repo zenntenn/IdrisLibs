@@ -118,35 +118,26 @@
 > possibleStateCtrlSeqs {t} {n = Z}    x r v Nil         =  ret (Nil x)
 > possibleStateCtrlSeqs {t} {n = S m}  x r v (p :: ps')  =
 >   fmap g (bind (tagElem mx') f) where
->     y    :  Ctrl t x
->     y    =  ctrl (p x r v)
->     mx'  :  M (State (S t))
->     mx'  =  nexts t x y
->     av   :  All (Viable m) mx'
->     av   =  allViable (p x r v)
->     g    :  StateCtrlSeq (S t) m -> StateCtrlSeq t (S m)
->     g    =  ((MkSigma x y) ::)
+>     y    :  Ctrl t x;;                                      y    =  ctrl (p x r v)
+>     mx'  :  M (State (S t));;                               mx'  =  nexts t x y
+>     av   :  All (Viable m) mx';;                            av   =  allViable (p x r v)
+>     g    :  StateCtrlSeq (S t) m -> StateCtrlSeq t (S m);;  g    =  ((MkSigma x y) ::)
 >     f    :  Sigma (State (S t)) (\ x' => x' `Elem` mx') -> M (StateCtrlSeq (S t) m)
 >     f (MkSigma x' x'emx') = possibleStateCtrlSeqs {n = m} x' r' v' ps' where
->       ar  :  All Reachable mx'
->       ar  =  reachableSpec1 x r y
->       r'  :  Reachable x'
->       r'  =  allElemSpec0 x' mx' ar x'emx'
->       v'  :  Viable m x'
->       v'  =  allElemSpec0 x' mx' av x'emx'
+>       ar : All Reachable mx';;  ar = reachableSpec1 x r y
+>       r' : Reachable x';;       r' =  allElemSpec0 x' mx' ar x'emx'
+>       v' : Viable m x';;        v' = allElemSpec0 x' mx' av x'emx'
 
 > |||
 > morePossibleStateCtrlSeqs  :  {t, n : Nat} -> 
 >                               (mx : M (State t)) -> 
 >                               All Reachable mx -> All (Viable n) mx ->
 >                               (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
-> morePossibleStateCtrlSeqs {t} {n}  mx ar av ps  =  bind (tagElem mx) f where
+> morePossibleStateCtrlSeqs {t} {n}  mx ar av ps  =  (tagElem mx) `bind` f where
 >   f : Sigma (State t) (\ x => x `Elem` mx) -> M (StateCtrlSeq t n)
 >   f (MkSigma x xemx) = possibleStateCtrlSeqs x r v ps where
->       r  :  Reachable x
->       r  =  allElemSpec0 x mx ar xemx
->       v  :  Viable n x
->       v  =  allElemSpec0 x mx av xemx
+>       r  :  Reachable x;;  r  =  allElemSpec0 x mx ar xemx
+>       v  :  Viable n x;;   v  =  allElemSpec0 x mx av xemx
 
 > |||
 > possibleStateCtrlSeqsRewards : {t : Nat} -> {n : Nat} -> 
