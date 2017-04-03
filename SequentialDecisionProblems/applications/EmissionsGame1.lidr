@@ -35,7 +35,8 @@
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
 > import NonNegDouble.Predicates
 > import NonNegDouble.LTEProperties
 > import Finite.Predicates
@@ -95,18 +96,19 @@ that |State| is finite:
 > -- The probabilities of staying in a good world and of entering a bad
 > -- world when the cumulated emissions are below the critical threshold
 > p1  :  NonNegDouble
-> p1  =  mkNonNegDouble 99.0
+> p1  =  mkNonNegDouble 0.99
 > p1' :  NonNegDouble
-> p1' =  mkNonNegDouble  1.0
-
+> p1' =  one - p1
 
 > -- The probabilities of staying in a good world and of entering a bad
 > -- world when the cumulated emissions are above the critical threshold
 > p2  :  NonNegDouble
 > p2  =  mkNonNegDouble 0.1
 > p2' :  NonNegDouble
-> p2' =  mkNonNegDouble 0.9
+> p2' =  one - p2
 
+
+> {-
 > cases : {a : Type} -> Double -> Double -> a -> a -> a
 > cases d1 d2 y n with (decLTE d1 d2)
 >     | Yes _ = y
@@ -126,27 +128,37 @@ that |State| is finite:
 > 
 > spInc : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
 > spInc t e = cases (fromFin e) cr (goodDist (FS e) 99) (goodDist (FS e) 10)
+> -}
 
 > -- The transition function: good world, freezing emissions
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Freeze   = spFreeze t e
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Increase = spInc t e
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Freeze =
+>   let e' = weaken e in
+>   if (fromFin e <= cr)
+>   then mkSimpleProb [((e', Good), p1), ((e', Bad), one - p1)]
+>   else mkSimpleProb [((e', Good), p2), ((e', Bad), one - p2)]
 
+> -- The transition function: good world, increasing emissions
+> SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Increase =
+>   let e' = FS e in
+>   if (fromFin e <= cr)
+>   then mkSimpleProb [((e', Good), p1), ((e', Bad), one - p1)]
+>   else mkSimpleProb [((e', Good), p2), ((e', Bad), one - p2)]
 
 > -- The transition function: bad world, freezing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Freeze =
->   MkSimpleProb [((weaken e, Bad), one)] positiveOne
+>   mkSimpleProb [((weaken e, Bad), one)]
 
 > -- The transition function: bad world, increasing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Increase =
->   MkSimpleProb [((    FS e, Bad), one)] positiveOne
+>   mkSimpleProb [((    FS e, Bad), one)]
 
 * |Val| and |LTE|:
 
 > SequentialDecisionProblems.CoreTheory.Val =
 >   NonNegDouble.NonNegDouble
-
+ 
 > SequentialDecisionProblems.CoreTheory.plus =
->   NonNegDouble.BasicOperations.plus
+>   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero =
 >   fromInteger 0
@@ -159,7 +171,7 @@ that |State| is finite:
 
 > SequentialDecisionProblems.FullTheory.transitiveLTE =
 >   NonNegDouble.LTEProperties.transitiveLTE
-
+ 
 > SequentialDecisionProblems.FullTheory.monotonePlusLTE =
 >   NonNegDouble.LTEProperties.monotonePlusLTE
 

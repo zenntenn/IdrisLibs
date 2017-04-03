@@ -1,6 +1,6 @@
 > module NonNegDouble.Postulates
 
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Properties
 > import Double.Predicates
 > import Double.Properties
 > import NonNegDouble.NonNegDouble

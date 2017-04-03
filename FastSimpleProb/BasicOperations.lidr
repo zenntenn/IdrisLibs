@@ -8,7 +8,7 @@
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Properties
 > import NonNegDouble.Postulates
 > import List.Operations
 > import Fun.Operations
@@ -16,6 +16,14 @@
 > %default total
 > %access public export
 > %auto_implicits off
+
+
+> |||
+> mkSimpleProb : {A : Type} -> 
+>                (aps : List (A, NonNegDouble)) -> 
+>                {auto prf : Positive (toDouble (sumMapSnd aps))} ->
+>                SimpleProb A
+> mkSimpleProb aps {prf} = MkSimpleProb aps prf
 
 
 > |||
@@ -79,12 +87,12 @@
 > ||| Make a SimpleProb in which all elements of a list have the same 
 > ||| probablility. If the list has no duplicates, this results in a
 > ||| uniform probability distribution
-> mkSimpleProb : {A : Type} -> (as : List A) -> List.Operations.NonEmpty as -> SimpleProb A
-> mkSimpleProb      Nil              prf = absurd prf
-> mkSimpleProb {A} (a :: Nil)        _   = MkSimpleProb [(a, one)] positiveOne
-> mkSimpleProb {A} (a :: (a' :: as)) _   = MkSimpleProb aps prf where
+> mkFlatSimpleProb : {A : Type} -> (as : List A) -> List.Operations.NonEmpty as -> SimpleProb A
+> mkFlatSimpleProb      Nil              prf = absurd prf
+> mkFlatSimpleProb {A} (a :: Nil)        _   = MkSimpleProb [(a, one)] positiveOne
+> mkFlatSimpleProb {A} (a :: (a' :: as)) _   = MkSimpleProb aps prf where
 >   ps' : SimpleProb A
->   ps' = assert_total (mkSimpleProb (a' :: as) ())
+>   ps' = assert_total (mkFlatSimpleProb (a' :: as) ())
 >   aps : List (A, NonNegDouble)
 >   aps = (a, one) :: (toList ps')
 >   prf : Positive (toDouble (sumMapSnd aps))

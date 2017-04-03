@@ -32,7 +32,8 @@
 > import Double.Predicates
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
 > import NonNegDouble.Predicates
 > import NonNegDouble.LTEProperties
 > import NonNegDouble.Measures

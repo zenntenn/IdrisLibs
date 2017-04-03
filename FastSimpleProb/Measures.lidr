@@ -9,7 +9,8 @@
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Predicates
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
 > import NonNegDouble.Measures
 > import NonNegDouble.LTEProperties
 > import List.Operations

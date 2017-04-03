@@ -15,7 +15,8 @@
 > import NonNegDouble.Postulates
 > import NonNegDouble.Constants
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
 
 > import Double.Predicates
 > import Num.Refinements

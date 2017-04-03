@@ -5,8 +5,8 @@
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
 > import NonNegDouble.Measures
-> import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
 > import NonNegDouble.Predicates
 > import NonNegDouble.LTEProperties
 > import List.Properties

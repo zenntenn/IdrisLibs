@@ -65,6 +65,11 @@
 
 * Non-negative double precision floating point numbers:
 
+> ||| Non-negative |Double|s are closed w.r.t. "subtraction"
+> postulate 
+> minusPreservesNonNegativity : {x, y : Double} -> 
+>                               NonNegative x -> NonNegative y -> y `LTE` x -> NonNegative (x - y)
+
 > ||| Non-negative |Double|s are closed w.r.t. division
 > postulate 
 > divPreservesNonNegativity : {x, y : Double} -> 

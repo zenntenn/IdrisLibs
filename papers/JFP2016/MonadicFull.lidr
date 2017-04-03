@@ -13,7 +13,7 @@
 * |LTE|
 
 > reflexiveLTE : (a : Val) -> a `LTE` a
-> transitiveLTE : (a : Val) -> (b : Val) -> (c : Val) -> a `LTE` b -> b `LTE` c -> a `LTE` c
+> transitiveLTE : {a, b, c : Val} -> a `LTE` b -> b `LTE` c -> a `LTE` c
 
 > monotonePlusLTE : {a, b, c, d : Val} -> a `LTE` b -> c `LTE` d -> (a `plus` c) `LTE` (b `plus` d)
 
@@ -70,10 +70,7 @@ extensions. Anything more general risks being non-implementable.
 >
 > Bellman {t} {m} ps ops p oep = opps where
 >   opps : OptPolicySeq (p :: ps)
->   opps x r v (p' :: ps') = transitiveLTE  (val x r v (p' :: ps')) 
->                                           (val x r v (p' :: ps)) 
->                                           (val x r v (p :: ps)) 
->                                           s4 s5 where
+>   opps x r v (p' :: ps') = transitiveLTE s4 s5 where
 >     gy'  :  GoodCtrl t x m;;                         gy'  =  p' x r v                       
 >     y'   :  Ctrl t x;;                               y'   =  ctrl gy'
 >     mx'  :  M (State (S t));;                        mx'  =  nexts t x y'

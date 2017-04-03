@@ -8,7 +8,7 @@
 > import List.Operations
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Properties
 > import List.Operations
 > import List.Properties
 

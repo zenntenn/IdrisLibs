@@ -2,8 +2,8 @@
 
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
-> import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Operations
+> import NonNegDouble.Properties
  
 > %default total
 > %access public export

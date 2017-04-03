@@ -5,7 +5,7 @@
 > import Double.Predicates
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.BasicOperations
-> import NonNegDouble.BasicProperties
+> import NonNegDouble.Properties
 > import List.Operations
 
 > %default total
