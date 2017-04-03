@@ -112,18 +112,18 @@ that |State| is finite:
 >     | Yes _ = y
 >     |  No _ = n
 
-> goodDist :  {t : Nat} -> Fin (S (S t)) ->
->             (p : Double) -> {auto prf1 : LTE 0.0 p} ->
->                             {auto prf2 : LTE 0.0 (100+negate p)} ->
->                             {auto prf3 : LT  0.0 (p+((100+negate p)+0))} ->
->	      SimpleProb (State (S t))
+> goodDist :  {t : Nat} -> Fin (S (S t)) -> (p : Double) -> 
+>             {auto prf1 : LTE 0.0 p} ->
+>             {auto prf2 : LTE 0.0 (100 + negate p)} ->
+>             {auto prf3 : LT  0.0 (p + ((100 + negate p) + 0))} ->
+>	            SimpleProb (State (S t))
 > goodDist i p {prf1} {prf2} {prf3} =
 >     MkSimpleProb [((i, Good), mkNonNegDouble p ),
->                   ((i, Bad),  mkNonNegDouble (100+negate p))]
->   	           (prf3)
+>                   ((i, Bad),  mkNonNegDouble (100 + negate p))] prf3
 
 > spFreeze : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
 > spFreeze t e = cases (fromFin e) cr (goodDist (weaken e) 99) (goodDist (weaken e) 10)
+> 
 > spInc : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
 > spInc t e = cases (fromFin e) cr (goodDist (FS e) 99) (goodDist (FS e) 10)
 

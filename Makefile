@@ -7,6 +7,7 @@ IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -p effects -V
 libs:
 	find . \
   -not \( -path "./examples" -prune \) \
+  -not \( -path "./issues" -prune \) \
   -not \( -path "./papers" -prune \) \
   -not \( -path "./projects" -prune \) \
   -not \( -path "./tmp" -prune \) \
