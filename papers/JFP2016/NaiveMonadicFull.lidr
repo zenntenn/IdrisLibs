@@ -54,7 +54,7 @@
 ** Policy sequences of length zero are optimal
 
 > nilOptPolicySeq : OptPolicySeq Nil
-> nilOptPolicySeq ps' x = reflexiveLTE zero
+> nilOptPolicySeq x ps' = reflexiveLTE zero
 
 
 > {-

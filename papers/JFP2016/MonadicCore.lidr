@@ -150,8 +150,8 @@
 
 > OptPolicySeq : {t, n : Nat} -> 
 >                PolicySeq t n -> Type
-> OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) ->
->                             (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+> OptPolicySeq {t} {n} ps  =  (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+>                             (ps' : PolicySeq t n) ->
 >                             val x r v ps' `LTE` val x r v ps
 
 
@@ -159,8 +159,8 @@
 
 > OptExt : {t, m : Nat} -> 
 >          PolicySeq (S t) m -> Policy t (S m) -> Type
-> OptExt {t} {m} ps p  =  (p' : Policy t (S m)) ->
->                         (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
+> OptExt {t} {m} ps p  =  (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
+>                         (p' : Policy t (S m)) ->
 >                         val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 
 > cval  :  {t, n : Nat} -> 

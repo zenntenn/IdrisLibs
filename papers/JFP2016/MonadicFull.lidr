@@ -59,7 +59,7 @@ extensions. Anything more general risks being non-implementable.
 ** Policy sequences of length zero are optimal
 
 > nilOptPolicySeq : OptPolicySeq Nil
-> nilOptPolicySeq ps' x r v = reflexiveLTE zero
+> nilOptPolicySeq x r v ps' = reflexiveLTE zero
 
 
 ** Bellman's principle of optimality:
@@ -70,7 +70,7 @@ extensions. Anything more general risks being non-implementable.
 >
 > Bellman {t} {m} ps ops p oep = opps where
 >   opps : OptPolicySeq (p :: ps)
->   opps (p' :: ps') x r v = transitiveLTE  (val x r v (p' :: ps')) 
+>   opps x r v (p' :: ps') = transitiveLTE  (val x r v (p' :: ps')) 
 >                                           (val x r v (p' :: ps)) 
 >                                           (val x r v (p :: ps)) 
 >                                           s4 s5 where
@@ -82,7 +82,7 @@ extensions. Anything more general risks being non-implementable.
 >     f    :  PossibleNextState x (ctrl gy') -> Val;;  f    =  sval x r v gy' ps
 >     s1   :  (x' : State (S t)) -> (r' : Reachable x') -> (v' : Viable m x') ->
 >             val x' r' v' ps' `LTE` val x' r' v' ps
->     s1   =  ops ps'
+>     s1 x' r' v' = ops x' r' v' ps' 
 >     s2   :  (z : PossibleNextState x (ctrl gy')) -> (f' z) `LTE` (f z)
 >     s2 (MkSigma x' x'emx') = 
 >       monotonePlusLTE (reflexiveLTE (reward t x y' x')) (s1 x' r' v') where 
@@ -92,11 +92,11 @@ extensions. Anything more general risks being non-implementable.
 >     s3  :  meas (fmap f' (tagElem mx')) `LTE` meas (fmap f (tagElem mx'))
 >     s3  =  measMon f' f s2 (tagElem mx')
 >     s4  :  val x r v (p' :: ps') `LTE` val x r v (p' :: ps);;  s4  =  s3
->     s5  :  val x r v (p' :: ps) `LTE` val x r v (p :: ps);;    s5  =  oep p' x r v
+>     s5  :  val x r v (p' :: ps) `LTE` val x r v (p :: ps);;    s5  =  oep x r v p'
 
 
 > optExtLemma  :  (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
-> optExtLemma {t} {n} ps p' x r v = s5 where
+> optExtLemma {t} {n} ps x r v p' = s5 where
 >   p     :  Policy t (S n);;                            p    = optExt ps
 >   gy    :  GoodCtrl t x n;;                            gy   = p x r v
 >   y     :  Ctrl t x;;                                  y    = ctrl gy

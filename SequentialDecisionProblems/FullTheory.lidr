@@ -124,7 +124,13 @@ non-implementable.
 
 > Bellman {t} {m} ps ops p oep = opps where
 >   opps : OptPolicySeq (p :: ps)
+>   {-
 >   opps (p' :: ps') x r v = transitiveLTE (val x r v (p' :: ps')) 
+>                                          (val x r v (p' :: ps)) 
+>                                          (val x r v (p :: ps)) 
+>                                          s4 s5 where
+>   -}
+>   opps x r v (p' :: ps') = transitiveLTE (val x r v (p' :: ps')) 
 >                                          (val x r v (p' :: ps)) 
 >                                          (val x r v (p :: ps)) 
 >                                          s4 s5 where
@@ -142,7 +148,8 @@ non-implementable.
 >     f  = sval x r v gy' ps
 >     s1 : (x' : State (S t)) -> (r' : Reachable x') -> (v' : Viable m x') ->
 >          val x' r' v' ps' `LTE` val x' r' v' ps
->     s1 x' r' v' = ops ps' x' r' v'
+>     -- s1 x' r' v' = ops ps' x' r' v'
+>     s1 x' r' v' = ops x' r' v' ps' 
 >     s2 : (z : PossibleNextState x (ctrl gy')) -> (f' z) `LTE` (f z)
 >     s2 (MkSigma x' x'emx') = 
 >       monotonePlusLTE (reflexiveLTE (reward t x y' x')) (s1 x' r' v') where 
@@ -157,12 +164,14 @@ non-implementable.
 >     s4 : val x r v (p' :: ps') `LTE` val x r v (p' :: ps)
 >     s4 = s3
 >     s5 : val x r v (p' :: ps) `LTE` val x r v (p :: ps)
->     s5 = oep p' x r v
+>     -- s5 = oep p' x r v
+>     s5 = oep x r v p'
 
 
 > |||
 > optExtLemma  :  {t, n : Nat} -> 
 >                 (ps : PolicySeq (S t) n) -> OptExt ps (optExt ps)
+> {-                
 > optExtLemma {t} {n} ps p' x r v = s5 where
 >   p     :  Policy t (S n)
 >   p     =  optExt ps
@@ -193,7 +202,37 @@ non-implementable.
 >   s4    =  s3
 >   s5    :  val x r v (p' :: ps) `LTE` val x r v (p :: ps)
 >   s5    =  s4
-
+> -}
+> optExtLemma {t} {n} ps x r v p' = s5 where
+>   p     :  Policy t (S n)
+>   p     =  optExt ps
+>   gy    :  GoodCtrl t x n
+>   gy    =  p x r v
+>   y     :  Ctrl t x
+>   y     =  ctrl gy
+>   av    :  All (Viable n) (nexts t x y)
+>   av    =  allViable gy
+>   gy'   :  GoodCtrl t x n
+>   gy'   =  p' x r v
+>   y'    :  Ctrl t x
+>   y'    =  ctrl gy'
+>   av'   :  All (Viable n) (nexts t x y')
+>   av'   =  allViable gy'
+>   f     :  PossibleNextState x (ctrl gy) -> Val
+>   f     =  sval x r v gy ps
+>   f'    :  PossibleNextState x (ctrl gy') -> Val
+>   f'    =  sval x r v gy' ps
+>   s1    :  cval x r v ps gy' `LTE` cvalmax x r v ps
+>   s1    =  cvalmaxSpec x r v ps gy'
+>   s2    :  cval x r v ps gy' `LTE` cval x r v ps (cvalargmax x r v ps)
+>   s2    =  replace {P = \ z => (cval x r v ps gy' `LTE` z)} (cvalargmaxSpec x r v ps) s1
+>   -- the rest of the steps are for the (sort of) human reader
+>   s3    :  cval x r v ps gy' `LTE` cval x r v ps gy
+>   s3    =  s2
+>   s4    :  meas (fmap f' (tagElem (nexts t x y'))) `LTE` meas (fmap f (tagElem (nexts t x y)))
+>   s4    =  s3
+>   s5    :  val x r v (p' :: ps) `LTE` val x r v (p :: ps)
+>   s5    =  s4
 
 ** Correctness of backwards induction
 

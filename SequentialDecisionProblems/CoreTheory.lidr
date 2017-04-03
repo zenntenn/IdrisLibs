@@ -383,8 +383,13 @@ from states in |State t|. Formally:
 > OptPolicySeq  :  {t, n : Nat} -> 
 >                  PolicySeq t n -> Type
 > 
+> {-
 > OptPolicySeq {t} {n} ps  =  (ps' : PolicySeq t n) ->
 >                             (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+>                             val x r v ps' `LTE` val x r v ps
+> -}
+> OptPolicySeq {t} {n} ps  =  (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+>                             (ps' : PolicySeq t n) ->
 >                             val x r v ps' `LTE` val x r v ps
 
 Notice that the above notion of optimality is very strong. It entails a
@@ -427,9 +432,14 @@ steps at step |t|. Formally:
 > |||
 > OptExt  :  {t, m : Nat} -> 
 >            PolicySeq (S t) m -> Policy t (S m) -> Type
+> {-           
 > OptExt {t} {m} ps p  =  (p' : Policy t (S m)) ->
 >                         (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
 >                         val x r v (p' :: ps) `LTE` val x r v (p :: ps)
+> -}
+> OptExt {t} {m} ps p  =  (x : State t) -> (r : Reachable x) -> (v : Viable (S m) x) ->
+>                         (p' : Policy t (S m)) ->
+>                         val x r v (p' :: ps) `LTE` val x r v (p :: ps) 
 
 The idea behind the notion of optimal extension is that if |p| is an
 optimal extension of |ps| and |ps| is optimal, then |p :: ps| is
