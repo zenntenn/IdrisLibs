@@ -19,6 +19,11 @@
 
 
 > ||| 
+> cast : (x : Double) -> {auto prf : 0.0 `LTE` x} -> NonNegDouble 
+> cast = mkNonNegDouble
+
+
+> ||| 
 > toDouble : NonNegDouble -> Double
 > toDouble = getWitness
 

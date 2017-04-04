@@ -93,64 +93,38 @@ that |State| is finite:
 > cr : Double
 > cr = 0.0
 
-> -- The probabilities of staying in a good world and of entering a bad
-> -- world when the cumulated emissions are below the critical threshold
+> -- The probability of staying in a good world when the cumulated
+> -- emissions are below the critical threshold
 > p1  :  NonNegDouble
-> p1  =  mkNonNegDouble 0.99
-> p1' :  NonNegDouble
-> p1' =  one - p1
+> p1  =  cast 0.99
 
-> -- The probabilities of staying in a good world and of entering a bad
-> -- world when the cumulated emissions are above the critical threshold
+> -- The probabilities of staying in a good world when the cumulated
+> -- emissions are above the critical threshold
 > p2  :  NonNegDouble
-> p2  =  mkNonNegDouble 0.1
-> p2' :  NonNegDouble
-> p2' =  one - p2
-
-
-> {-
-> cases : {a : Type} -> Double -> Double -> a -> a -> a
-> cases d1 d2 y n with (decLTE d1 d2)
->     | Yes _ = y
->     |  No _ = n
-
-> goodDist :  {t : Nat} -> Fin (S (S t)) -> (p : Double) -> 
->             {auto prf1 : LTE 0.0 p} ->
->             {auto prf2 : LTE 0.0 (100 + negate p)} ->
->             {auto prf3 : LT  0.0 (p + ((100 + negate p) + 0))} ->
->	            SimpleProb (State (S t))
-> goodDist i p {prf1} {prf2} {prf3} =
->     MkSimpleProb [((i, Good), mkNonNegDouble p ),
->                   ((i, Bad),  mkNonNegDouble (100 + negate p))] prf3
-
-> spFreeze : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
-> spFreeze t e = cases (fromFin e) cr (goodDist (weaken e) 99) (goodDist (weaken e) 10)
-> 
-> spInc : (t : Nat) -> (e : Fin (S t)) -> SimpleProb (State (S t))
-> spInc t e = cases (fromFin e) cr (goodDist (FS e) 99) (goodDist (FS e) 10)
-> -}
+> p2  =  cast 0.1
 
 > -- The transition function: good world, freezing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Freeze =
->   let e' = weaken e in
+>   let goodState = (weaken e, Good) in
+>   let badState  = (weaken e, Bad) in
 >   if (fromFin e <= cr)
->   then mkSimpleProb [((e', Good), p1), ((e', Bad), one - p1)]
->   else mkSimpleProb [((e', Good), p2), ((e', Bad), one - p2)]
+>   then mkSimpleProb [(goodState, p1), (badState, one - p1)]
+>   else mkSimpleProb [(goodState, p2), (badState, one - p2)]
 
 > -- The transition function: good world, increasing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Good) Increase =
->   let e' = FS e in
->   if (fromFin e <= cr)
->   then mkSimpleProb [((e', Good), p1), ((e', Bad), one - p1)]
->   else mkSimpleProb [((e', Good), p2), ((e', Bad), one - p2)]
+>   let goodState = (FS e, Good) in
+>   let badState  = (FS e, Bad) in
+>   if (fromFin e <= cr)  then mkSimpleProb [(goodState, p1), (badState, one - p1)]
+>                         else mkSimpleProb [(goodState, p2), (badState, one - p2)]
 
 > -- The transition function: bad world, freezing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Freeze =
->   mkSimpleProb [((weaken e, Bad), one)]
+>   let badState  = (weaken e, Bad) in mkSimpleProb [(badState, one)]
 
 > -- The transition function: bad world, increasing emissions
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Bad) Increase =
->   mkSimpleProb [((    FS e, Bad), one)]
+>   let badState  = (FS e, Bad) in mkSimpleProb [(badState, one)]
 
 * |Val| and |LTE|:
 
@@ -185,52 +159,52 @@ The idea is that being in a good world yields one unit of benefits per
 step and being in a bad world yield less benefits:
 
 > -- Ratio of the benefits in a bad world and the benefits in a good world
-> badOverGoodBenefits : NonNegDouble
-> badOverGoodBenefits = mkNonNegDouble 0.5
+> badOverGood : NonNegDouble
+> badOverGood = cast 0.5
 
 > -- Sanity check
-> badOverGoodBenefitsLTEone : badOverGoodBenefits `NonNegDouble.Predicates.LTE` one
-> badOverGoodBenefitsLTEone = MkLTE Oh
+> badOverGoodLTEone : badOverGood `NonNegDouble.Predicates.LTE` one
+> badOverGoodLTEone = MkLTE Oh
 
 Emitting greenhouse gases also brings benefits. These are a fraction of
 the step benefits in a good world and freezing emissions brings less
 benefits than increasing emissions:
 
 > -- Ratio between freezing emissions benefits and step benefits (in a good world)
-> freezeOverGoodBenefits : NonNegDouble
-> freezeOverGoodBenefits = mkNonNegDouble 0.1
+> freezeOverGood : NonNegDouble
+> freezeOverGood = cast 0.1
 
 > -- Ratio between increasing emissions benefits and step benefits (in a good world)
-> increaseOverGoodBenefits : NonNegDouble
-> increaseOverGoodBenefits = mkNonNegDouble 0.3
+> increaseOverGood : NonNegDouble
+> increaseOverGood = cast 0.3
 
 > -- Sanity check
-> freezeOverGoodBenefitsLTEone : freezeOverGoodBenefits `NonNegDouble.Predicates.LTE` one
-> freezeOverGoodBenefitsLTEone = MkLTE Oh
+> freezeOverGoodLTEone : freezeOverGood `NonNegDouble.Predicates.LTE` one
+> freezeOverGoodLTEone = MkLTE Oh
 
 > -- Sanity check
-> increaseOverGoodBenefitsLTEone : increaseOverGoodBenefits `NonNegDouble.Predicates.LTE` one
-> increaseOverGoodBenefitsLTEone = MkLTE Oh
+> increaseOverGoodLTEone : increaseOverGood `NonNegDouble.Predicates.LTE` one
+> increaseOverGoodLTEone = MkLTE Oh
 
 > -- Sanity check
-> freezeBenefitsLTEincreaseBenefits : freezeOverGoodBenefits `NonNegDouble.Predicates.LTE` increaseOverGoodBenefits
-> freezeBenefitsLTEincreaseBenefits = MkLTE Oh
+> freezeLTEincrease : freezeOverGood `NonNegDouble.Predicates.LTE` increaseOverGood
+> freezeLTEincrease = MkLTE Oh
 
 > -- Reward function:
 > SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_, Good) =
->   one                       + one * freezeOverGoodBenefits
+>   one                       + one * freezeOverGood
 
 > -- Reward function:
 > SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_, Good) =
->   one                       + one * increaseOverGoodBenefits
+>   one                       + one * increaseOverGood
 
 > -- Reward function:
 > SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_,  Bad) =
->   one * badOverGoodBenefits + one * freezeOverGoodBenefits
+>   one * badOverGood + one * freezeOverGood
 
 > -- Reward function:
 > SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_,  Bad) =
->   one * badOverGoodBenefits + one * increaseOverGoodBenefits
+>   one * badOverGood + one * increaseOverGood
 
 
 * Completing the problem specification
@@ -343,27 +317,6 @@ process. This means implemeting functions to print states and controls:
 >                      putStrLn "possible rewards:"
 >                      putStr "  "
 >                      putStrLn (show mvs)
->                      -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
->                      -- putStrLn "possible state-control sequences and rewards:"
->                      -- putStr "  "
->                      -- putStrLn (show mxyvs)
->                      -- putStrLn "measure of possible rewards: "
->                      -- putStr "  "
->                      -- putStrLn (show (meas mvs))
->                      -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                      -- putStrLn "best possible state-control sequence: "
->                      -- putStr "  "
->                      -- putStrLn (show (fst argmaxmax))
->                      -- putStrLn "best possible reward: "
->                      -- putStr "  "
->                      -- putStrLn (show (snd argmaxmax))
->                      -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                      -- -- putStrLn "worst possible state-control sequence: "
->                      -- -- putStr "  "
->                      -- -- putStrLn (show (fst argminmin))
->                      -- -- putStrLn "worst possible reward: "
->                      -- -- putStr "  "
->                      -- -- putStrLn (show (snd argminmin))
 >                      putStrLn ("done!")
 >        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
