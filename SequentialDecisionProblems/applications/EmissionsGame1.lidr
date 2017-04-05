@@ -96,7 +96,7 @@ that |State| is finite:
 > -- The probability of staying in a good world when the cumulated
 > -- emissions are below the critical threshold
 > p1  :  NonNegDouble
-> p1  =  cast 0.99
+> p1  =  cast 0.65
 
 > -- The probabilities of staying in a good world when the cumulated
 > -- emissions are above the critical threshold

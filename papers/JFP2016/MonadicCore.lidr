@@ -184,9 +184,9 @@
 
 > backwardsInduction : (t : Nat) -> (n : Nat) -> PolicySeq t n
 > backwardsInduction t  Z     =  Nil
-> backwardsInduction t (S n)  =  optExt ps :: ps where
->   ps : PolicySeq (S t) n;;  ps = backwardsInduction (S t) n
+> backwardsInduction t (S n)  =  let ps = backwardsInduction (S t) n in optExt ps :: ps
 
 > {-
 
 > ---}
+ 
