@@ -28,24 +28,19 @@ Published in Proceedings of the Conferences on Intelligent Computer
   Mathematics (CICM 2013), "Programming Languages for Mechanized Mathematics
   Systems Workshop (PLMMS)", volume 1010 of CEUR Workshop Proceedings, 2013.
 
-### 2014-2016: SDPs, dependent types and generic solutions (Accepted for LMCS 2016-10)
+### 2014-2016: SDPs, dependent types and generic solutions
 
 Title: Sequential decision problems, dependent types and generic solutions
 
-* 2014-08: Submitted for publication
-* 2015-06: Received referee reports
-* 2015-07: [Resubmitted](http://www.cse.chalmers.se/~patrikj/papers/SeqDecProbDepType_LMCS_2015_preprint.pdf).
-* 2015-12: Received 2nd round of referee reports
-* 2016-02: [Resubmitted](http://www.cse.chalmers.se/~patrikj/papers/SeqDecProbDepType_LMCS_2016_preprint.pdf).
-* 2016-07: Received 3rd round of referee reports ("Accept with minor revision")
-* 2016-08: [Resubmitted](http://www.cse.chalmers.se/~patrikj/papers/SeqDecProbDepType_LMCS_2016-08_preprint.pdf).
-* 2016-10: Accepted for publication in LICS (as is). Available at [arXiv](https://arxiv.org/abs/1610.07145).
+Authors: [Nicola Botta](https://www.pik-potsdam.de/members/botta/publications), Patrik Jansson, Cezar Ionescu, David R. Christiansen, Edwin Brady
 
-Authors: Nicola Botta, Patrik Jansson, Cezar Ionescu, David R. Christiansen, Edwin Brady
+Paper: https://lmcs.episciences.org/3202
+
+Published in Logical Methods in Computer Science, March 17, 2017, Volume 13, Issue 1
 
 ### 2015-2017: Contributions to a computational theory of policy advice and avoidability
 
-Authors: Nicola Botta, Patrik Jansson, Cezar Ionescu
+Authors: [Nicola Botta](https://www.pik-potsdam.de/members/botta/publications), Patrik Jansson, Cezar Ionescu
 
 * 2016-01-06: Submitted to the Journal of Functional Programming (JFP) Special issue on Dependently Typed Programming. (JFP is a [RoMEO Green journal](http://www.sherpa.ac.uk/romeo/search.php?issn=0956-7968).)
     * [Full text pre-print available](http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2016_preprint.pdf)
