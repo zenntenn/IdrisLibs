@@ -139,6 +139,7 @@
 >       r  :  Reachable x;;  r  =  allElemSpec0 x mx ar xemx
 >       v  :  Viable n x;;   v  =  allElemSpec0 x mx av xemx
 
+
 > |||
 > possibleStateCtrlSeqsRewards : {t : Nat} -> {n : Nat} -> 
 >                                (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
