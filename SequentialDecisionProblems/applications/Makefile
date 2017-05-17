@@ -1,7 +1,12 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. +RTS -K32000000 -RTS -p contrib -p effects -V
+#IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. +RTS -K32000000 -RTS -p contrib -p effects -V
+IDRISFLAGS = -O3 --warnreach \
+             -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
+             +RTS -K32000000 -RTS \
+             -p contrib -p effects \
+             -V
 
 newcomb: Newcomb.lidr
 	${IDRIS} ${IDRISFLAGS} Newcomb.lidr -o newcomb
@@ -15,7 +20,18 @@ emissionsgame0: EmissionsGame0.lidr
 emissionsgame1: EmissionsGame1.lidr
 	${IDRIS} ${IDRISFLAGS} EmissionsGame1.lidr -o emissionsgame1
 
+emissionsgame2: EmissionsGame2.lidr
+	${IDRIS} ${IDRISFLAGS} EmissionsGame2.lidr -o emissionsgame2
+
+emissionsgame2.1: EmissionsGame2.1.lidr
+	${IDRIS} ${IDRISFLAGS} EmissionsGame2.1.lidr -o emissionsgame2.1
+
 clean:
-	rm newcomb
+	rm -f newcomb
+	rm -f fastnewcomb
+	rm -f emissionsgame0
+	rm -f emissionsgame1
+	rm -f emissionsgame2
+	rm -f emissionsgame2.1
 	-find . -name '*.ibc' -delete
 	-find . -name '*~' -delete

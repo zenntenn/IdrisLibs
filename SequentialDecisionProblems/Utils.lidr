@@ -316,6 +316,83 @@ We apply these patterns, for instance, in |ViabilityDefaults|.
 > possibleRewards' {t} {n} xys = fmap (valStateCtrlSeq t n) xys
 
 
+* Computation of specific trajectories via selection function
+
+> {-
+> |||
+> stateCtrlSeq : {t, n : Nat} -> 
+>                (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+>                (ps : PolicySeq t n) ->
+>                (eps : {A : Type} -> M A -> A) ->
+>                StateCtrlSeq t n
+> stateCtrlSeq {t} {n = Z}    x r v Nil        eps =  Nil x
+> stateCtrlSeq {t} {n = S m}  x r v (p :: ps') eps =
+>   (MkSigma x y) :: (eps (fmap f (tagElem mx'))) where
+>     y   :  Ctrl t x
+>     y   =  ctrl (p x r v)
+>     mx' :  M (State (S t))
+>     mx' =  nexts t x y
+>     av  :  All (Viable m) mx'
+>     av  =  allViable (p x r v)
+>     f   :  Sigma (State (S t)) (\ x' => x' `Elem` mx') -> StateCtrlSeq (S t) m
+>     f (MkSigma x' x'emx') = res where -- stateCtrlSeq {t = S t} {n = m} x' r' v' ps' eps where
+>       ar  :  All Reachable mx'
+>       ar  =  reachableSpec1 x r y
+>       r'  :  Reachable x'
+>       r'  =  allElemSpec0 x' mx' ar x'emx'
+>       v'  :  Viable m x'
+>       v'  =  allElemSpec0 x' mx' av x'emx'
+>       res :  StateCtrlSeq (S t) m
+>       res =  ?kika
+> -}
+
+
+* Alternative computation of trajectories
+
+> |||
+> app : {t, m, n : Nat} ->
+>       StateCtrlSeq t m -> Policy (t + m) (S n) -> M (StateCtrlSeq t (S m))
+> app {t} {m = Z} {n} (Nil {t} x) p = fmap (f . g) (nexts t x y) where
+>   postulate r : Reachable x
+>   postulate v : Viable (S n) x
+>   q : Policy t (S n)
+>   q = replace {P = \ X => Policy X (S n)} (plusZeroRightNeutral t) p
+>   y : Ctrl t x
+>   y = ctrl (q x r v)
+>   f : StateCtrlSeq (S t) Z -> StateCtrlSeq t (S Z)
+>   f nx' = (MkSigma x y) :: nx'
+>   g : State (S t) -> StateCtrlSeq (S t) Z
+>   g x' = Nil x'
+> app {t} {m = S m'} {n} (xy :: xys) p = fmap f (app xys q) where
+>   f : StateCtrlSeq (S t) (S m') -> StateCtrlSeq t (S (S m'))
+>   f = (xy ::)
+>   q : Policy (S t + m') (S n)
+>   q = replace {P = \ X => Policy X (S n)} (sym (plusSuccRightSucc t m')) p
+
+> |||
+> extend : {t, m, n : Nat} ->
+>          M (StateCtrlSeq t m) -> PolicySeq (t + m) n -> M (StateCtrlSeq t (m + n))
+> extend mxys {t} {m} {n = Z}         Nil  = 
+>   replace {P = \ X => M (StateCtrlSeq t X)} (sym (plusZeroRightNeutral m)) mxys
+> extend mxys {t} {m} {n = S n'} (p :: ps) = s2 where
+>   s1 : M (StateCtrlSeq t (plus (S m) n'))
+>   s1 = extend mxys' (replace {P = \ X => PolicySeq X n'} (plusSuccRightSucc t m) ps) where
+>     mxys' : M (StateCtrlSeq t (S m))
+>     mxys' = bind mxys f where
+>       f : StateCtrlSeq t m ->  M (StateCtrlSeq t (S m))
+>       f xys = app xys p
+>   s2 : M (StateCtrlSeq t (plus m (S n')))
+>   s2 = replace {P = \ X => M (StateCtrlSeq t X)} (plusSuccRightSucc m n') s1     
+
+> possibleStateCtrlSeqs1 : {t, n : Nat} -> (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
+>                          (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
+> possibleStateCtrlSeqs1 {t} {n} x r v ps = s2 where
+>   s1 : M (StateCtrlSeq t (Z + n))
+>   s1 = extend (ret (Nil {t} x)) (replace {P = \ X => PolicySeq X n} (sym (plusZeroRightNeutral t)) ps)
+>   s2 : M (StateCtrlSeq t n)
+>   s2 = replace {P = \ X => M (StateCtrlSeq t X)} (plusZeroLeftNeutral n) s1
+
+
 > {-
 
 > ---}

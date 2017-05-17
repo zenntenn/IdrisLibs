@@ -181,7 +181,7 @@ We implement |toptExt| on the basis of the implementation of |optExt|
 of the core theory. We start with a tabulated version of |sval|:
 
 > tsval : {t,n : Nat} -> 
->         (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>         (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
 >         (gy  : GoodCtrl t x n) -> 
 >         (vt : Vect (cardReachableAndViableState (S t) n) Val) ->
 >         PossibleNextState x (ctrl gy) -> Val
@@ -212,7 +212,7 @@ of the core theory. We start with a tabulated version of |sval|:
 Next, we implement a tabulated version of |cval|:
 
 > tcval : {t, n : Nat} -> 
->         (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S n) x) ->
+>         (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
 >         (vt : Vect (cardReachableAndViableState (S t) n) Val) -> 
 >         GoodCtrl t x n -> Val
 > tcval {t} x r v vt gy = meas (fmap (tsval x r v gy vt) (tagElem mx')) where
@@ -224,7 +224,7 @@ Next, we implement a tabulated version of |cval|:
 And finally
 
 > tcvalargmax : {t, n : Nat} -> 
->               (x  : State t) -> (r : Reachable x) -> (v : Viable (S n) x) ->
+>               (x  : State t) -> .(r : Reachable x) -> .(v : Viable (S n) x) ->
 >               (vt : Vect (cardReachableAndViableState (S t) n) Val) -> GoodCtrl t x n
 
 > toptExt {t} {n} vt = p where

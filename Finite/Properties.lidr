@@ -18,6 +18,7 @@
 > import Fun.Properties
 > import Sigma.Sigma
 > import Pairs.Operations
+> import Tuple.Properties
 
 
 > %default total
@@ -131,6 +132,27 @@ this by applying |contra|. To this end, we need a value of type |Any P
 > finitePair = finiteProduct
 > %freeze finitePair -- frozen
 
+> ||| Tuples of 3 finite types are finite
+> finiteTuple3 : {A, B, C : Type} -> 
+>                Finite A -> Finite B -> Finite C -> 
+>                Finite (A, B, C)
+> finiteTuple3 {A} {B} {C} fA fB fC = 
+>   MkSigma _ (isoTrans (tuplePairIso3 {A} {B} {C}) (getProof fABC)) where
+>     fAB  : Finite (A, B)
+>     fAB  = finiteProduct fA fB
+>     fABC : Finite ((A, B), C)
+>     fABC = finiteProduct fAB fC
+
+> ||| ||| Tuples of 4 finite types are finite
+> finiteTuple4 : {A, B, C, D : Type} -> 
+>                Finite A -> Finite B -> Finite C ->  Finite D -> 
+>                Finite (A, B, C, D)
+> finiteTuple4 {A} {B} {C} {D} fA fB fC fD =
+>   MkSigma _ (isoTrans (tuplePairIso4 {A} {B} {C} {D}) (getProof fABCD)) where
+>     fABC  : Finite (A, B, C)
+>     fABC  = finiteTuple3 fA fB fC
+>     fABCD : Finite ((A, B, C), D)
+>     fABCD = finiteProduct fABC fD
 
 > {- we have to comply with the new |record| syntax for this to type check
 

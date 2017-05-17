@@ -44,42 +44,46 @@
 > pLH = cast 0.7
 
 > SequentialDecisionProblems.CoreTheory.nexts t (e, True, False, True) False =
+>   let ttres = mkSimpleProb 
+>               [((weaken e, False, False,  True),        pLH  * (one - pA1) *        pS1), 
+>                ((    FS e,  True, False,  True), (one - pLH) * (one - pA1) *        pS1),
+>                ((weaken e, False,  True,  True),        pLH  *        pA1  *        pS1), 
+>                ((    FS e,  True,  True,  True), (one - pLH) *        pA1  *        pS1),
+>                ((weaken e, False, False, False),        pLH  * (one - pA1) * (one - pS1)), 
+>                ((    FS e,  True, False, False), (one - pLH) * (one - pA1) * (one - pS1)),
+>                ((weaken e, False,  True, False),        pLH  *        pA1  * (one - pS1)), 
+>                ((    FS e,  True,  True, False), (one - pLH) *        pA1  * (one - pS1))] in
+>   let tfres = mkSimpleProb 
+>               [((weaken e, False, False,  True),        pLH  * (one - pA1) *        pS2), 
+>                ((    FS e,  True, False,  True), (one - pLH) * (one - pA1) *        pS2),
+>                ((weaken e, False,  True,  True),        pLH  *        pA1  *        pS2), 
+>                ((    FS e,  True,  True,  True), (one - pLH) *        pA1  *        pS2),
+>                ((weaken e, False, False, False),        pLH  * (one - pA1) * (one - pS2)), 
+>                ((    FS e,  True, False, False), (one - pLH) * (one - pA1) * (one - pS2)),
+>                ((weaken e, False,  True, False),        pLH  *        pA1  * (one - pS2)), 
+>                ((    FS e,  True,  True, False), (one - pLH) *        pA1  * (one - pS2))] in
+>   let ftres = mkSimpleProb 
+>               [((weaken e, False, False,  True),        pLH  * (one - pA2) *        pS1), 
+>                ((    FS e,  True, False,  True), (one - pLH) * (one - pA2) *        pS1),
+>                ((weaken e, False,  True,  True),        pLH  *        pA2  *        pS1), 
+>                ((    FS e,  True,  True,  True), (one - pLH) *        pA2  *        pS1),
+>                ((weaken e, False, False, False),        pLH  * (one - pA2) * (one - pS1)), 
+>                ((    FS e,  True, False, False), (one - pLH) * (one - pA2) * (one - pS1)),
+>                ((weaken e, False,  True, False),        pLH  *        pA2  * (one - pS1)), 
+>                ((    FS e,  True,  True, False), (one - pLH) *        pA2  * (one - pS1))] in
+>   let ffres = mkSimpleProb 
+>               [((weaken e, False, False,  True),        pLH  * (one - pA2) *        pS2), 
+>                ((    FS e,  True, False,  True), (one - pLH) * (one - pA2) *        pS2),
+>                ((weaken e, False,  True,  True),        pLH  *        pA2  *        pS2), 
+>                ((    FS e,  True,  True,  True), (one - pLH) *        pA2  *        pS2),
+>                ((weaken e, False, False, False),        pLH  * (one - pA2) * (one - pS2)), 
+>                ((    FS e,  True, False, False), (one - pLH) * (one - pA2) * (one - pS2)),
+>                ((weaken e, False,  True, False),        pLH  *        pA2  * (one - pS2)), 
+>                ((    FS e,  True,  True, False), (one - pLH) *        pA2  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => mkSimpleProb 
->                         [((weaken e, False, False,  True),        pLH  * (one - pA1) *        pS1), 
->                          ((    FS e,  True, False,  True), (one - pLH) * (one - pA1) *        pS1),
->                          ((weaken e, False,  True,  True),        pLH  *        pA1  *        pS1), 
->                          ((    FS e,  True,  True,  True), (one - pLH) *        pA1  *        pS1),
->                          ((weaken e, False, False, False),        pLH  * (one - pA1) * (one - pS1)), 
->                          ((    FS e,  True, False, False), (one - pLH) * (one - pA1) * (one - pS1)),
->                          ((weaken e, False,  True, False),        pLH  *        pA1  * (one - pS1)), 
->                          ((    FS e,  True,  True, False), (one - pLH) *        pA1  * (one - pS1))]
->                False => mkSimpleProb 
->                         [((weaken e, False, False,  True),        pLH  * (one - pA1) *        pS2), 
->                          ((    FS e,  True, False,  True), (one - pLH) * (one - pA1) *        pS2),
->                          ((weaken e, False,  True,  True),        pLH  *        pA1  *        pS2), 
->                          ((    FS e,  True,  True,  True), (one - pLH) *        pA1  *        pS2),
->                          ((weaken e, False, False, False),        pLH  * (one - pA1) * (one - pS2)), 
->                          ((    FS e,  True, False, False), (one - pLH) * (one - pA1) * (one - pS2)),
->                          ((weaken e, False,  True, False),        pLH  *        pA1  * (one - pS2)), 
->                          ((    FS e,  True,  True, False), (one - pLH) *        pA1  * (one - pS2))]
+>                True  => ttres
+>                False => tfres
 >     False => case (fromFin e <= crE) of
->                True  => mkSimpleProb 
->                         [((weaken e, False, False,  True),        pLH  * (one - pA2) *        pS1), 
->                          ((    FS e,  True, False,  True), (one - pLH) * (one - pA2) *        pS1),
->                          ((weaken e, False,  True,  True),        pLH  *        pA2  *        pS1), 
->                          ((    FS e,  True,  True,  True), (one - pLH) *        pA2  *        pS1),
->                          ((weaken e, False, False, False),        pLH  * (one - pA2) * (one - pS1)), 
->                          ((    FS e,  True, False, False), (one - pLH) * (one - pA2) * (one - pS1)),
->                          ((weaken e, False,  True, False),        pLH  *        pA2  * (one - pS1)), 
->                          ((    FS e,  True,  True, False), (one - pLH) *        pA2  * (one - pS1))]
->                False => mkSimpleProb 
->                         [((weaken e, False, False,  True),        pLH  * (one - pA2) *        pS2), 
->                          ((    FS e,  True, False,  True), (one - pLH) * (one - pA2) *        pS2),
->                          ((weaken e, False,  True,  True),        pLH  *        pA2  *        pS2), 
->                          ((    FS e,  True,  True,  True), (one - pLH) *        pA2  *        pS2),
->                          ((weaken e, False, False, False),        pLH  * (one - pA2) * (one - pS2)), 
->                          ((    FS e,  True, False, False), (one - pLH) * (one - pA2) * (one - pS2)),
->                          ((weaken e, False,  True, False),        pLH  *        pA2  * (one - pS2)), 
->                          ((    FS e,  True,  True, False), (one - pLH) *        pA2  * (one - pS2))]
+>                True  => ftres
+>                False => ffres

@@ -197,6 +197,16 @@
 >                                  QED
 
 
+* |nub| preserves non-emptiness:
+
+> nubPreservesNonEmpty : {A : Type} -> (Eq A) => 
+>                        (as : List A) -> 
+>                        List.Operations.NonEmpty as -> 
+>                        List.Operations.NonEmpty (nub as)
+> nubPreservesNonEmpty Nil ne = absurd ne
+> nubPreservesNonEmpty (a :: as) ne = ()                       
+
+
 * |fmap| preserves shape:
 
 > mapPreservesNonEmpty : {A, B : Type} -> 
@@ -204,7 +214,7 @@
 >                        List.Operations.NonEmpty as -> 
 >                        List.Operations.NonEmpty (map f as)
 > mapPreservesNonEmpty f Nil ne = absurd ne
-> mapPreservesNonEmpty f (a :: as) ne = ()                       
+> mapPreservesNonEmpty f (a :: as) ne = ()
 
 
 * Fusion-related properties:

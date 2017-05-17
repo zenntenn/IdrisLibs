@@ -31,6 +31,11 @@
 > postulate
 > minusSelfZero : {x : Double} -> x - x = 0.0
 
+> |||
+> postulate
+> plusAssociative : (x : Double) -> (y : Double) -> (z : Double) -> 
+>                   x + (y + z) = (x + y) + z
+
 
 * |LTE|:
 
@@ -61,6 +66,17 @@
 > postulate
 > monotoneDivConstLTE : {a, b, c : Double} -> 
 >                       a `LTE` b -> Positive c -> a / c `LTE` b / c
+
+> ||| LTE is unique
+> postulate 
+> uniqueLTE : {x, y : Double} -> (p : x `LTE` y) -> (q : x `LTE` y) -> p = q
+
+
+* |LT|:
+
+> ||| LT is unique
+> postulate 
+> uniqueLT : {x, y : Double} -> (p : x `LT` y) -> (q : x `LT` y) -> p = q
 
 
 * Non-negative double precision floating point numbers:

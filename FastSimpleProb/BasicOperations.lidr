@@ -2,16 +2,19 @@
 
 > import Data.List
 > import Data.So
+> import Syntax.PreorderReasoning
 
 > import FastSimpleProb.SimpleProb
 > import Double.Predicates
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.Constants
 > import NonNegDouble.BasicOperations
+> import NonNegDouble.Operations
 > import NonNegDouble.Properties
 > import NonNegDouble.Postulates
 > import List.Operations
 > import Fun.Operations
+> import Pairs.Operations
 
 > %default total
 > %access public export

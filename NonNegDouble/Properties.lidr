@@ -11,7 +11,9 @@
 > import NonNegDouble.BasicOperations
 > import NonNegDouble.Operations
 > import List.Operations
-
+> import Subset.Properties
+> import Pairs.Operations
+> import Unique.Predicates
 
 > %default total
 > %access public export
@@ -117,6 +119,24 @@
 >   s2 : Positive ((toDouble x) / (toDouble y))
 >   s2 = Double.Postulates.divPreservesPositivity pdx pdy
 
+> |||
+> plusAssociative : (x : NonNegDouble) -> (y : NonNegDouble) -> (z : NonNegDouble) -> 
+>                   x + (y + z) = (x + y) + z
+> plusAssociative (Element x px) (Element y py) (Element z pz) =
+>     ( Element x px + ((Element y py) + (Element z pz)) )
+>   ={ Refl }=
+>     ( Element x px + Element (y + z) (plusPreservesNonNegativity py pz) )  
+>   ={ Refl }=
+>     ( Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz)) )    
+>   ={ subsetEqLemma1 (Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz))) 
+>                     (Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz)) 
+>                     (plusAssociative x y z) uniqueLTE }=
+>     ( Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz) )
+>   ={ Refl }=
+>     ( Element (x + y) (plusPreservesNonNegativity px py) + Element z pz )
+>   ={ Refl }=
+>     ( ((Element x px) + (Element y py)) + Element z pz )
+>   QED                   
 
 > {-
 
