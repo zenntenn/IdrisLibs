@@ -47,6 +47,15 @@
 > cardNotZGoodBad = cardNotZLemma finiteGoodBad Good
 
 
+* |GoodBad| is in |Eq|:
+
+> implementation Eq GoodBad where
+>   (==) Good Good = True
+>   (==) Good  Bad = False
+>   (==)  Bad Good = False
+>   (==)  Bad  Bad = True
+
+
 > {-
 
 > ---}

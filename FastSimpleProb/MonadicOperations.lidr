@@ -45,7 +45,6 @@
 > ret : {A : Type} -> A -> SimpleProb A
 > ret a = MkSimpleProb [(a, one)] positiveOne
 
-
 > |||
 > bind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
 > bind {A} {B} (MkSimpleProb aps psum) f = normalize (MkSimpleProb bps' psum') where

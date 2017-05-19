@@ -47,6 +47,15 @@
 > cardNotZLowHigh = cardNotZLemma finiteLowHigh Low
 
 
+* |LowHigh| is in |Eq|:
+
+> implementation Eq LowHigh where
+>   (==)  Low  Low = True
+>   (==)  Low High = False
+>   (==) High  Low = False
+>   (==) High High = True
+
+
 > {-
 
 > ---}

@@ -47,6 +47,15 @@
 > cardNotZAvailableUnavailable = cardNotZLemma finiteAvailableUnavailable Available
 
 
+* |AvailableUnavailable| is in |Eq|:
+
+> implementation Eq AvailableUnavailable where
+>   (==)   Available   Available = True
+>   (==)   Available Unavailable = False
+>   (==) Unavailable   Available = False
+>   (==) Unavailable Unavailable = True
+
+
 > {-
 
 > ---}
