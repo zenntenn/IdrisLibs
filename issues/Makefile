@@ -1,11 +1,11 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-IDRISFLAGS = -O3 --warnreach \
-             -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
-             +RTS -K32000000 -RTS \
+IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
+             +RTS -K64000000 -RTS \
              -p contrib -p effects \
              -V
+# -O3 --warnreach
 
 run_time_complexity: run_time_complexity.lidr
 	${IDRIS} ${IDRISFLAGS} run_time_complexity.lidr -o run_time_complexity

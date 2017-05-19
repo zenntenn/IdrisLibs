@@ -54,159 +54,64 @@
 
 > -- %default total
 > %auto_implicits off
-
 > -- %logging 5
-
-
-* Introduction
-
-We specify a second emissions game as a stochastic sequential decision
-problem with a single decision maker.
-
-The idea is that "best" decisions on levels of greenhouse gases (GHG)
-emissions (that is, how much GHG shall be allowed to be emitted in a
-given time period) are affected by three major sources of uncertainty:
-
-1) uncertainty about the (typically negative) effects of high GHG
-concentrations in the atmosphere,
-
-2) uncertainty about the availability of effective (cheap, efficient)
-technologies for reducing GHG emissions,
-
-3) uncertainty about the capability of actually implementing a decision
-on a given GHG emission level.
-
-We study the effects of 1), 2) and 3) on optimal sequences of emission
-policies. The idea is to design an emission game that accounts for all
-three sources of uncertainty and yet is simple enough to support
-investigating the logical consequences of different assumptions through
-comparisons and parametric studies.
 
 
 * Controls
 
-We consider a game in which, at each decision step, the decision maker
-can select between low and high GHG emissions
-
 > SequentialDecisionProblems.CoreTheory.Ctrl _ _ = LowHigh
-
-Low emissions, if implemented, increase the cumulated GHG emissions less
-than high emissions.
 
 
 * States
 
-At each decision step, the decision maker has to choose an option on the
-basis of four data: the cumulated GHG emissions, the current emission
-level (low or high), the availability of effective technologies for
-reducing GHG emissions and the state of the world. Effective
-technologies for reducing GHG emissions can be either available or
-unavailable. The state of the world can be either good or bad:
-
 > SequentialDecisionProblems.CoreTheory.State t 
 > = (Fin (S t), LowHigh, AvailableUnavailable, GoodBad)
-
-The idea is that the game starts with zero cumulated emissions, high
-emission levels, unavailable GHG technologies and with the world in a
-good state. 
-
-In these conditions, the probability to turn to the bad state is
-low. But if the cumulated emissions increase beyond a fixed critical
-threshold, the probability that the state of the world turns bad
-increases. If the world is the bad state, there is no chance to come
-back to the good state.
-
-Similarly, the probability that effective technologies for reducing GHG
-emissions become available increases after a fixed number of decision
-steps. Once available, effective technologies stay available for ever.
-
-The capability of actually implementing a decision on a given GHG
-emission level in general depends on many factors. In our simplified
-setup, we just investigate the effect of inertia: implementing low
-emissions is easier when low emission policies are already in place than
-when the current emission policies are high emission
-policies. Similarly, implementing high emission policies is easier under
-high emissions policies than under low emissions policies.
 
 
 * Transition function
 
-> -- The critical cumulated emissions threshold
 > crE : Double
 > crE = 0.0
 
-> -- The critical number of decision steps
 > crN : Nat
 > crN = 8
 
-> -- The probability of staying in a good world when the cumulated
-> -- emissions are below the critical threshold |crE|
 > pS1  :  NonNegDouble
 > pS1  =  cast 0.9
 
-> -- The probability of staying in a good world when the cumulated
-> -- emissions are above the critical threshold |crE|
 > pS2  :  NonNegDouble
 > pS2  =  cast 0.1
 
-> -- Sanity check
 > pS2LTEpS1 : pS2 `NonNegDouble.Predicates.LTE` pS1
 > pS2LTEpS1 = MkLTE Oh
 
-> -- The probability of effective technologies for reducing GHG
-> -- emissions becoming available when the number of decision steps is
-> -- below |crN|
 > pA1  :  NonNegDouble
 > pA1  =  cast 0.1
 
-> -- The probability of effective technologies for reducing GHG
-> -- emissions becoming available when the number of decision steps is
-> -- above |crN|
 > pA2  :  NonNegDouble
 > pA2  =  cast 0.9
 
-> -- Sanity check
 > pA1LTEpA2 : pA1 `NonNegDouble.Predicates.LTE` pA2
 > pA1LTEpA2 = MkLTE Oh
 
-> -- The probability being able to implement low emission policies when
-> -- the current emissions are low and low emissions are selected
 > pLL  :  NonNegDouble
 > pLL  =  cast 0.9
 
-> -- The probability being able to implement low emission policies when
-> -- the current emissions are high and low emissions are selected
 > pLH  :  NonNegDouble
 > pLH  =  cast 0.7
 
-> -- Sanity check
 > pLHLTEpLL : pLH `NonNegDouble.Predicates.LTE` pLL
 > pLHLTEpLL = MkLTE Oh
 
-> -- The probability being able to implement high emission policies when
-> -- the current emissions are low and high emissions are selected
 > pHL  :  NonNegDouble
 > pHL  =  cast 0.7
 
-> -- The probability being able to implement high emission policies when
-> -- the current emissions are high and high emissions are selected
 > pHH  :  NonNegDouble
 > pHH  =  cast 0.9
 
-> -- Sanity check
 > pHLLTEpHH : pHL `NonNegDouble.Predicates.LTE` pHH
 > pHLLTEpHH = MkLTE Oh
 
-Low emissions leave the cumulated emissions unchanged, high emissions
-increase the cumulated emissions by one:
-
-> -- The transition function:
->
-> -- The transition function: high emissions
->
-> -- The transition function: high emissions, unavailable GHG technologies
->
-> -- The transition function: high emissions, unavailable GHG technologies, good world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA1) *        pS1), 
@@ -296,7 +201,6 @@ increase the cumulated emissions by one:
 >                True  => ftres
 >                False => ffres
 >
-> -- The transition function: high emissions, unavailable GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1)), 
@@ -355,9 +259,6 @@ increase the cumulated emissions by one:
 >                False => ffres
 >
 >
-> -- The transition function: high emissions, available GHG technologies
->
-> -- The transition function: high emissions, available GHG technologies, good world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available, Good),        pLH  *        pS1), 
@@ -415,7 +316,6 @@ increase the cumulated emissions by one:
 >                True  => ftres
 >                False => ffres
 >
-> -- The transition function: high emissions, available GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available,  Bad),        pLH ), 
@@ -460,11 +360,6 @@ increase the cumulated emissions by one:
 >
 >
 >
-> -- The transition function: low emissions
->
-> -- The transition function: low emissions, unavailable GHG technologies
->
-> -- The transition function: low emissions, unavailable GHG technologies, good world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA1) *        pS1), 
@@ -554,7 +449,6 @@ increase the cumulated emissions by one:
 >                True  => ftres
 >                False => ffres
 >
-> -- The transition function: low emissions, unavailable GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1)), 
@@ -613,9 +507,6 @@ increase the cumulated emissions by one:
 >                False => ffres
 >
 >
-> -- The transition function: low emissions, available GHG technologies
->
-> -- The transition function: low emissions, available GHG technologies, good world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available, Good),        pLL  *        pS1), 
@@ -673,7 +564,6 @@ increase the cumulated emissions by one:
 >                True  => ftres
 >                False => ffres
 >
-> -- The transition function: low emissions, available GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) Low =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available,  Bad),        pLL ), 
@@ -745,59 +635,36 @@ increase the cumulated emissions by one:
 
 * Reward function
 
-The idea is that being in a good world yields one unit of benefits per
-step and being in a bad world yield less benefits:
-
-> -- Ratio of the benefits in a bad world and the benefits in a good world
 > badOverGood : NonNegDouble
 > badOverGood = cast 0.5
 
-> -- Sanity check
 > badOverGoodLTEone : badOverGood `NonNegDouble.Predicates.LTE` one
 > badOverGoodLTEone = MkLTE Oh
 
-Emitting GHGs also brings benefits. These are a fraction of the step
-benefits in a good world and low emissions bring less benefits than high
-emissions:
-
-> -- Ratio between low emissions and step benefits in good world, when
-> -- effective technologies for reducing GHG emissions are unavailable
 > lowOverGoodUnavailable : NonNegDouble
 > lowOverGoodUnavailable = cast 0.1
 
-> -- Ratio between low emissions and step benefits in good world, when
-> -- effective technologies for reducing GHG emissions are available
 > lowOverGoodAvailable : NonNegDouble
 > lowOverGoodAvailable = cast 0.2
 
-> -- Ratio between high emissions and step benefits in a good world
 > highOverGood : NonNegDouble
 > highOverGood = cast 0.3
 
-> -- Sanity check
 > lowOverGoodUnavailableLTEone : lowOverGoodUnavailable `NonNegDouble.Predicates.LTE` one
 > lowOverGoodUnavailableLTEone = MkLTE Oh
 
-> -- Sanity check
 > lowOverGoodAvailableLTEone : lowOverGoodAvailable `NonNegDouble.Predicates.LTE` one
 > lowOverGoodAvailableLTEone = MkLTE Oh
 
-> -- Sanity check
 > lowOverGoodUnavailableLTElowOverGoodAvailable : lowOverGoodUnavailable `NonNegDouble.Predicates.LTE` lowOverGoodAvailable
 > lowOverGoodUnavailableLTElowOverGoodAvailable = MkLTE Oh
 
-> -- Sanity check
 > highOverGoodLTEone : highOverGood `NonNegDouble.Predicates.LTE` one
 > highOverGoodLTEone = MkLTE Oh
 
-> -- Sanity check
 > lowLTEhigh : lowOverGoodAvailable `NonNegDouble.Predicates.LTE` highOverGood
 > lowLTEhigh = MkLTE Oh
 
-The reward only depend on the next state, not on the current state or on
-the selected control:
-
-> -- Reward function:
 > SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable, Good) =
 >   one               + one * highOverGood
 > SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable,  Bad) =
@@ -821,36 +688,15 @@ the selected control:
  
 * Completing the problem specification
 
-To be able to apply the verified, generic backwards induction algorithm
-of |CoreTheory| to compute optimal policies for our problem, we have to
-explain how the decision maker accounts for uncertainties on rewards
-induced by uncertainties in the transition function. We first assume
-that the decision maker measures uncertain rewards by their expected
-value:
-
 > SequentialDecisionProblems.CoreTheory.meas = expectedValue
 > SequentialDecisionProblems.FullTheory.measMon = monotoneExpectedValue
 
-Further on, we have to implement the notions of viability and
-reachability. We start by positing that all states are viable for any
-number of steps:
-
-> -- Viable : (n : Nat) -> State t -> Type
 > SequentialDecisionProblems.CoreTheory.Viable n x = Unit
-
-From this definition, it trivially follows that all elements of an
-arbitrary list of states are viable for an arbitrary number of steps:
 
 > viableLemma : {t, n : Nat} -> (xs : List (State t)) -> All (Viable n) xs
 > viableLemma  Nil      = Nil
 > viableLemma {t} {n} (x :: xs) = () :: (viableLemma {t} {n} xs)
 
-This fact and the (less trivial) result that simple probability
-distributions are never empty, see |nonEmptyLemma| in
-|MonadicProperties| in |SimpleProb|, allows us to show that the above
-definition of |Viable| fulfills |viableSpec1|:
-
-> -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x
 > SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} s v =
 >   MkSigma Low (ne, av) where
 >     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t s Low)
@@ -862,15 +708,8 @@ definition of |Viable| fulfills |viableSpec1|:
 
 > SequentialDecisionProblems.Utils.decidableViable n x = decidableUnit
 
-For reachability, we proceed in a similar way. We say that all states
-are reachable
-
-> -- Reachable : State t' -> Type
 > SequentialDecisionProblems.CoreTheory.Reachable x' = Unit
 
-which immediately implies |reachableSpec1|:
-
-> -- reachableSpec1 : (x : State t) -> Reachable {t' = t} x -> (y : Ctrl t x) -> All (Reachable {t' = S t}) (nexts t x y)
 > SequentialDecisionProblems.CoreTheory.reachableSpec1 {t} x r y = all (nexts t x y) where
 >   all : (sp : SimpleProb  (State (S t))) -> SequentialDecisionProblems.CoreTheory.All (Reachable {t' = S t}) sp
 >   all sp = all' (support sp) where
@@ -878,17 +717,9 @@ which immediately implies |reachableSpec1|:
 >     all' Nil = Nil
 >     all' (x :: xs) = () :: (all' xs)
 
-and decidability of |Reachable|:
-
 > SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
 
-Finally, we have to show that controls are finite
-
-> -- finiteCtrl : {t : Nat} -> (x : State t) -> Finite (Ctrl t x)
 > SequentialDecisionProblems.Utils.finiteCtrl _ = finiteLowHigh
-
-and, in order to use the fast, tail-recursive tabulated version of
-backwards induction, that states are finite:
 
 > SequentialDecisionProblems.TabBackwardsInduction.finiteState t =
 >   finiteTuple4 finiteFin finiteLowHigh finiteAvailableUnavailable finiteGoodBad
@@ -896,12 +727,6 @@ backwards induction, that states are finite:
 
 * Optimal policies, optimal decisions, ...
 
-We can now apply the results of our |CoreTheory| and of the |FullTheory|
-to compute verified optimal policies, possible state-control sequences,
-etc. To this end, we need to be able to show the outcome of the decision
-process. This means implemeting functions to print states and controls:
-
-> -- showState : {t : Nat} -> State t -> String
 > SequentialDecisionProblems.Utils.showState {t} (e, High, Unavailable, Good) =
 >   "(" ++ show (finToNat e) ++ ",H,U,G)"
 > SequentialDecisionProblems.Utils.showState {t} (e, High, Unavailable,  Bad) =
@@ -919,11 +744,9 @@ process. This means implemeting functions to print states and controls:
 > SequentialDecisionProblems.Utils.showState {t} (e,  Low,   Available,  Bad) =
 >   "(" ++ show (finToNat e) ++ ",L,A,B)"
 
-> -- showControl : {t : Nat} -> {x : State t} -> Ctrl t x -> String
 > SequentialDecisionProblems.Utils.showCtrl {t} {x}  Low = "L"
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} High = "H"
 
-> -- ad-hoc trajectories computation
 > adHocPossibleStateCtrlSeqs : {t, n : Nat} -> 
 >                              (ps : PolicySeq t n) ->
 >                              (x : State t) -> 
