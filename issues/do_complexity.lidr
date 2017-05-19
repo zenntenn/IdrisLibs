@@ -939,42 +939,81 @@ process. This means implemeting functions to print states and controls:
 >     f   :  State (S t) -> M (StateCtrlSeq (S t) m)
 >     f   =  adHocPossibleStateCtrlSeqs {n = m} ps'
 
+> --{-
 > computation : { [STDIO] } Eff ()
 > computation =
 >   do putStr ("enter number of steps:\n")
 >      nSteps <- getNat
->      case (decidableViable {t = Z} nSteps (FZ, High, Unavailable, Good)) of
 >      
->        (Yes v) => do putStrLn "computing optimal policies ..."
->                      ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
+>      putStrLn "computing optimal policies ..."
+>      ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                      
->                      -- putStrLn "computing possible state-control sequences ..."
->                      -- mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
->                      -- putStrLn "possible state-control sequences and their probabilities:"
->                      -- putStrLn (showlong mxys)
+>      putStrLn "computing possible state-control sequences ..."
+>      mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
+>      putStrLn "possible state-control sequences and their probabilities:"
+>      putStrLn (showlong mxys)
 >                      
->                      -- putStrLn "computing (naively) the number of possible state-control sequences ..."
->                      -- n <- pure (length (toList mxys))
->                      -- putStrLn ("number of possible state-control sequences: " ++ show n)
+>      putStrLn "computing (naively) the number of possible state-control sequences ..."
+>      n <- pure (length (toList mxys))
+>      putStrLn ("number of possible state-control sequences: " ++ show n)
 >                      
->                      -- putStrLn "computing (naively) the most probable state-control sequence ..."
->                      -- xys <- pure (naiveMostProbableProb mxys)
->                      -- putStrLn "most probable state-control sequence and its probability:"
->                      -- putStrLn (show xys)
->                      -- putStrLn ("reward of most probable state-control sequence: " ++ show (valStateCtrlSeq Z nSteps (fst xys)))
+>      putStrLn "computing (naively) the most probable state-control sequence ..."
+>      xys <- pure (naiveMostProbableProb mxys)
+>      putStrLn "most probable state-control sequence and its probability:"
+>      putStrLn (show xys)
+>      putStrLn ("reward of most probable state-control sequence: " ++ show (valStateCtrlSeq Z nSteps (fst xys)))
 >                      
->                      -- putStrLn "sorting (naively) the possible state-control sequence ..."
->                      -- xyss <- pure (naiveSortToList mxys)
->                      -- putStrLn "most probable state-control sequences (first 3) and their probabilities:"
->                      -- putStrLn (showlong (take 3 xyss))
+>      putStrLn "sorting (naively) the possible state-control sequence ..."
+>      xyss <- pure (naiveSortToList mxys)
+>      putStrLn "most probable state-control sequences (first 3) and their probabilities:"
+>      putStrLn (showlong (take 3 xyss))
+>      
+>      mvs <- pure (possibleRewards' mxys)
+>      putStrLn "measure of possible rewards:"
+>      putStrLn ("  " ++ show (meas mvs))
+>                                      
+>      putStrLn "done!"
+> ---}
+
+> {-
+> computation : { [STDIO] } Eff ()
+> computation =
+>   do putStr ("enter number of steps:\n")
+>      nSteps <- getNat
+>      
+>      case (0 == 1) of
+>      
+>        False => do putStrLn "computing optimal policies ..."
+>                    ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
 >                      
->                      -- mvs <- pure (possibleRewards' mxys)
->                      -- putStrLn "measure of possible rewards:"
->                      -- putStrLn ("  " ++ show (meas mvs))
+>                    putStrLn "computing possible state-control sequences ..."
+>                    mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
+>                    putStrLn "possible state-control sequences and their probabilities:"
+>                    putStrLn (showlong mxys)
 >                      
->                      putStrLn "done!"
+>                    putStrLn "computing (naively) the number of possible state-control sequences ..."
+>                    n <- pure (length (toList mxys))
+>                    putStrLn ("number of possible state-control sequences: " ++ show n)
 >                      
->        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
+>                    putStrLn "computing (naively) the most probable state-control sequence ..."
+>                    xys <- pure (naiveMostProbableProb mxys)
+>                    putStrLn "most probable state-control sequence and its probability:"
+>                    putStrLn (show xys)
+>                    putStrLn ("reward of most probable state-control sequence: " ++ show (valStateCtrlSeq Z nSteps (fst xys)))
+>                      
+>                    putStrLn "sorting (naively) the possible state-control sequence ..."
+>                    xyss <- pure (naiveSortToList mxys)
+>                    putStrLn "most probable state-control sequences (first 3) and their probabilities:"
+>                    putStrLn (showlong (take 3 xyss))
+>      
+>                    mvs <- pure (possibleRewards' mxys)
+>                    putStrLn "measure of possible rewards:"
+>                    putStrLn ("  " ++ show (meas mvs))
+>                                      
+>                    putStrLn "done!"
+>        
+>        True  => do putStrLn "done!"
+> ---}
 
 > main : IO ()
 > main = run computation
