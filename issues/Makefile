@@ -19,6 +19,6 @@ error_in_C_tmp_file: error_in_C_tmp_file.lidr
 clean:
 	rm -f run_time_complexity
 	rm -f do_complexity
-  rm -f error_in_C_tmp_file
+	rm -f error_in_C_tmp_file
 	-find . -name '*.ibc' -delete
 	-find . -name '*~' -delete
