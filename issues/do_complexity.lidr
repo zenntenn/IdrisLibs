@@ -824,14 +824,14 @@
 >                    putStrLn (show xys)
 >                    putStrLn ("reward of most probable state-control sequence: " ++ show (valStateCtrlSeq Z nSteps (fst xys)))
 >                      
->                    putStrLn "sorting (naively) the possible state-control sequence ..."
->                    xyss <- pure (naiveSortToList mxys)
->                    putStrLn "most probable state-control sequences (first 3) and their probabilities:"
->                    putStrLn (showlong (take 3 xyss))
+>                    -- putStrLn "sorting (naively) the possible state-control sequence ..."
+>                    -- xyss <- pure (naiveSortToList mxys)
+>                    -- putStrLn "most probable state-control sequences (first 3) and their probabilities:"
+>                    -- putStrLn (showlong (take 3 xyss))
 >      
->                    mvs <- pure (possibleRewards' mxys)
->                    putStrLn "measure of possible rewards:"
->                    putStrLn ("  " ++ show (meas mvs))
+>                    -- mvs <- pure (possibleRewards' mxys)
+>                    -- putStrLn "measure of possible rewards:"
+>                    -- putStrLn ("  " ++ show (meas mvs))
 >                                      
 >                    putStrLn "done!"
 >        

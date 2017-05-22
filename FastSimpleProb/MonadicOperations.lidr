@@ -57,6 +57,30 @@
 >   psum' : Positive (toDouble (sumMapSnd bps'))
 >   psum' = mvMultLemma aps psum f' psums'
 
+> |||
+> naivebind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
+> {-
+> naivebind {A} {B} (MkSimpleProb aps psum) f = MkSimpleProb bps' psum' where
+>   f' : A -> List (B, NonNegDouble)
+>   f' a = toList (f a)
+>   psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))
+>   psums' a = toListLemma (f a)
+>   bps' : List (B, NonNegDouble)
+>   bps' = mvMult aps f'  
+>   psum' : Positive (toDouble (sumMapSnd bps'))
+>   psum' = mvMultLemma aps psum f' psums'
+> -}
+> naivebind {A} {B} (MkSimpleProb aps psum) f = 
+>   let f'     : (A -> List (B, NonNegDouble))
+>              = toList . f in
+>   let psums' : ((a : A) -> Positive (toDouble (sumMapSnd (f' a))))
+>              = (\ a => toListLemma (f a)) in
+>   let bps'   : List (B, NonNegDouble)
+>              = mvMult aps f' in
+>   let psum'  : Positive (toDouble (sumMapSnd bps'))
+>              = mvMultLemma aps psum f' psums' in
+>   MkSimpleProb bps' psum'
+
 
 * |SimpleProb| is a container monad:
 

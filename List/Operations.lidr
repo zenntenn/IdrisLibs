@@ -142,6 +142,8 @@
 > |||
 > mvMult : {A, A', B : Type} -> (Num B) => List (A, B) -> (A -> List (A', B)) -> List (A', B)
 > mvMult abs f = concat (map (mapIdRightMult . (cross f id)) abs)
+> -- mvMult            Nil  f = Nil
+> -- mvMult ((a, b) :: abs) f = mapIdRightMult (f a, b) ++ mvMult abs f
 
 > |||
 > prods : {B : Type} -> (Num B) => List (B, B) -> List B
