@@ -619,6 +619,10 @@
 >             QED
 
 > |||
+> postulate discardBySndZeroLemmaEq : {A, B : Type} -> (Num B, Eq B) => 
+>                                     (abs : List (A, B)) -> sumMapSnd (discardBySndZeroEq abs) = sumMapSnd abs
+
+> |||
 > discardBySndZeroLemma1 : {A, B : Type} -> (Num B, DecEq B) => 
 >                          (a : A) -> (b : B) -> Not (b = 0) ->
 >                          discardBySndZero ((a, b) :: Nil) = (a, b) :: Nil

@@ -103,8 +103,11 @@ reducing GHG emissions and the state of the world. Effective
 technologies for reducing GHG emissions can be either available or
 unavailable. The state of the world can be either good or bad:
 
+> CumulatedEmissions : (t : Nat) -> Type
+> CumulatedEmissions t = Fin (S t)
+
 > SequentialDecisionProblems.CoreTheory.State t 
-> = (Fin (S t), LowHigh, AvailableUnavailable, GoodBad)
+> = (CumulatedEmissions t, LowHigh, AvailableUnavailable, GoodBad)
 
 The idea is that the game starts with zero cumulated emissions, high
 emission levels, unavailable GHG technologies and with the world in a
@@ -133,21 +136,21 @@ high emissions policies than under low emissions policies.
 
 > -- The critical cumulated emissions threshold
 > crE : Double
-> crE = 0.0
+> crE = 4.0
 
 > -- The critical number of decision steps
 > crN : Nat
-> crN = 8
+> crN = 2
 
 > -- The probability of staying in a good world when the cumulated
-> -- emissions are below the critical threshold |crE|
+> -- emissions are |<=| the critical threshold |crE|
 > pS1  :  NonNegDouble
-> pS1  =  cast 0.9
+> pS1  =  cast 1.0 -- cast 0.9
 
 > -- The probability of staying in a good world when the cumulated
-> -- emissions are above the critical threshold |crE|
+> -- emissions are |>=| the critical threshold |crE|
 > pS2  :  NonNegDouble
-> pS2  =  cast 0.1
+> pS2  =  cast 0.0 -- cast 0.1
 
 > -- Sanity check
 > pS2LTEpS1 : pS2 `NonNegDouble.Predicates.LTE` pS1
@@ -157,13 +160,13 @@ high emissions policies than under low emissions policies.
 > -- emissions becoming available when the number of decision steps is
 > -- below |crN|
 > pA1  :  NonNegDouble
-> pA1  =  cast 0.1
+> pA1  =  cast 0.0 -- cast 0.1
 
 > -- The probability of effective technologies for reducing GHG
 > -- emissions becoming available when the number of decision steps is
 > -- above |crN|
 > pA2  :  NonNegDouble
-> pA2  =  cast 0.9
+> pA2  =  cast 1.0 -- cast 0.9
 
 > -- Sanity check
 > pA1LTEpA2 : pA1 `NonNegDouble.Predicates.LTE` pA2
@@ -172,12 +175,12 @@ high emissions policies than under low emissions policies.
 > -- The probability being able to implement low emission policies when
 > -- the current emissions are low and low emissions are selected
 > pLL  :  NonNegDouble
-> pLL  =  cast 0.9
+> pLL  =  cast 0.9 -- cast 1.0 -- cast 0.9
 
 > -- The probability being able to implement low emission policies when
 > -- the current emissions are high and low emissions are selected
 > pLH  :  NonNegDouble
-> pLH  =  cast 0.7
+> pLH  =  cast 0.7 -- cast 1.0 -- cast 0.5
 
 > -- Sanity check
 > pLHLTEpLL : pLH `NonNegDouble.Predicates.LTE` pLL
@@ -186,12 +189,12 @@ high emissions policies than under low emissions policies.
 > -- The probability being able to implement high emission policies when
 > -- the current emissions are low and high emissions are selected
 > pHL  :  NonNegDouble
-> pHL  =  cast 0.7
+> pHL  =  cast 0.7 -- cast 1.0 -- cast 0.5
 
 > -- The probability being able to implement high emission policies when
 > -- the current emissions are high and high emissions are selected
 > pHH  :  NonNegDouble
-> pHH  =  cast 0.9
+> pHH  =  cast 0.9 -- cast 1.0 -- cast 0.9
 
 > -- Sanity check
 > pHLLTEpHH : pHL `NonNegDouble.Predicates.LTE` pHH
@@ -246,11 +249,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA1) *        pS1), 
@@ -290,11 +293,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHH  *        pA2  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 > -- The transition function: high emissions, unavailable GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) Low =
@@ -320,11 +323,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2 )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1)), 
@@ -348,11 +351,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHH  *        pA2 )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 >
 > -- The transition function: high emissions, available GHG technologies
@@ -381,11 +384,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available, Good), (one - pHH) *        pS1), 
@@ -409,11 +412,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHH  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 > -- The transition function: high emissions, available GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) Low =
@@ -431,11 +434,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLH))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available,  Bad), (one - pHH)), 
@@ -451,11 +454,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHH )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 >
 >
@@ -504,11 +507,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA1) *        pS1), 
@@ -548,11 +551,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHL  *        pA2  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 > -- The transition function: low emissions, unavailable GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) Low =
@@ -578,11 +581,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2 )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1)), 
@@ -606,11 +609,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHL  *        pA2 )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 >
 > -- The transition function: low emissions, available GHG technologies
@@ -639,11 +642,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available, Good), (one - pHL) *        pS1), 
@@ -667,11 +670,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHL  * (one - pS2))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 >
 > -- The transition function: low emissions, available GHG technologies, bad world
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) Low =
@@ -689,11 +692,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad), (one - pLL))] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 > SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) High =
 >   let ttres = mkSimpleProb 
 >               [((weaken e, Low,    Available,  Bad), (one - pHL)), 
@@ -709,11 +712,11 @@ increase the cumulated emissions by one:
 >                ((    FS e, High,   Available,  Bad),        pHL )] in
 >   case (t <= crN) of
 >     True  => case (fromFin e <= crE) of
->                True  => ttres
->                False => tfres
+>                True  => trim ttres
+>                False => trim tfres
 >     False => case (fromFin e <= crE) of
->                True  => ftres
->                False => ffres
+>                True  => trim ftres
+>                False => trim ffres
 
 
 * |Val| and |LTE|:
@@ -828,8 +831,8 @@ induced by uncertainties in the transition function. We first assume
 that the decision maker measures uncertain rewards by their expected
 value:
 
-> SequentialDecisionProblems.CoreTheory.meas = expectedValue
-> SequentialDecisionProblems.FullTheory.measMon = monotoneExpectedValue
+> SequentialDecisionProblems.CoreTheory.meas = worst -- expectedValue
+> -- SequentialDecisionProblems.FullTheory.measMon = monotoneWorst -- monotoneExpectedValue
 
 Further on, we have to implement the notions of viability and
 reachability. We start by positing that all states are viable for any
@@ -852,11 +855,11 @@ definition of |Viable| fulfills |viableSpec1|:
 
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x
 > SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} s v =
->   MkSigma Low (ne, av) where
->     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t s Low)
->     ne = nonEmptyLemma (nexts t s Low)
->     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t s Low)
->     av = viableLemma {t = S t} (support (nexts t s Low))
+>   MkSigma High (ne, av) where
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t s High)
+>     ne = nonEmptyLemma (nexts t s High)
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t s High)
+>     av = viableLemma {t = S t} (support (nexts t s High))
 
 > SequentialDecisionProblems.Utils.finiteViable n x = finiteUnit
 
@@ -948,14 +951,84 @@ process. This means implemeting functions to print states and controls:
 > ---}
 
 
+> bau : (t : Nat) -> (n : Nat) -> PolicySeq t n
+> bau t  Z    = Nil
+> bau t (S n) = p :: (bau (S t) n) where
+>   p : Policy t (S n)
+>   p x r v = viableSpec1 x v
+
+
 > computation : { [STDIO] } Eff ()
 > computation =
 >   do putStr ("enter number of steps:\n")
 >      nSteps <- getNat
-
+>      putStrLn "nSteps (number of decision steps):"
+>      putStrLn ("  " ++ show nSteps)
+>      
+>      putStrLn "crE (crit. cumulated emissions threshold):"
+>      putStrLn ("  " ++ show crE)
+>      putStrLn "crN (crit. number of decision steps):" 
+>      putStrLn ("  " ++ show crN)
+>      
+>      putStrLn "pS1 (prob. of staying in a good world, cumulated emissions below crE):"
+>      putStrLn ("  " ++ show pS1)
+>      putStrLn "pS2 (prob. of staying in a good world, cumulated emissions above crE):"
+>      putStrLn ("  " ++ show pS2)
+>      
+>      putStrLn "pA1 (prob. of eff. tech. becoming available, number of steps below crN):" 
+>      putStrLn ("  " ++ show pA1)
+>      putStrLn "pA2 (prob. of eff. tech. becoming available, number of steps above crN):"
+>      putStrLn ("  " ++ show pA2)
+>      
+>      putStrLn "pLL (prob. of low emission policies, emissions low, low selected):"
+>      putStrLn ("  " ++ show pLL)
+>      putStrLn "pLH (prob. of low emission policies, emissions high, low selected):"
+>      putStrLn ("  " ++ show pLH)
+>      putStrLn "pHL (prob. of high emission policies, emissions low, high selected):"
+>      putStrLn ("  " ++ show pHL)
+>      putStrLn "pHH (prob. of high emission policies, emissions high, high selected):"
+>      putStrLn ("  " ++ show pHH) 
+>      
+>      putStrLn "badOverGood (step benefits ratio: bad over good world):"
+>      putStrLn ("  " ++ show badOverGood)
+>      putStrLn "lowOverGoodUnavailable (benefits ratio: low emissions over step, good world, eff. tech. unavailable):"
+>      putStrLn ("  " ++ show lowOverGoodUnavailable) 
+>      putStrLn "lowOverGoodAvailable (benefits ratio: low emissions over step, good world, eff. tech. available):"
+>      putStrLn ("  " ++ show lowOverGoodAvailable)
+>      putStrLn "highOverGood (benefits ratio: High emissions over step, good world):"
+>      putStrLn ("  " ++ show highOverGood) 
+>                
+>      putStrLn "computing BAU policies ..."
+>      baups <- pure (bau Z nSteps)
+>
+>      putStrLn "computing BAU state-control sequences ..."
+>      baumxys <- pure (adHocPossibleStateCtrlSeqs baups (FZ, High, Unavailable, Good))
+>      putStrLn "pairing BAU state-control sequences with their values ..."
+>      baumxysv <- pure (possibleStateCtrlSeqsRewards' baumxys)
+>      -- putStrLn "BAU state-control sequences and their values:"
+>      -- putStrLn (showlong baumxysv)  
+>      
+>      putStrLn "computing (naively) the number of BAU state-control sequences ..."
+>      baun <- pure (length (toList baumxysv))
+>      putStrLn "number of BAU state-control sequences:"
+>      putStrLn ("  " ++ show baun)
+>                  
+>      putStrLn "computing (naively) the most probable BAU state-control sequence ..."
+>      bauxysv <- pure (naiveMostProbableProb baumxysv)
+>      putStrLn "most probable BAU state-control sequence and its probability:"
+>      putStrLn ("  " ++ show bauxysv)            
+>                  
+>      putStrLn "sorting (naively) the BAU state-control sequence ..."
+>      bauxysvs <- pure (naiveSortToList baumxysv)
+>      putStrLn "most probable BAU state-control sequences (first 3) and their probabilities:"
+>      putStrLn (showlong (take 3 bauxysvs))
+>                      
+>      putStrLn "measure of BAU rewards:"
+>      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd baumxysv)))            
+>                  
 >      putStrLn "computing optimal policies ..."
 >      ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
->      
+>            
 >      putStrLn "computing possible state-control sequences ..."
 >      mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
 >      putStrLn "pairing possible state-control sequences with their values ..."

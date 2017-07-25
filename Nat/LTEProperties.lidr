@@ -39,7 +39,6 @@ LTE is decidable:
 > ||| LTE is reflexive
 > reflexiveLTE : (n : Nat) -> LTE n n
 > reflexiveLTE n = lteRefl {n}
-> %freeze reflexiveLTE
 
 > ||| LTE is transitive
 > transitiveLTE : (m : Nat) -> (n : Nat) -> (o : Nat) ->

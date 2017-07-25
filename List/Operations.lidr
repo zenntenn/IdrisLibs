@@ -91,12 +91,20 @@
 > |||
 > min : {A : Type} -> {R : A -> A -> Type} -> 
 >       TotalPreorder R -> (as : List A) -> List.Operations.NonEmpty as -> A
+> {-
 > min tp       Nil        p = absurd p
 > min tp (a :: Nil)       _ = a
 > min tp (a :: a' :: abs) _ with (min tp (a' :: abs) ())
 >   | m with (totalPre tp a m)
 >     | (Left _)  = a
 >     | (Right _) = m
+> -}
+> min tp       Nil        p = absurd p
+> min tp (a :: Nil)       _ = a
+> min tp (a :: a' :: abs) _ with (totalPre tp a a')
+>   | (Left  _) = assert_total (min tp (a  :: abs) ())
+>   | (Right _) = assert_total (min tp (a' :: abs) ())
+
 
 > |||
 > argminMin : {A, B : Type} -> {R : B -> B -> Type} -> 
@@ -170,3 +178,10 @@
 > discardBySndZero (ab :: abs) with (decEq (snd ab) 0)
 >   | (Yes _) = discardBySndZero abs
 >   | (No _)  = ab :: discardBySndZero abs
+
+> |||
+> discardBySndZeroEq : {A, B : Type} -> (Num B, Eq B) => List (A, B) -> List (A, B)
+> discardBySndZeroEq  Nil      = Nil
+> discardBySndZeroEq (ab :: abs) with ((snd ab) == 0)
+>   |  True = discardBySndZeroEq abs
+>   | False = ab :: discardBySndZeroEq abs

@@ -13,6 +13,7 @@
 > import NonNegDouble.Properties
 > import NonNegDouble.Postulates
 > import List.Operations
+> import List.Properties
 > import Fun.Operations
 > import Pairs.Operations
 
@@ -100,6 +101,17 @@
 >   aps = (a, one) :: (toList ps')
 >   prf : Positive (toDouble (sumMapSnd aps))
 >   prf = sumMapSndConsLemma1 a 1.0 positiveOne (MkLTE Oh) (toList ps')
+
+
+> |||
+> trim : {A : Type} -> (Eq A) => 
+>        SimpleProb A -> SimpleProb A
+> trim {A} (MkSimpleProb aps psum) = MkSimpleProb aps' psum' where
+>   aps'  : List (A, NonNegDouble)
+>   aps'  = discardBySndZeroEq aps
+>   psum' : Positive (toDouble (sumMapSnd aps'))
+>   psum' = replace {P = \ X => Positive (toDouble X)} (sym (discardBySndZeroLemmaEq aps)) psum
+
 
 > ||| 
 > showlong : {A : Type} -> Show A => SimpleProb A -> String

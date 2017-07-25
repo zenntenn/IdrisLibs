@@ -171,6 +171,27 @@ Membership, quantifiers:
 > %freeze decAny
 
 
+> elemNotHeadTail : Elem a (a' :: as) -> Not (a = a') -> Elem a as
+> elemNotHeadTail  Here     q = void (q Refl)
+> elemNotHeadTail (There p) _ = p 
+
+> decElemTailDecElemHeadTail : {A : Type} -> {n : Nat} -> (DecEq A) =>
+>                              (a : A) -> (a' : A) -> (as : Vect n A)-> 
+>                              Dec (Elem a as) -> Dec (Elem a (a' :: as))
+> decElemTailDecElemHeadTail a a' as (Yes p) = Yes (There p)
+> decElemTailDecElemHeadTail a a' as (No  p) with (decEq a a')
+>   | Yes q = Yes (replace {P = \ X => Elem a (X :: as)} q Here)
+>   |  No q =  No (\ prf => p (elemNotHeadTail prf q))
+
+> |||
+> decElem : {A : Type} -> {n : Nat} -> (DecEq A) => 
+>           (a : A) -> (as : Vect n A)-> Dec (Elem a as)
+> decElem a Nil = No absurd
+> decElem a (a' :: as) with (decEq a a')
+>   | Yes p  = Yes (replace {P = \ X => Elem a (X :: as)} p Here)
+>   | No  p  = decElemTailDecElemHeadTail a a' as (decElem a as)
+
+
 Container monad properties
 
 > |||
