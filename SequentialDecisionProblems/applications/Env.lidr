@@ -17,10 +17,6 @@
 > import SequentialDecisionProblems.FullTheoryOptDefaults
 > import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
 
-> import SequentialDecisionProblems.applications.LowHigh
-> import SequentialDecisionProblems.applications.AvailableUnavailable
-> import SequentialDecisionProblems.applications.GoodBad
-
 > import FastSimpleProb.SimpleProb
 > import FastSimpleProb.BasicOperations
 > import FastSimpleProb.BasicProperties
@@ -30,6 +26,9 @@
 > import FastSimpleProb.MeasuresProperties
 > import FastSimpleProb.Operations
 > import Sigma.Sigma
+> import Sigma.Operations
+> import Sigma.Properties
+> import Nat.LTProperties
 > import Double.Predicates
 > import Double.Postulates
 > import Double.Operations
@@ -41,14 +40,20 @@
 > import NonNegDouble.Properties
 > import NonNegDouble.Predicates
 > import NonNegDouble.LTEProperties
+> import NonNegDouble.Measures
+> import NonNegDouble.MeasureProperties
 > import Finite.Predicates
 > import Finite.Operations
 > import Finite.Properties
+> import Unique.Predicates
 > import Decidable.Predicates
 > import Decidable.Properties
 > import LocalEffect.Exception
 > import LocalEffect.StdIO
 > import Fin.Operations
+> import Fraction.Fraction
+> import Fraction.Normal
+> import Nat.Positive
 > import List.Operations
 > import Unit.Properties
 
