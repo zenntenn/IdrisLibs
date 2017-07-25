@@ -8,6 +8,9 @@ IDRISFLAGS = -O3 --warnreach \
              -p contrib -p effects \
              -V
 
+env: Env.lidr
+	${IDRIS} ${IDRISFLAGS} --check Env.lidr
+
 newcomb: Newcomb.lidr
 	${IDRIS} ${IDRISFLAGS} Newcomb.lidr -o newcomb
 
