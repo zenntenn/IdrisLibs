@@ -1,10 +1,9 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-#IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. +RTS -K32000000 -RTS -p contrib -p effects -V
 IDRISFLAGS = -O3 --warnreach \
              -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
-             +RTS -K32000000 -RTS \
+             +RTS -K64000000 -RTS \
              -p contrib -p effects \
              -V
 
