@@ -145,12 +145,12 @@ high emissions policies than under low emissions policies.
 > -- The probability of staying in a good world when the cumulated
 > -- emissions are |<=| the critical threshold |crE|
 > pS1  :  NonNegDouble
-> pS1  =  cast 1.0 -- cast 0.9
+> pS1  =  cast 0.8 -- cast 1.0 -- cast 0.9
 
 > -- The probability of staying in a good world when the cumulated
 > -- emissions are |>=| the critical threshold |crE|
 > pS2  :  NonNegDouble
-> pS2  =  cast 0.0 -- cast 0.1
+> pS2  =  cast 0.2 -- cast 0.0 -- cast 0.1
 
 > -- Sanity check
 > pS2LTEpS1 : pS2 `NonNegDouble.Predicates.LTE` pS1
@@ -160,13 +160,13 @@ high emissions policies than under low emissions policies.
 > -- emissions becoming available when the number of decision steps is
 > -- below |crN|
 > pA1  :  NonNegDouble
-> pA1  =  cast 0.0 -- cast 0.1
+> pA1  =  cast 0.1 -- cast 0.0 -- cast 0.1
 
 > -- The probability of effective technologies for reducing GHG
 > -- emissions becoming available when the number of decision steps is
 > -- above |crN|
 > pA2  :  NonNegDouble
-> pA2  =  cast 1.0 -- cast 0.9
+> pA2  =  cast 0.9 -- cast 1.0 -- cast 0.9
 
 > -- Sanity check
 > pA1LTEpA2 : pA1 `NonNegDouble.Predicates.LTE` pA2
@@ -175,12 +175,12 @@ high emissions policies than under low emissions policies.
 > -- The probability being able to implement low emission policies when
 > -- the current emissions are low and low emissions are selected
 > pLL  :  NonNegDouble
-> pLL  =  cast 0.9 -- cast 1.0 -- cast 0.9
+> pLL  =  cast 0.9 -- cast 1.0 -- cast 0.9 -- cast 0.5
 
 > -- The probability being able to implement low emission policies when
 > -- the current emissions are high and low emissions are selected
 > pLH  :  NonNegDouble
-> pLH  =  cast 0.7 -- cast 1.0 -- cast 0.5
+> pLH  =  cast 0.7 -- cast 1.0 -- cast 0.7 -- cast 0.5
 
 > -- Sanity check
 > pLHLTEpLL : pLH `NonNegDouble.Predicates.LTE` pLL
@@ -189,12 +189,12 @@ high emissions policies than under low emissions policies.
 > -- The probability being able to implement high emission policies when
 > -- the current emissions are low and high emissions are selected
 > pHL  :  NonNegDouble
-> pHL  =  cast 0.7 -- cast 1.0 -- cast 0.5
+> pHL  =  cast 0.7 -- cast 1.0 -- cast 0.7 -- cast 0.5
 
 > -- The probability being able to implement high emission policies when
 > -- the current emissions are high and high emissions are selected
 > pHH  :  NonNegDouble
-> pHH  =  cast 0.9 -- cast 1.0 -- cast 0.9
+> pHH  =  cast 0.9 -- cast 1.0 -- cast 0.9 -- cast 0.5
 
 > -- Sanity check
 > pHLLTEpHH : pHL `NonNegDouble.Predicates.LTE` pHH
@@ -766,12 +766,12 @@ emissions:
 > -- Ratio between low emissions and step benefits in good world, when
 > -- effective technologies for reducing GHG emissions are unavailable
 > lowOverGoodUnavailable : NonNegDouble
-> lowOverGoodUnavailable = cast 0.1
+> lowOverGoodUnavailable = cast 0.1 -- cast 0.0 -- cast 0.1
 
 > -- Ratio between low emissions and step benefits in good world, when
 > -- effective technologies for reducing GHG emissions are available
 > lowOverGoodAvailable : NonNegDouble
-> lowOverGoodAvailable = cast 0.2
+> lowOverGoodAvailable = cast 0.2 -- cast 0.1 -- cast 0.2
 
 > -- Ratio between high emissions and step benefits in a good world
 > highOverGood : NonNegDouble
@@ -831,8 +831,8 @@ induced by uncertainties in the transition function. We first assume
 that the decision maker measures uncertain rewards by their expected
 value:
 
-> SequentialDecisionProblems.CoreTheory.meas = worst -- expectedValue
-> -- SequentialDecisionProblems.FullTheory.measMon = monotoneWorst -- monotoneExpectedValue
+> SequentialDecisionProblems.CoreTheory.meas = expectedValue -- worst -- expectedValue
+> SequentialDecisionProblems.FullTheory.measMon = monotoneExpectedValue -- monotoneWorst -- monotoneExpectedValue
 
 Further on, we have to implement the notions of viability and
 reachability. We start by positing that all states are viable for any
@@ -951,11 +951,27 @@ process. This means implemeting functions to print states and controls:
 > ---}
 
 
-> bau : (t : Nat) -> (n : Nat) -> PolicySeq t n
-> bau t  Z    = Nil
-> bau t (S n) = p :: (bau (S t) n) where
+> constHigh : (t : Nat) -> (n : Nat) -> PolicySeq t n
+> constHigh t  Z    = Nil
+> constHigh t (S n) = p :: (constHigh (S t) n) where
 >   p : Policy t (S n)
->   p x r v = viableSpec1 x v
+>   p x r v = MkSigma High (ne, av) where
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x High)
+>     ne = nonEmptyLemma (nexts t x High)
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x High)
+>     av = viableLemma {t = S t} (support (nexts t x High))
+
+
+> ||| Constant low policy sequences
+> constLow : (t : Nat) -> (n : Nat) -> PolicySeq t n
+> constLow t  Z    = Nil
+> constLow t (S n) = p :: (constLow (S t) n) where
+>   p : Policy t (S n)
+>   p x r v = MkSigma Low (ne, av) where
+>     ne : SequentialDecisionProblems.CoreTheory.NotEmpty (nexts t x Low)
+>     ne = nonEmptyLemma (nexts t x Low)
+>     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Low)
+>     av = viableLemma {t = S t} (support (nexts t x Low))
 
 
 > computation : { [STDIO] } Eff ()
@@ -998,33 +1014,59 @@ process. This means implemeting functions to print states and controls:
 >      putStrLn "highOverGood (benefits ratio: High emissions over step, good world):"
 >      putStrLn ("  " ++ show highOverGood) 
 >                
->      putStrLn "computing BAU policies ..."
->      baups <- pure (bau Z nSteps)
+>      putStrLn "computing constHigh policies ..."
+>      constHigh_ps <- pure (constHigh Z nSteps)
 >
->      putStrLn "computing BAU state-control sequences ..."
->      baumxys <- pure (adHocPossibleStateCtrlSeqs baups (FZ, High, Unavailable, Good))
->      putStrLn "pairing BAU state-control sequences with their values ..."
->      baumxysv <- pure (possibleStateCtrlSeqsRewards' baumxys)
->      -- putStrLn "BAU state-control sequences and their values:"
->      -- putStrLn (showlong baumxysv)  
+>      putStrLn "computing constHigh state-control sequences ..."
+>      constHigh_mxys <- pure (adHocPossibleStateCtrlSeqs constHigh_ps (FZ, High, Unavailable, Good))
+>      putStrLn "pairing constHigh state-control sequences with their values ..."
+>      constHigh_mxysv <- pure (possibleStateCtrlSeqsRewards' constHigh_mxys)
+>      -- putStrLn "constHigh state-control sequences and their values:"
+>      -- putStrLn (showlong constHigh_mxysv)  
 >      
->      putStrLn "computing (naively) the number of BAU state-control sequences ..."
->      baun <- pure (length (toList baumxysv))
->      putStrLn "number of BAU state-control sequences:"
->      putStrLn ("  " ++ show baun)
+>      putStrLn "computing (naively) the number of constHigh state-control sequences ..."
+>      constHigh_n <- pure (length (toList constHigh_mxysv))
+>      putStrLn "number of constHigh state-control sequences:"
+>      putStrLn ("  " ++ show constHigh_n)
 >                  
->      putStrLn "computing (naively) the most probable BAU state-control sequence ..."
->      bauxysv <- pure (naiveMostProbableProb baumxysv)
->      putStrLn "most probable BAU state-control sequence and its probability:"
->      putStrLn ("  " ++ show bauxysv)            
+>      putStrLn "computing (naively) the most probable constHigh state-control sequence ..."
+>      constHigh_xysv <- pure (naiveMostProbableProb constHigh_mxysv)
+>      putStrLn "most probable constHigh state-control sequence and its probability:"
+>      putStrLn ("  " ++ show constHigh_xysv)            
 >                  
->      putStrLn "sorting (naively) the BAU state-control sequence ..."
->      bauxysvs <- pure (naiveSortToList baumxysv)
->      putStrLn "most probable BAU state-control sequences (first 3) and their probabilities:"
->      putStrLn (showlong (take 3 bauxysvs))
+>      putStrLn "sorting (naively) the constHigh state-control sequence ..."
+>      constHigh_xysvs <- pure (naiveSortToList constHigh_mxysv)
+>      putStrLn "most probable constHigh state-control sequences (first 3) and their probabilities:"
+>      putStrLn (showlong (take 3 constHigh_xysvs))
 >                      
->      putStrLn "measure of BAU rewards:"
->      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd baumxysv)))            
+>      putStrLn "measure of constHigh rewards:"
+>      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constHigh_mxysv)))            
+>
+>      putStrLn "computing constLow policies ..."
+>      constLow_ps <- pure (constLow Z nSteps)
+>
+>      putStrLn "computing constLow state-control sequences ..."
+>      constLow_mxys <- pure (adHocPossibleStateCtrlSeqs constLow_ps (FZ, High, Unavailable, Good))
+>      putStrLn "pairing constLow state-control sequences with their values ..."
+>      constLow_mxysv <- pure (possibleStateCtrlSeqsRewards' constLow_mxys)
+>      
+>      putStrLn "computing (naively) the number of constLow state-control sequences ..."
+>      constLow_n <- pure (length (toList constLow_mxysv))
+>      putStrLn "number of constLow state-control sequences:"
+>      putStrLn ("  " ++ show constLow_n)
+>                  
+>      putStrLn "computing (naively) the most probable constLow state-control sequence ..."
+>      constLow_xysv <- pure (naiveMostProbableProb constLow_mxysv)
+>      putStrLn "most probable constLow state-control sequence and its probability:"
+>      putStrLn ("  " ++ show constLow_xysv)            
+>                  
+>      putStrLn "sorting (naively) the constLow state-control sequence ..."
+>      constLow_xysvs <- pure (naiveSortToList constLow_mxysv)
+>      putStrLn "most probable constLow state-control sequences (first 3) and their probabilities:"
+>      putStrLn (showlong (take 3 constLow_xysvs))
+>                      
+>      putStrLn "measure of constLow rewards:"
+>      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constLow_mxysv)))            
 >                  
 >      putStrLn "computing optimal policies ..."
 >      ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
