@@ -145,12 +145,12 @@ high emissions policies than under low emissions policies.
 > -- The probability of staying in a good world when the cumulated
 > -- emissions are |<=| the critical threshold |crE|
 > pS1  :  NonNegDouble
-> pS1  =  cast 0.8 -- cast 1.0 -- cast 0.9
+> pS1  =  cast 0.9 -- cast 0.8 -- cast 1.0 -- cast 0.9
 
 > -- The probability of staying in a good world when the cumulated
 > -- emissions are |>=| the critical threshold |crE|
 > pS2  :  NonNegDouble
-> pS2  =  cast 0.2 -- cast 0.0 -- cast 0.1
+> pS2  =  cast 0.1 -- cast 0.2 -- cast 0.0 -- cast 0.1
 
 > -- Sanity check
 > pS2LTEpS1 : pS2 `NonNegDouble.Predicates.LTE` pS1
