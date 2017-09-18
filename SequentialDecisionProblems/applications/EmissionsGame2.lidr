@@ -753,7 +753,7 @@ step and being in a bad world yield less benefits:
 
 > -- Ratio of the benefits in a bad world and the benefits in a good world
 > badOverGood : NonNegDouble
-> badOverGood = cast 0.5
+> badOverGood = cast 0.89 -- cast 0.89 -- cast 0.5
 
 > -- Sanity check
 > badOverGoodLTEone : badOverGood `NonNegDouble.Predicates.LTE` one
