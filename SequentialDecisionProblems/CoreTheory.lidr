@@ -496,6 +496,31 @@ implementations of backwards induction:
 >   ps : PolicySeq (S t) n
 >   ps = backwardsInduction (S t) n
 
+> take : {t : Nat} -> (n : Nat) -> (m : Nat) -> PolicySeq t n -> Sigma Nat (\ m' => PolicySeq t m')
+> take {t}    Z   m          ps  = MkSigma Z Nil
+> take {t} (S n)  Z          ps  = MkSigma Z Nil
+> take {t} (S n) (S m) (p :: ps) = MkSigma (S m') (p' :: ps') where
+>   mps' : Sigma Nat (\ m' => PolicySeq (S t) m')
+>   mps' = take n m ps 
+>   m'   : Nat
+>   m'   = outl mps'
+>   ps'  : PolicySeq (S t) m'
+>   ps'  = outr mps'
+>   p'   : Policy t (S m')
+>   p'   = ?this_might_work -- p
+
+> bi : (t : Nat) -> (n : Nat) -> (m : Nat) -> PolicySeq t n
+> bi t  Z    m  =  Nil
+> bi t (S n) m  =  p :: ps where
+>   ps        : PolicySeq (S t) n
+>   ps        = bi (S t) n m
+>   m'        : Nat 
+>   m'        = outl (take n m ps)
+>   ps'       : PolicySeq (S t) m'
+>   ps'       = outr (take n m ps)
+>   p         : Policy t (S n)
+>   p         = ?this_will_not_work -- optExt ps'
+
 This file contains all the *computational* elements that the user must
 specify in order to be able to run |backwardsInduction|.  The results
 are going to fulfill the condition of optimality only if several
@@ -525,3 +550,4 @@ this case, not be machine-checked.
 
 [2] Ionescu, Cezar; "Vulnerability Modelling and Monadic Dynamical
     Systems", Freie Universitaet Berlin, 2009
+ 
