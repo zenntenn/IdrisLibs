@@ -1,0 +1,257 @@
+Translating "Selection Functions, Bar Recursion, and Backward Induction"
+
+From: botta@pik-potsdam.de
+3 May
+
+to Cezar, Pierre, Julian, Viktor, Philipp, Patrik, Tim, Jobst
+
+Dear all,
+
+I have finally managed to get through the first 15 pages of "Selection
+Functions, Bar Recursion, and Backward Induction" by Escardó + Oliva.
+
+Many thanks again Jules, without your explanations at the March meeting,
+I would not have made it!
+
+I am now quite confident that we can translate the construction of
+optimal strategy profiles based on quantifiers and selection functions
+into our dependently typed theory.
+
+This would give us (me, at least) a better understanding of the Escardó
++ Oliva results in terms of notions of dynamic programming. It also
+should enable us to implement machine checkable proofs of correctness as
+we have done for backwards induction for sequential decision problems
+(SDP). In turn, this would allow us to "deliver" strategy profiles with
+optimality guarantees.
+
+Before getting to the translation, let me start with a critique of
+definition 2.2.2 at pages 7-8. This was also the point I started from
+for rewriting Escardó + Oliva.
+
+At point 1 of 2.2.2, Escardó + Oliva define p x to be the outcome of
+play x. This is fine. At point 3, they define the optimal outcome of a
+game G := (X, p, phi) to be
+
+  w = (Prod phi) p
+
+This is also fine: p is the "outcome function" and phi are the
+quantifiers of the game. But at point 4 they introduce the notion of
+"optimal move at round k" as
+
+  "a move that forces the optimal outcome at round k+1 to be the same as
+  the optimal outcome at round k".
+
+This definition comes a little bit out of the blue and is, in my view,
+unnecessary.
+
+That optimal moves (or, in fact, sequences of optimal moves) do fulfil
+an optimality principle (in dynamic programming, the "subsequences of
+optimal control sequences are themselves optimal" mantra), is a result
+that can be proved rigorously.
+
+In our SDP theory, we called this result "Bellman's principle". It is
+coded in Bellman in FullTheory.lidr in the PIK GitLab repository.
+
+Taking the result as a definition of optimality for moves brings in a
+lot of low-level notation. I would have expected something like
+
+  x = (x_0...x_{n-1}) optimal play  <=>  p x = w
+
+or, even better
+
+  sp optimal strategy profile for G
+
+  <=>
+
+  p (val sp ()) = w
+
+where val sp () is the value of playing according to sp in the full
+game, see below.
+
+The crucial observation is that, in game theory, optimality (for
+instance, NE) is a property of strategy profiles. Similarly, in control
+theory, optimality is a property of policy sequences.
+
+For sequential games of perfect information (and deterministic SDPs),
+optimality of strategy profiles does indeed entail the notion of
+optimality of plays and, therefore, of moves.
+
+But when the decision problem is non-deterministic or stochastic or when
+the game has non-singleton information sets, optimality of strategy
+profiles is the relevant notion.
+
+Thus, it makes sense to start translating the Escardó + Oliva theory
+from this notion:
+
+Let s_i : (X_0...X_{i-i}) -> X_i for i : [0,n-1]. Then (s_k...s_{n-1})
+is then a strategy profile (SP) for the subgame of G starting in
+(X_0...X_{k-1}).
+
+For games of perfect information, we can compute *the* play determined
+by a strategy profile (for the subgame of G starting in (X_0...X_{k-1}))
+for every initial play x:
+
+  * Play determined by a strategy profile
+
+  play (s_{n-1})  x = (x * (s_{n-1} x))
+  play (s_k * sp) x = play sp (x * (s_k x))
+
+And therefore compute the value of playing the subgame of G starting in
+x : (X_0...X_{k-1}) for arbitrary x:
+
+  * Value of strategy profiles
+
+  val sp x = p (play sp x)
+
+or just
+
+  val = p . play
+
+In an extension of Escardó + Oliva to games of imperfect information, we
+would have to define the value of a strategy profile in a more general
+way. But here we only have value judgments on plays and therefore we
+cannot do anything but composing p with play.
+
+With a notion of value for strategy profiles in place, we can say what
+it means for a strategy profile to be optimal for a game. This is
+perfectly analogous to the notion of optimality of policy sequences in
+control theory:
+
+  * Optimality of strategy profiles
+
+  sp optimal SP for the subgame of G starting in (X_0...X_{k-1})
+
+  <=>
+
+  forall x, val sp x = (Prod_{k}^{n-1} phi) (\ y . p (x * y))
+
+Here, the product of the n-k quantifiers applied to (\ y . p (x * y))
+gives the optimal outcome of the subgame starting in x. In Escardó +
+Oliva this value is sometimes called w_x.
+
+Now we come to formulating Bellman's principle of optimality using the
+framework of Escardó + Oliva. The idea is, as in control theory, to
+introduce the computation of an optimal extension of a strategy
+profile. This is now easily done because we have selection functions. We
+simply apply the selection function to pick up a "best" move for any
+initial play:
+
+  * Optimal extensions of strategy profiles
+
+  next_k : (X_0...X_{k-1}) -> X_k optimal extension of sp
+
+  <=>
+
+  next_k = \ x . eps_k (\ x_k . val sp (x * x_k))
+
+This corresponds to the definition of next_k in Lemma 3.2.1 at page 13
+of Escardó + Oliva. With this notions in place, we can formulate and
+prove Bellman's principle of optimality (and rewrite plain backwards
+induction for computing optimal strategy profiles) in the Escardó +
+Oliva notation:
+
+  * Bellman's principle of optimality
+
+  sp optimal SP for the subgame of G starting in (X_0...X_{k}),
+
+  next_k : (X_0...X_{k-1}) -> X_k optimal extension of sp
+
+  =>
+
+  (next_k * sp) optimal SP for the subgame of G starting in
+  (X_0...X_{k-1})
+
+We can prove Bellman's principle of optimality by using two
+identities. The first identity is
+
+  (1) (Prod_{k}^{n-1} phi) (\ y . p (x * y))
+      =
+      p (x * (Prod_{k}^{n-1} eps) (\ y . p (x * y)))
+
+The second identity is
+
+  (2) x * (Prod_{k}^{n-1} eps) (\ y . p (x * y))
+      =
+      x * next_k x * ((Prod_{k+1}^{n-1} eps) (\ y . p (x * next_k x * y)))
+
+The first identity is the third equation at page 14 of Escardó +
+Oliva. The second identity follows from the definition of next_k and
+from that of product of selection functions at page 11 of Escardó +
+Oliva. I am pretty sure that (2) is correct but it would be good if you
+could double check: I have so far only a proof on paper. With (1) and
+(2), proving Bellman's principle is straightforward. We have to show
+that (next_k * sp) is optimal that is
+
+  val (next_k * sp) x = (Prod_{k}^{n-1} phi) (\ y . p (x * y))
+
+for all x : (X_0...X_{k-1}). We have
+
+  val (next_k * sp) x
+
+    = { def. of val }
+
+  p (play (next_k * sp) x)
+
+    = { def. of play }
+
+  p (play sp (x * next_k x))
+
+    = { def. of val }
+
+  val sp (x * next_k x)
+
+    = { optimality of sp }
+
+  (Prod_{k+1}^{n-1} phi) (\ y . p ((x * next_k x) * y))
+
+    = { (1) }
+
+  p ((x * next_k x) * (Prod_{k+1}^{n-1} eps) (\ y . p ((x * next_k x) * y)))
+
+    = { (2), congruence }
+
+  p (x * (Prod_{k}^{n-1} eps) (\ y . p (x * y)))
+
+    = { (1) }
+
+  (Prod_{k}^{n-1} phi) (\ y . p (x * y))
+
+    QED
+
+That's it for the moment. It seems that the notions and results from
+sections 2 and 3 of Escardó + Oliva paper can indeed been translated to
+a few known notions and results in the theory of SDPs. To me, this
+translation also seems to be a simplification of the Escardó + Oliva
+theory.
+
+So far, I have made no attempts at implementing the translation in Idris
+but I think that it should work. If you do not see obvious errors or
+weaknesses, perhaps we could try to implement it in a joint work.
+
+Using the above formulation of Bellman's principle, it should be easy to
+show that backwards induction
+
+  next_{n-1} = \ x . eps_{n-1} (\ x_k . p (x * x_k))
+
+  ...
+
+  next_k = \ x . eps_k (\ x_k . val (next_{k+1}...next_{n-1}) (x * x_k))
+
+indeed yields an optimal strategy profile. This would give us a provably
+correct algorithm for optimal decision making in a unified game-theory +
+control-theory framework.
+
+We would have to generalize the theory (and backwards induction) to
+games of imperfect information and to games with "trembling hands", of
+course. But this should not be too difficult if we have a translating of
+Escardó + Oliva to SDP theory: there we already have a general theory.
+
+Ciao,
+Nicola
+
+
+PS: Jobst (in CC) has applied game-theoretical approaches to
+investigate, among others, the formation and stability of coalitions in
+public-good games. He is co-speaker of the PIK COPAN project, see
+https://www.pik-potsdam.de/research/earth-system-analysis/projects/flagships/copan
+and potentially interested in our work.
