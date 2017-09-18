@@ -1,0 +1,81 @@
+enter number of steps:
+ Nat: thanks!
+nSteps (number of decision steps):
+  9
+crE (crit. cumulated emissions threshold):
+  4
+crN (crit. number of decision steps):
+  2
+pS1 (prob. of staying in a good world, cumulated emissions below crE):
+  0.9
+pS2 (prob. of staying in a good world, cumulated emissions above crE):
+  0.1
+pA1 (prob. of eff. tech. becoming available, number of steps below crN):
+  0.1
+pA2 (prob. of eff. tech. becoming available, number of steps above crN):
+  0.9
+pLL (prob. of low emission policies, emissions low, low selected):
+  0.9
+pLH (prob. of low emission policies, emissions high, low selected):
+  0.7
+pHL (prob. of high emission policies, emissions low, high selected):
+  0.7
+pHH (prob. of high emission policies, emissions high, high selected):
+  0.9
+badOverGood (step benefits ratio: bad over good world):
+  0.89
+lowOverGoodUnavailable (benefits ratio: low emissions over step, good world, eff. tech. unavailable):
+  0.1
+lowOverGoodAvailable (benefits ratio: low emissions over step, good world, eff. tech. available):
+  0.2
+highOverGood (benefits ratio: High emissions over step, good world):
+  0.3
+computing constHigh policies ...
+computing constHigh state-control sequences ...
+pairing constHigh state-control sequences with their values ...
+computing (naively) the number of constHigh state-control sequences ...
+number of constHigh state-control sequences:
+  51200
+computing (naively) the most probable constHigh state-control sequence ...
+most probable constHigh state-control sequence and its probability:
+  (([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,G) ** H), ((3,H,U,G) ** H), ((4,H,A,G) ** H), ((5,H,A,G) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 11.26), 0.1350851717672993)
+sorting (naively) the constHigh state-control sequence ...
+most probable constHigh state-control sequences (first 3) and their probabilities:
+  [(([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,G) ** H), ((3,H,U,G) ** H), ((4,H,A,G) ** H), ((5,H,A,G) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 11.26), 0.1350851717672993),
+   (([((0,H,U,G) ** H), ((1,H,U,B) ** H), ((2,H,U,B) ** H), ((3,H,U,B) ** H), ((4,H,A,B) ** H), ((5,H,A,B) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 10.71), 0.02541865828329001),
+   (([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,B) ** H), ((3,H,U,B) ** H), ((4,H,A,B) ** H), ((5,H,A,B) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 10.82), 0.02287679245496101)]
+measure of constHigh rewards:
+  11.02210028741807
+computing constLow policies ...
+computing constLow state-control sequences ...
+pairing constLow state-control sequences with their values ...
+computing (naively) the number of constLow state-control sequences ...
+number of constLow state-control sequences:
+  51200
+computing (naively) the most probable constLow state-control sequence ...
+most probable constLow state-control sequence and its probability:
+  (([((0,H,U,G) ** L), ((0,L,U,G) ** L), ((0,L,U,G) ** L), ((0,L,U,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) **  )], 10.5), 0.07659329239205871)
+sorting (naively) the constLow state-control sequence ...
+most probable constLow state-control sequences (first 3) and their probabilities:
+  [(([((0,H,U,G) ** L), ((0,L,U,G) ** L), ((0,L,U,G) ** L), ((0,L,U,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) ** L), ((0,L,A,G) **  )], 10.5), 0.07659329239205871),
+   (([((0,H,U,G) ** L), ((1,H,U,G) ** L), ((1,L,U,G) ** L), ((1,L,U,G) ** L), ((1,L,A,G) ** L), ((1,L,A,G) ** L), ((1,L,A,G) ** L), ((1,L,A,G) ** L), ((1,L,A,G) ** L), ((1,L,A,G) **  )], 10.7), 0.02553109746401958),
+   (([((0,H,U,G) ** L), ((0,L,U,B) ** L), ((0,L,U,B) ** L), ((0,L,U,B) ** L), ((0,L,A,B) ** L), ((0,L,A,B) ** L), ((0,L,A,B) ** L), ((0,L,A,B) ** L), ((0,L,A,B) ** L), ((0,L,A,B) **  )], 9.51), 0.01977006755367001)]
+measure of constLow rewards:
+  10.34806256971083
+computing optimal policies ...
+computing possible state-control sequences ...
+pairing possible state-control sequences with their values ...
+computing (naively) the number of possible state-control sequences ...
+number of possible state-control sequences:
+  51200
+computing (naively) the most probable state-control sequence ...
+most probable state-control sequence and its probability:
+  (([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,G) ** H), ((3,H,U,G) ** H), ((4,H,A,G) ** H), ((5,H,A,G) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 11.26), 0.1350851717672993)
+sorting (naively) the possible state-control sequence ...
+most probable state-control sequences (first 3) and their probabilities:
+  [(([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,G) ** H), ((3,H,U,G) ** H), ((4,H,A,G) ** H), ((5,H,A,G) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 11.26), 0.1350851717672993),
+   (([((0,H,U,G) ** H), ((1,H,U,B) ** H), ((2,H,U,B) ** H), ((3,H,U,B) ** H), ((4,H,A,B) ** H), ((5,H,A,B) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 10.71), 0.02541865828329001),
+   (([((0,H,U,G) ** H), ((1,H,U,G) ** H), ((2,H,U,B) ** H), ((3,H,U,B) ** H), ((4,H,A,B) ** H), ((5,H,A,B) ** H), ((6,H,A,B) ** H), ((7,H,A,B) ** H), ((8,H,A,B) ** H), ((9,H,A,B) **  )], 10.82), 0.02287679245496101)]
+measure of possible rewards:
+  11.02210028741807
+done!
