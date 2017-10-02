@@ -496,6 +496,8 @@ implementations of backwards induction:
 >   ps : PolicySeq (S t) n
 >   ps = backwardsInduction (S t) n
 
+> {-
+
 > take : {t : Nat} -> (n : Nat) -> (m : Nat) -> PolicySeq t n -> Sigma Nat (\ m' => PolicySeq t m')
 > take {t}    Z   m          ps  = MkSigma Z Nil
 > take {t} (S n)  Z          ps  = MkSigma Z Nil
@@ -520,6 +522,8 @@ implementations of backwards induction:
 >   ps'       = outr (take n m ps)
 >   p         : Policy t (S n)
 >   p         = ?this_will_not_work -- optExt ps'
+
+> -}
 
 This file contains all the *computational* elements that the user must
 specify in order to be able to run |backwardsInduction|.  The results

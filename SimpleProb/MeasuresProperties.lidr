@@ -1,4 +1,4 @@
-> module SimpleProb.Measures
+> module SimpleProb.MeasuresProperties
 
 > import Syntax.PreorderReasoning
 

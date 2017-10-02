@@ -22,8 +22,15 @@ encoded in the notion of "good" control, see |Utils|:
 Trivially, for every state that is viable for |n + 1| steps we can
 compute a good control
 
+> -- viableSpec0 : (x : State t) -> Viable Z x
+> SequentialDecisionProblems.CoreTheory.viableSpec0 x = ()
+
 > -- viableSpec1 : (x : State t) -> Viable (S n) x -> GoodCtrl t x n
 > SequentialDecisionProblems.CoreTheory.viableSpec1 {t} {n} x v = v
+
+> -- viableSpec2 : (x : State t) -> GoodCtrl t x n -> Viable (S n) x
+> SequentialDecisionProblems.CoreTheory.viableSpec2 {t} {n} x gy = gy
+
 
 If users can show that ..., see |Utils|. For |M = List|, for instance,
 ... are implemented in |NonDeterministic Defaults|:
