@@ -12,6 +12,7 @@
 > %hide (+)
 > %hide plusZeroRightNeutral
 
+
 * Streams
 
 For a type |T|, streams of values of type |T| can be described by values
@@ -24,8 +25,7 @@ The idea is that any |Stream T| has a head and a tail
 > head : {T : Type} -> Stream T -> T
 > tail : {T : Type} -> Stream T -> Stream T
 
-and that piecing together a |T| with a |Stream T| obtains another
-|Stream T|:
+and that piecing together a |T| with a |Stream T| yields a |Stream T|:
 
 > cons : {T : Type} -> T -> Stream T -> Stream T
 
@@ -44,29 +44,34 @@ three properties:
 We want to look at differentiation and integration of functions of real
 variables from the point of view of streams. More specifically, we want
 to understand which properties differentiation and integration have to
-fulfill when we look at differentiation and integration as operations on
-streams of type |Stream R = F|. Here
+fulfill when we consider these operations as operations on streams of
+type |Stream R = R -> R|. Here
 
 > R : Type
 
-is taken to represent real numbers and
+is meant to represent real numbers and
 
 > F : Type
 > F = R -> R
 
-are differentiable and integrable functions on |R|:
+are differentiable and integrable functions on |R|. For the time being,
+we represent differentiation and integration through functions
 
 > D : F -> F
-
 > S : R -> R -> F -> R
+
+where |D f| and |S a b f| representing the derivative of |f| and the
+integral of |f| on |[a,b]|. 
+
+
+* Head, tail and cons for functions/streams
 
 How can we implement |head| for |Stream R = F|? We have
 
 > headF : F -> R
 
-The obvioius way to compute a real number from a |f : F| is to evaluate
-|f|. Thus, we require our "real numbers" to contain at least one
-element, say zero:
+The natural way to compute a real number from a |f : F| is to simply
+evaluate |f|. We require our "real numbers" to contain a zero element
 
 > zero : R
 
@@ -78,13 +83,12 @@ What about the tail of a function |f|?
 
 > tailF : F -> F
 
-The only operation that we can apply on values of type |F| that
-obviously matches the type of |tailF| is |D|. Thus
+The type of |tailF| is |F -> F|, just like the type of |D|. Thus, we
+take
 
 > tailF = D
 
-We are left with the implementation of |cons| for real numbers and
-functions on real numbers:
+We are left with the implementation of |consF|:
 
 > consF : R -> F -> F
 
@@ -114,21 +118,23 @@ and
 
 < D (consF a g) = g
 
-The first condition can be fulfiled by defining |consF a g| to be |const
-a|. The second condition requires |consF a g| has to be the
+The first condition could be fulfilled by defining |consF a g| to be
+|const a|. But the second condition requires |consF a g| has to be an
 anti-derivative of |g|. This suggests the definition
 
 > (+) : R -> R -> R
 
 > consF a f = \ x => a + S zero x f
 
+where we can think of |(+)| as representing the standard addition on
+real numbers.
+
 
 * Properties of |R|, |D| and |S|
 
 Which properties do |R|, |D| and |S| have to satisfy for |headF|,
 |tailF| and |consF| to be stream operations? Our definition already
-require |R| to be equipped with a zero element and with a |(+)| binary
-operation:
+requires |R| to be equipped with a zero element and with a |(+)|:
 
 < R : Type
 < zero : R
@@ -156,34 +162,37 @@ We can derive a formal proof of |headF (consF a f) = a|:
 >                     ( a )
 >                   QED
 
-Similarly, if we assume that the derivative of constant functions is zero
+Satisfying |tailF (consF a f) = f| requires some more assumptions.
+Consistently with the interpretation of |D f| representing the
+derivative of |f|, we need
 
 > derConstZero : (a : R) -> D (const a) = const zero
 
-, that |D| is linear
+and
 
 > derLinear1 : (f, g : F) -> D (\ x => f x + g x) = \ x => (D f) x + (D g) x
 
-, that integration is an "anti-derivative"
+Moreover |S| has to be an "anti-derivative"
 
 > intAntiDer : (f : F) -> D (\ x => S zero x f) = f
 
-, that |zero| is a
+We also need |zero| to be left-neutral
 
 > plusZeroLeftNeutral : (right : R) -> zero + right = right 
 
-we can derive a formal proof of |tailF (consF a f) = f|. For this, however,
-we also need extensional equality on |F|:
+and equality on |F| to be extensional:
 
 > extEqF : (f, g : F) -> ((x : R) -> f x = g x) -> f = g
 
-With these assumptions one has
+With these assumptions, we can derive
 
 > lemma : (f : F) -> (x : R) -> zero + f x = f x
 > lemma f x = ( zero + f x )
 >           ={ plusZeroLeftNeutral (f x) }=
 >             ( f x )
 >           QED
+
+and, finally
 
 > tailConsPropF : (a : R) -> (f : F) -> tailF (consF a f) = f  
 > tailConsPropF a f = ( tailF (consF a f) )
@@ -207,7 +216,7 @@ With these assumptions one has
 >                     ( f )
 >                   QED
 
-
+We are left with the last property: |consF (headF f) (tailF f) = f|. 
 
 
 > {-
