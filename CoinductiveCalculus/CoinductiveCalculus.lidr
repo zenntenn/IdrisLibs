@@ -60,7 +60,7 @@ we represent differentiation and integration through functions
 > D : F -> F
 > S : R -> R -> F -> R
 
-where |D f| and |S a b f| representing the derivative of |f| and the
+with |D f| and |S a b f| representing the derivative of |f| and the
 integral of |f| on |[a,b]|. 
 
 
@@ -216,8 +216,69 @@ and, finally
 >                     ( f )
 >                   QED
 
-We are left with the last property: |consF (headF f) (tailF f) = f|. 
+We are left with the last property: |consF (headF f) (tailF f) = f|. To
+prove this property, we need three more assumptions
 
+> (-) : R -> R -> R
+
+> plusAnyMinus : (x, y : R) -> x + (y - x) = y
+
+> derAntiInt : (f : F) -> (a : R) -> (b : R) -> S a b (D f) = f b - f a
+
+With these, one has
+
+> lemma1 : (c : R) -> (f : F) -> (x : R) -> (c + (f x - c) = f x)
+> lemma1 c f x = plusAnyMinus c (f x)
+
+> lemma2 : (f : F) -> (c : R) -> (a : R) -> (b : R) -> c + S a b (D f) = c + (f b - f a)
+> lemma2 f c a b = ( c + S a b (D f) )
+>                ={ cong (derAntiInt f a b) }=
+>                  ( c + (f b - f a) )
+>                QED
+
+> consHeadTailPropF : (f : F) -> consF (headF f) (tailF f) = f 
+> consHeadTailPropF f = ( consF (headF f) (tailF f) )
+>                     ={ Refl }=
+>                       ( consF (f zero) (D f) )
+>                     ={ Refl }=
+>                       ( \ x => f zero + S zero x (D f) )
+>                     ={ extEqF (\ x => f zero + S zero x (D f))
+>                               (\ x => f zero + (f x - f zero))
+>                               (lemma2 f (f zero) zero) }=
+>                       ( \ x => f zero + (f x - f zero) )
+>                     ={ extEqF (\ x => f zero + (f x - f zero)) 
+>                               (\ x => f x) 
+>                               (lemma1 (f zero) f) }=
+>                       ( \ x => f x )  
+>                     ={ Refl }=
+>                       ( f )
+>                     QED
+
+
+* Properties of |R|, |D| and |S| (wrap up)
+
+  ( 1) R : Type
+  ( 2) zero : R
+  ( 3) (+)  :  R -> R -> R
+  ( 4) (-)  :  R -> R -> R
+  ( 5) plusAnyMinus : (x, y : R) -> x + (y - x) = y
+  ( 6) plusZeroLeftNeutral   :  (right : R) -> zero + right = right 
+  ( 7) plusZeroRightNeutral  :  ( left : R) -> left +  zero =  left 
+
+  ( 8) derConstZero : (a : R) -> D (const a) = const zero
+  ( 9) derLinear1 : (f, g : F) -> D (\ x => f x + g x) = \ x => (D f) x + (D g) x
+
+  (10) intProp1 : (a : R) -> (f : F) -> S a a f = zero
+  (11) intAntiDer : (f : F) -> D (\ x => S zero x f) = f
+  (12) derAntiInt : (f : F) -> (a : R) -> (b : R) -> S a b (D f) = f b - f a
+
+  (13) extEqF : (f, g : F) -> ((x : R) -> f x = g x) -> f = g
+
+
+Properties (1-7) follow from standard axioms on real numbers. (8-9)
+follow from the standard definition of derivative. (10-12) follows from ?
+  
+  
 
 > {-
 
