@@ -22,7 +22,7 @@
 
 No natural number is smaller than zero
 
-> implementation Uninhabited (LTB Z) where
+> implementation [UninhabitedLTBZ] Uninhabited (LTB Z) where
 >   uninhabited (MkSigma n prf) = absurd prf
 
 
@@ -164,32 +164,33 @@ Basic properties
 > %freeze toFinFromFinLemma -- frozen
 
 
-> ||| |fromFin| is the left-inverse of |toFin|
-> fromFinToFinLemma : (n : LTB b) -> fromFin (toFin n) = n
-> fromFinToFinLemma {b = Z}   m                         = absurd m
-> fromFinToFinLemma {b = S m} (MkSigma   Z    (LTESucc LTEZero))  = Refl
-> fromFinToFinLemma {b = S m} (MkSigma (S n) (LTESucc prf))      = s6 where
->   s1 : fromFin (toFin (MkSigma (S n) (LTESucc prf)))
->        =
->        fromFin (FS (toFin (MkSigma n prf)))
->   s1 = Refl
->   s2 : fromFin (FS (toFin (MkSigma n prf)))
->        =
->        MkSigma (finToNat (FS (toFin (MkSigma n prf)))) (finToNatLemma (FS (toFin (MkSigma n prf))))
->   s2 = Refl
->   s3 : finToNat (FS (toFin (MkSigma n prf))) = S n
->   s3 = toFinLemma1 n m prf
->   s4 : finToNatLemma (FS (toFin (MkSigma n prf))) = LTESucc prf
->   s4 = toFinLemma3 n m prf
->   s5 : MkSigma {A = Nat} {P = \ i => LT i (S m)}
->        (finToNat (FS (toFin (MkSigma n prf))))
->        (finToNatLemma (FS (toFin (MkSigma n prf))))
->        =
->        MkSigma {A = Nat} {P = \ i => LT i (S m)} (S n) (LTESucc prf)
->   s5 = depCong2 {f = MkSigma {A = Nat} {P = \ i => LT i (S m)}} s3 s4
->   s6 : fromFin (toFin (MkSigma (S n) (LTESucc prf))) = MkSigma (S n) (LTESucc prf)
->   s6 = trans s1 (trans s2 s5)
-> %freeze fromFinToFinLemma -- frozen
+> using implementation UninhabitedLTBZ
+>   ||| |fromFin| is the left-inverse of |toFin|
+>   fromFinToFinLemma : (n : LTB b) -> fromFin (toFin n) = n
+>   fromFinToFinLemma {b = Z}   k                                   = absurd k
+>   fromFinToFinLemma {b = S m} (MkSigma   Z    (LTESucc LTEZero))  = Refl
+>   fromFinToFinLemma {b = S m} (MkSigma (S n) (LTESucc prf))       = s6 where
+>     s1 : fromFin (toFin (MkSigma (S n) (LTESucc prf)))
+>          =
+>          fromFin (FS (toFin (MkSigma n prf)))
+>     s1 = Refl
+>     s2 : fromFin (FS (toFin (MkSigma n prf)))
+>          =
+>          MkSigma (finToNat (FS (toFin (MkSigma n prf)))) (finToNatLemma (FS (toFin (MkSigma n prf))))
+>     s2 = Refl
+>     s3 : finToNat (FS (toFin (MkSigma n prf))) = S n
+>     s3 = toFinLemma1 n m prf
+>     s4 : finToNatLemma (FS (toFin (MkSigma n prf))) = LTESucc prf
+>     s4 = toFinLemma3 n m prf
+>     s5 : MkSigma {A = Nat} {P = \ i => LT i (S m)}
+>          (finToNat (FS (toFin (MkSigma n prf))))
+>          (finToNatLemma (FS (toFin (MkSigma n prf))))
+>          =
+>          MkSigma {A = Nat} {P = \ i => LT i (S m)} (S n) (LTESucc prf)
+>     s5 = depCong2 {f = MkSigma {A = Nat} {P = \ i => LT i (S m)}} s3 s4
+>     s6 : fromFin (toFin (MkSigma (S n) (LTESucc prf))) = MkSigma (S n) (LTESucc prf)
+>     s6 = trans s1 (trans s2 s5)
+>   %freeze fromFinToFinLemma
 
 
 Finitness properties
@@ -219,13 +220,13 @@ Decidability properties
 > %freeze decEqLTB -- frozen
 
 
-> implementation DecEq (LTB b) where
+> implementation [DecEqLTB] DecEq (LTB b) where
 >   decEq {b} i j = decEqLTB {b} i j
 
 
 Show
 
 > using (b : Nat)
->   implementation Show (LTB b) where
+>   implementation [ShowLTB] Show (LTB b) where
 >     show (MkSigma i _) = show i
 

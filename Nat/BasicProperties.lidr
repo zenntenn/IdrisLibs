@@ -6,8 +6,10 @@
 > -- %access public export
 
 
+> {-
 > implementation Uninhabited (S n = Z) where
 >   uninhabited Refl impossible
+> -}
 
 
 > |||
