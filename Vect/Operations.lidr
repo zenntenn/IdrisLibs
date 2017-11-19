@@ -156,6 +156,25 @@ Pointwise modify
 > modifyVect {n = S m} (a :: as) (FS k) a' = a :: (modifyVect as k a')
 
 
+Fold:
+
+data Vect : Nat -> Type -> Type where
+  Nil : Vect Z A
+  Cons : A -> Vect n A -> Vect (S n) A
+
+x0 : X 0
+f  : A -> X n -> X (S n)
+
+
+> foldVect : {X : Nat -> Type} -> 
+>            {A : Type} ->
+>            X 0 ->
+>            ((n : Nat) -> A -> X n -> X (S n)) ->
+>            Vect n A ->
+>            X n
+> foldVect {n = Z} x0 f Nil = x0
+> foldVect {n = S m} x0 f (a :: as) = f m a (foldVect x0 f as)
+
 
 > {-
 
