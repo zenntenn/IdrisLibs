@@ -270,6 +270,14 @@ of policies of length |n|, one for each decision step:
 >   (::)  :  {t, n : Nat} -> 
 >            Policy t (S n) -> PolicySeq (S t) n -> PolicySeq t (S n)
 
+Fold for |PolicySeq|:
+
+> foldPolicySeq : {X : (t : Nat) -> (n : Nat) -> Type} ->
+>                 ((t : Nat) -> X t Z) ->
+>                 ((t : Nat) -> (n : Nat) -> Policy t (S n) -> X (S t) n -> X t (S n)) ->
+>                 (t : Nat) -> (n : Nat) -> PolicySeq t n -> X t n
+> foldPolicySeq e f t Z Nil = e t
+> foldPolicySeq e f t (S n) (p :: ps) = f t n p (foldPolicySeq e f (S t) n ps)
 
 * The value of policy sequences
 
