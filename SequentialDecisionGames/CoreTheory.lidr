@@ -22,14 +22,15 @@ For the time being, we just consider two players: player 1 and player 2
  to player 2 at decision step |t| and in state |x|:
 
 > Ctrl1 : (t : Nat) -> (x : State t) -> Type
+
 > Ctrl2 : (t : Nat) -> (x : State t) -> Type
+
+> Ctrls : (t : Nat) -> (x : State t) -> Type
+> Ctrls t x = (Ctrl1 t x, Ctrl2 t x)
 
 > M : Type -> Type
 
-> nexts : (t : Nat) -> 
->         (x : State t) -> 
->         (Ctrl1 t x, Ctrl2 t x) -> 
->         M (State (S t))
+> nexts : (t : Nat) -> (x : State t) -> (ys : Ctrls t x) -> M (State (S t))
 
 > fmap  :  {A, B : Type} -> 
 >          (A -> B) -> M A -> M B
@@ -43,10 +44,10 @@ For the time being, we just consider two players: player 1 and player 2
 
 > Val : Type
 
-> reward : (t : Nat) -> 
->          (x : State t) -> 
->          (Ctrl1 t x, Ctrl2 t x) -> 
->          (x' : State (S t)) -> (Val, Val)
+> Vals : Type
+> Vals = (Val, Val) 
+
+> reward : (t : Nat) -> (x : State t) ->  (ys : Ctrls t x) -> (x' : State (S t)) -> Vals
 
 > plus : Val -> Val -> Val
 
@@ -55,7 +56,9 @@ For the time being, we just consider two players: player 1 and player 2
 > LTE : Val -> Val -> Type
 
 > meas1 : M Val -> Val
+
 > meas2 : M Val -> Val
+
 
 
 * Solving sequential decision problems
@@ -86,52 +89,41 @@ For the time being, we just consider two players: player 1 and player 2
 > postulate viableSpec0 : {t : Nat} ->
 >                         (x : State t) -> Viable Z x
 
-> Good : (t : Nat) -> (x : State t) -> (n : Nat) -> (Ctrl1 t x, Ctrl2 t x) -> Type
-> Good t x n y = (NotEmpty (nexts t x y), All (Viable {t = S t} n) (nexts t x y))
+> Good : (t : Nat) -> (x : State t) -> (n : Nat) -> (ys : Ctrls t x) -> Type
+> Good t x n ys = (NotEmpty (nexts t x ys), All (Viable {t = S t} n) (nexts t x ys))
 
-> GoodCtrl : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
-> GoodCtrl t x n = Sigma ((Ctrl1 t x), (Ctrl2 t x)) (Good t x n)
+> GoodCtrls : (t : Nat) -> (x : State t) -> (n : Nat) -> Type
+> GoodCtrls t x n = Sigma (Ctrls t x) (Good t x n)
 
 > viableSpec1 : {t : Nat} -> {n : Nat} ->
->               (x : State t) -> Viable (S n) x -> GoodCtrl t x n
+>               (x : State t) -> Viable (S n) x -> GoodCtrls t x n
 
 > postulate viableSpec2 : {t : Nat} -> {n : Nat} ->
->                         (x : State t) -> GoodCtrl t x n -> Viable (S n) x
+>                         (x : State t) -> GoodCtrls t x n -> Viable (S n) x
 
-> ctrl : {t, n : Nat} -> {x : State t} -> GoodCtrl t x n -> (Ctrl1 t x, Ctrl2 t x)
-> ctrl (MkSigma y _) = y
+> ctrls : {t, n : Nat} -> {x : State t} -> GoodCtrls t x n -> Ctrls t x
+> ctrls (MkSigma ys _) = ys
 
 > allViable : {t, n : Nat} -> {x : State t} -> 
->             (gy : GoodCtrl t x n) -> 
->             All (Viable {t = S t} n) (nexts t x (ctrl gy)) 
+>             (gys : GoodCtrls t x n) -> 
+>             All (Viable {t = S t} n) (nexts t x (ctrls gys)) 
 > allViable (MkSigma _ p) = snd p
 
 
-> {-
 
 * Reachability
-
-Viability is, strictly speaking, all what is needed to formalize the
-notion of policies as functions that associate "good" controls to
-viable states.
-
-But in a decision problem, not all viable states are actually
-reachable. Thus, we would like to further restrict the domain of
-policies to states that can actually be reached. Intuitively, a state is
-reachable if there are controls that allow for a path from some initial
-state to that state. Thus, tautologically, every initial state is
-reachable:
 
 > Reachable : {t' : Nat} -> State t' -> Type
 
 > postulate reachableSpec0 : (x : State Z) -> Reachable x
 
-Moreover, if |x| is reachable and admits a control |y|, then all states
-that can be obtained by selecting |y| in |x| are also reachable:
+> reachableSpec1  :  {t : Nat} -> 
+>                    (x : State t) -> 
+>                    Reachable x -> 
+>                    (ys : Ctrls t x) -> 
+>                    All Reachable (nexts t x ys)
 
-> reachableSpec1  :  {t : Nat} -> (x : State t) -> Reachable x -> (y : Ctrl t x) -> All Reachable (nexts t x y)
-
-And the other way round:
+> {-
 
 > Pred : {t : Nat} -> State t -> State (S t) -> Type
 > Pred {t} x x'  =  Sigma (Ctrl t x) (\ y => x' `Elem` nexts t x y)
