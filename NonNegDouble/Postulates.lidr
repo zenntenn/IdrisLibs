@@ -5,6 +5,7 @@
 > import Double.Properties
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.BasicOperations
+> import NonNegDouble.Operations
 > import NonNegDouble.Properties
 > import List.Operations
 
@@ -16,6 +17,7 @@
 * Properties of sums of products:
 
 > using implementation NumNonNegDouble
+>   |||
 >   postulate 
 >   mapIdRightMultPreservesPositivity : 
 >     {A : Type} ->
@@ -26,26 +28,28 @@
 >     Positive (toDouble (sumMapSnd (mapIdRightMult (axs, y))))
 
 
-> ||| 
-> postulate 
-> sumMapSndConsLemma1 : 
->   {A : Type} ->
->   (a : A) ->
->   (x : Double) ->
->   (px : Positive x) ->
->   (nnx : NonNegative x) ->
->   (axs : List (A, NonNegDouble)) -> 
->   Positive (toDouble (sumMapSnd ((a, Element x nnx) :: axs)))
+> using implementation NumNonNegDouble
+>   ||| 
+>   postulate 
+>   sumMapSndConsLemma1 : 
+>     {A : Type} ->
+>     (a : A) ->
+>     (x : Double) ->
+>     (px : Positive x) ->
+>     (nnx : NonNegative x) ->
+>     (axs : List (A, NonNegDouble)) -> 
+>     Positive (toDouble (sumMapSnd ((a, Element x nnx) :: axs)))
 
 
-> |||
-> postulate 
-> mvMultLemma : {A, B : Type} ->
->               (axs : List (A, NonNegDouble)) -> 
->               Positive (toDouble (sumMapSnd axs)) -> 
->               (f : A -> List (B, NonNegDouble)) -> 
->               ((a : A) -> Positive (toDouble (sumMapSnd (f a)))) ->
->               Positive (toDouble (sumMapSnd (mvMult axs f)))
+> using implementation NumNonNegDouble
+>   |||
+>   postulate 
+>   mvMultLemma : {A, B : Type} ->
+>                 (axs : List (A, NonNegDouble)) -> 
+>                 Positive (toDouble (sumMapSnd axs)) -> 
+>                 (f : A -> List (B, NonNegDouble)) -> 
+>                 ((a : A) -> Positive (toDouble (sumMapSnd (f a)))) ->
+>                 Positive (toDouble (sumMapSnd (mvMult axs f)))
 
 
 > {-
