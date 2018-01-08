@@ -5,6 +5,7 @@
 > import Double.Properties
 > import NonNegDouble.NonNegDouble
 > import NonNegDouble.BasicOperations
+> import NonNegDouble.Properties
 > import List.Operations
 
 
@@ -14,15 +15,15 @@
 
 * Properties of sums of products:
 
-> ||| 
-> postulate 
-> mapIdRightMultPreservesPositivity : 
->   {A : Type} ->
->   (axs : List (A, NonNegDouble)) -> 
->   Positive (toDouble (sumMapSnd axs)) ->
->   (y : NonNegDouble) -> 
->   Positive (toDouble y) ->
->   Positive (toDouble (sumMapSnd (mapIdRightMult (axs, y))))
+> using implementation NumNonNegDouble
+>   postulate 
+>   mapIdRightMultPreservesPositivity : 
+>     {A : Type} ->
+>     (axs : List (A, NonNegDouble)) -> 
+>     Positive (toDouble (sumMapSnd axs)) ->
+>     (y : NonNegDouble) -> 
+>     Positive (toDouble y) ->
+>     Positive (toDouble (sumMapSnd (mapIdRightMult (axs, y))))
 
 
 > ||| 
