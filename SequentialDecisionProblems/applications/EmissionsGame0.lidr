@@ -130,7 +130,7 @@ the same decisions in a competitive setup, see section on rewards.
 >   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
->   fromInteger 0
+>   fromInteger @{NumNonNegDouble} 0
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
 >   NonNegDouble.Predicates.LTE
@@ -172,10 +172,13 @@ benefits than increasing emissions in a good world:
 > benefitsIncreaseBad : NonNegDouble
 > benefitsIncreaseBad = cast 0.9
 
-> SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Freeze   (_, _, Good) = benefitsGood + benefitsFreeze
-> SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Increase (_, _, Good) = benefitsGood + benefitsIncreaseGood
-> SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Freeze   (_, _,  Bad) = benefitsBad  + benefitsFreeze
-> SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Increase (_, _,  Bad) = benefitsBad  + benefitsIncreaseBad
+
+> using implementation NumNonNegDouble
+> 
+>   SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Freeze   (_, _, Good) = benefitsGood + benefitsFreeze
+>   SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Increase (_, _, Good) = benefitsGood + benefitsIncreaseGood
+>   SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Freeze   (_, _,  Bad) = benefitsBad  + benefitsFreeze
+>   SequentialDecisionProblems.CoreTheory.reward _ (_, _, _) Increase (_, _,  Bad) = benefitsBad  + benefitsIncreaseBad
 
 
 * Completing the problem specification

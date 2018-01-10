@@ -23,6 +23,7 @@
 > import SimpleProb.MonadicOperations
 > import SimpleProb.MonadicProperties
 > import SimpleProb.Measures
+> import SimpleProb.MeasuresProperties
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties

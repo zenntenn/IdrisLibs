@@ -210,513 +210,516 @@ increase the cumulated emissions by one:
 > -- The transition function: high emissions, unavailable GHG technologies
 >
 > -- The transition function: high emissions, unavailable GHG technologies, good world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA1) *        pS1), 
->                ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA1) *        pS1),
->                ((weaken e, Low,    Available, Good),        pLH  *        pA1  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pA1  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA1  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA1) *        pS2), 
->                ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA1) *        pS2),
->                ((weaken e, Low,    Available, Good),        pLH  *        pA1  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pA1  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA1  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA2) *        pS1), 
->                ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA2) *        pS1),
->                ((weaken e, Low,    Available, Good),        pLH  *        pA2  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pA2  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA2  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA2) *        pS2), 
->                ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA2) *        pS2),
->                ((weaken e, Low,    Available, Good),        pLH  *        pA2  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pA2  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA2  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA1) *        pS1), 
->                ((    FS e, High, Unavailable, Good),        pHH  * (one - pA1) *        pS1),
->                ((weaken e, Low,    Available, Good), (one - pHH) *        pA1  *        pS1), 
->                ((    FS e, High,   Available, Good),        pHH  *        pA1  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA1  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA1) *        pS2), 
->                ((    FS e, High, Unavailable, Good),        pHH  * (one - pA1) *        pS2),
->                ((weaken e, Low,    Available, Good), (one - pHH) *        pA1  *        pS2), 
->                ((    FS e, High,   Available, Good),        pHH  *        pA1  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA1  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA2) *        pS1), 
->                ((    FS e, High, Unavailable, Good),        pHH  * (one - pA2) *        pS1),
->                ((weaken e, Low,    Available, Good), (one - pHH) *        pA2  *        pS1), 
->                ((    FS e, High,   Available, Good),        pHH  *        pA2  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA2  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA2) *        pS2), 
->                ((    FS e, High, Unavailable, Good),        pHH  * (one - pA2) *        pS2),
->                ((weaken e, Low,    Available, Good), (one - pHH) *        pA2  *        pS2), 
->                ((    FS e, High,   Available, Good),        pHH  *        pA2  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA2  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
+> 
+> using implementation NumNonNegDouble
+>   
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA1) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA1) *        pS1),
+>                  ((weaken e, Low,    Available, Good),        pLH  *        pA1  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pA1  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA1  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA1) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA1) *        pS2),
+>                  ((weaken e, Low,    Available, Good),        pLH  *        pA1  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pA1  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA1  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA2) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA2) *        pS1),
+>                  ((weaken e, Low,    Available, Good),        pLH  *        pA2  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pA2  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA2  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLH  * (one - pA2) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLH) * (one - pA2) *        pS2),
+>                  ((weaken e, Low,    Available, Good),        pLH  *        pA2  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pA2  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA2  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Good) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA1) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good),        pHH  * (one - pA1) *        pS1),
+>                  ((weaken e, Low,    Available, Good), (one - pHH) *        pA1  *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pA1  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA1  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA1) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good),        pHH  * (one - pA1) *        pS2),
+>                  ((weaken e, Low,    Available, Good), (one - pHH) *        pA1  *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pA1  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA1  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA2) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good),        pHH  * (one - pA2) *        pS1),
+>                  ((weaken e, Low,    Available, Good), (one - pHH) *        pA2  *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pA2  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA2  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHH) * (one - pA2) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good),        pHH  * (one - pA2) *        pS2),
+>                  ((weaken e, Low,    Available, Good), (one - pHH) *        pA2  *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pA2  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA2  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
 >
-> -- The transition function: high emissions, unavailable GHG technologies, bad world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA1 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1 )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA1 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1 )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA2 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2 )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad),        pLH  *        pA2 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2 )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1 ), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA1 )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1 ), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA1 )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2 ), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA2 )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2 ), 
->                ((    FS e, High,   Available,  Bad),        pHH  *        pA2 )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
->
->
-> -- The transition function: high emissions, available GHG technologies
->
-> -- The transition function: high emissions, available GHG technologies, good world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLH  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pS1),
->                ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLH  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pS2),
->                ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLH  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pS1),
->                ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLH  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLH) *        pS2),
->                ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHH) *        pS1), 
->                ((    FS e, High,   Available, Good),        pHH  *        pS1),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHH  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHH) *        pS2), 
->                ((    FS e, High,   Available, Good),        pHH  *        pS2),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHH  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHH) *        pS1), 
->                ((    FS e, High,   Available, Good),        pHH  *        pS1),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHH  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHH) *        pS2), 
->                ((    FS e, High,   Available, Good),        pHH  *        pS2),
->                ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHH  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
->
-> -- The transition function: high emissions, available GHG technologies, bad world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLH ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLH ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLH ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLH ), 
->                ((    FS e, High,   Available,  Bad), (one - pLH))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHH)), 
->                ((    FS e, High,   Available,  Bad),        pHH )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHH)), 
->                ((    FS e, High,   Available,  Bad),        pHH )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHH)), 
->                ((    FS e, High,   Available,  Bad),        pHH )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHH)), 
->                ((    FS e, High,   Available,  Bad),        pHH )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
+>   -- The transition function: high emissions, unavailable GHG technologies, bad world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1 )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA1 )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2 )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLH  * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLH) * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) *        pA2 )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Unavailable, Bad) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA1 )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA1 )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA2 )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHH) * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHH  * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  *        pA2 )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
 >
 >
+>   -- The transition function: high emissions, available GHG technologies
+>
+>   -- The transition function: high emissions, available GHG technologies, good world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLH  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pS1),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLH  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pS2),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLH  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pS1),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLH  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLH) *        pS2),
+>                  ((weaken e, Low,    Available,  Bad),        pLH  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH) * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Good) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHH) *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pS1),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHH) *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pS2),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHH) *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pS1),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHH) *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHH  *        pS2),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHH) * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>
+>   -- The transition function: high emissions, available GHG technologies, bad world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLH ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLH ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLH ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLH ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLH))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, High, Available, Bad) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHH)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHH)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHH)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHH)), 
+>                  ((    FS e, High,   Available,  Bad),        pHH )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
 >
 >
-> -- The transition function: low emissions
->
-> -- The transition function: low emissions, unavailable GHG technologies
->
-> -- The transition function: low emissions, unavailable GHG technologies, good world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA1) *        pS1), 
->                ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA1) *        pS1),
->                ((weaken e, Low,    Available, Good),        pLL  *        pA1  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pA1  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA1  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA1) *        pS2), 
->                ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA1) *        pS2),
->                ((weaken e, Low,    Available, Good),        pLL  *        pA1  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pA1  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA1  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA2) *        pS1), 
->                ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA2) *        pS1),
->                ((weaken e, Low,    Available, Good),        pLL  *        pA2  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pA2  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA2  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA2) *        pS2), 
->                ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA2) *        pS2),
->                ((weaken e, Low,    Available, Good),        pLL  *        pA2  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pA2  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA2  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA1) *        pS1), 
->                ((    FS e, High, Unavailable, Good),        pHL  * (one - pA1) *        pS1),
->                ((weaken e, Low,    Available, Good), (one - pHL) *        pA1  *        pS1), 
->                ((    FS e, High,   Available, Good),        pHL  *        pA1  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA1  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA1) *        pS2), 
->                ((    FS e, High, Unavailable, Good),        pHL  * (one - pA1) *        pS2),
->                ((weaken e, Low,    Available, Good), (one - pHL) *        pA1  *        pS2), 
->                ((    FS e, High,   Available, Good),        pHL  *        pA1  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA1  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA2) *        pS1), 
->                ((    FS e, High, Unavailable, Good),        pHL  * (one - pA2) *        pS1),
->                ((weaken e, Low,    Available, Good), (one - pHL) *        pA2  *        pS1), 
->                ((    FS e, High,   Available, Good),        pHL  *        pA2  *        pS1),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2) * (one - pS1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2) * (one - pS1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA2  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA2) *        pS2), 
->                ((    FS e, High, Unavailable, Good),        pHL  * (one - pA2) *        pS2),
->                ((weaken e, Low,    Available, Good), (one - pHL) *        pA2  *        pS2), 
->                ((    FS e, High,   Available, Good),        pHL  *        pA2  *        pS2),
->                ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2) * (one - pS2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2) * (one - pS2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA2  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
->
-> -- The transition function: low emissions, unavailable GHG technologies, bad world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA1 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1 )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA1 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1 )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA2 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2 )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad),        pLL  *        pA2 ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2 )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1 ), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA1 )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1 ), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA1 )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2 ), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA2 )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2)), 
->                ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2)),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2 ), 
->                ((    FS e, High,   Available,  Bad),        pHL  *        pA2 )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
 >
 >
-> -- The transition function: low emissions, available GHG technologies
+>   -- The transition function: low emissions
 >
-> -- The transition function: low emissions, available GHG technologies, good world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLL  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pS1),
->                ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLL  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pS2),
->                ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLL  *        pS1), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pS1),
->                ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good),        pLL  *        pS2), 
->                ((    FS e, High,   Available, Good), (one - pLL) *        pS2),
->                ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHL) *        pS1), 
->                ((    FS e, High,   Available, Good),        pHL  *        pS1),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHL  * (one - pS1))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHL) *        pS2), 
->                ((    FS e, High,   Available, Good),        pHL  *        pS2),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHL  * (one - pS2))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHL) *        pS1), 
->                ((    FS e, High,   Available, Good),        pHL  *        pS1),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS1)), 
->                ((    FS e, High,   Available,  Bad),        pHL  * (one - pS1))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available, Good), (one - pHL) *        pS2), 
->                ((    FS e, High,   Available, Good),        pHL  *        pS2),
->                ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS2)), 
->                ((    FS e, High,   Available,  Bad),        pHL  * (one - pS2))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
+>   -- The transition function: low emissions, unavailable GHG technologies
 >
-> -- The transition function: low emissions, available GHG technologies, bad world
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) Low =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLL ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL))] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLL ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL))] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLL ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL))] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad),        pLL ), 
->                ((    FS e, High,   Available,  Bad), (one - pLL))] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
-> SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) High =
->   let ttres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHL)), 
->                ((    FS e, High,   Available,  Bad),        pHL )] in
->   let tfres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHL)), 
->                ((    FS e, High,   Available,  Bad),        pHL )] in
->   let ftres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHL)), 
->                ((    FS e, High,   Available,  Bad),        pHL )] in
->   let ffres = mkSimpleProb 
->               [((weaken e, Low,    Available,  Bad), (one - pHL)), 
->                ((    FS e, High,   Available,  Bad),        pHL )] in
->   case (t <= crN) of
->     True  => case (fromFin e <= crE) of
->                True  => trim ttres
->                False => trim tfres
->     False => case (fromFin e <= crE) of
->                True  => trim ftres
->                False => trim ffres
+>   -- The transition function: low emissions, unavailable GHG technologies, good world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA1) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA1) *        pS1),
+>                  ((weaken e, Low,    Available, Good),        pLL  *        pA1  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pA1  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA1  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA1) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA1) *        pS2),
+>                  ((weaken e, Low,    Available, Good),        pLL  *        pA1  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pA1  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA1  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA2) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA2) *        pS1),
+>                  ((weaken e, Low,    Available, Good),        pLL  *        pA2  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pA2  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA2  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good),        pLL  * (one - pA2) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good), (one - pLL) * (one - pA2) *        pS2),
+>                  ((weaken e, Low,    Available, Good),        pLL  *        pA2  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pA2  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA2  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Good) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA1) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good),        pHL  * (one - pA1) *        pS1),
+>                  ((weaken e, Low,    Available, Good), (one - pHL) *        pA1  *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pA1  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA1  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA1) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good),        pHL  * (one - pA1) *        pS2),
+>                  ((weaken e, Low,    Available, Good), (one - pHL) *        pA1  *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pA1  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA1  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA2) *        pS1), 
+>                  ((    FS e, High, Unavailable, Good),        pHL  * (one - pA2) *        pS1),
+>                  ((weaken e, Low,    Available, Good), (one - pHL) *        pA2  *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pA2  *        pS1),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2) * (one - pS1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2) * (one - pS1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA2  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable, Good), (one - pHL) * (one - pA2) *        pS2), 
+>                  ((    FS e, High, Unavailable, Good),        pHL  * (one - pA2) *        pS2),
+>                  ((weaken e, Low,    Available, Good), (one - pHL) *        pA2  *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pA2  *        pS2),
+>                  ((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2) * (one - pS2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2) * (one - pS2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA2  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>
+>   -- The transition function: low emissions, unavailable GHG technologies, bad world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1 )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA1 )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2 )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad),        pLL  * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad), (one - pLL) * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) *        pA2 )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Unavailable, Bad) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA1 )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA1)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA1)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA1 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA1 )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA2 )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,  Unavailable,  Bad), (one - pHL) * (one - pA2)), 
+>                  ((    FS e, High, Unavailable,  Bad),        pHL  * (one - pA2)),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) *        pA2 ), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  *        pA2 )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>
+>
+>   -- The transition function: low emissions, available GHG technologies
+>
+>   -- The transition function: low emissions, available GHG technologies, good world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLL  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pS1),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLL  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pS2),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLL  *        pS1), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pS1),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good),        pLL  *        pS2), 
+>                  ((    FS e, High,   Available, Good), (one - pLL) *        pS2),
+>                  ((weaken e, Low,    Available,  Bad),        pLL  * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL) * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Good) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHL) *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pS1),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  * (one - pS1))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHL) *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pS2),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  * (one - pS2))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHL) *        pS1), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pS1),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS1)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  * (one - pS1))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available, Good), (one - pHL) *        pS2), 
+>                  ((    FS e, High,   Available, Good),        pHL  *        pS2),
+>                  ((weaken e, Low,    Available,  Bad), (one - pHL) * (one - pS2)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL  * (one - pS2))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>
+>   -- The transition function: low emissions, available GHG technologies, bad world
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) Low =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLL ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL))] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLL ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL))] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLL ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL))] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad),        pLL ), 
+>                  ((    FS e, High,   Available,  Bad), (one - pLL))] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
+>   SequentialDecisionProblems.CoreTheory.nexts t (e, Low, Available, Bad) High =
+>     let ttres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHL)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL )] in
+>     let tfres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHL)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL )] in
+>     let ftres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHL)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL )] in
+>     let ffres = mkSimpleProb 
+>                 [((weaken e, Low,    Available,  Bad), (one - pHL)), 
+>                  ((    FS e, High,   Available,  Bad),        pHL )] in
+>     case (t <= crN) of
+>       True  =>   case (fromFin e <= crE) of
+>                  True  =>   trim ttres
+>                  False =>   trim tfres
+>       False =>   case (fromFin e <= crE) of
+>                  True  =>   trim ftres
+>                  False =>   trim ffres
 
 
 * |Val| and |LTE|:
@@ -728,7 +731,7 @@ increase the cumulated emissions by one:
 >   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero =
->   fromInteger 0
+>   fromInteger @{NumNonNegDouble} 0
 
 > SequentialDecisionProblems.CoreTheory.LTE =
 >   NonNegDouble.Predicates.LTE
@@ -801,25 +804,28 @@ The reward only depend on the next state, not on the current state or on
 the selected control:
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable, Good) =
->   one               + one * highOverGood
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable,  Bad) =
->   one * badOverGood + one * highOverGood
->
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available, Good) =
->   one               + one * highOverGood
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available,  Bad) =
->   one * badOverGood + one * highOverGood
+> 
+> using implementation NumNonNegDouble
 >   
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable, Good) =
->   one               + one * lowOverGoodUnavailable
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable,  Bad) =
->   one * badOverGood + one * lowOverGoodUnavailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable, Good) =
+>     one               + one * highOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable,  Bad) =
+>     one * badOverGood + one * highOverGood
 >
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available, Good) =
->   one               + one * lowOverGoodAvailable
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available,  Bad) =
->   one * badOverGood + one * lowOverGoodAvailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available, Good) =
+>     one               + one * highOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available,  Bad) =
+>     one * badOverGood + one * highOverGood
+>     
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable, Good) =
+>     one               + one * lowOverGoodUnavailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable,  Bad) =
+>     one * badOverGood + one * lowOverGoodUnavailable
+>
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available, Good) =
+>     one               + one * lowOverGoodAvailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available,  Bad) =
+>     one * badOverGood + one * lowOverGoodAvailable
 
  
 * Completing the problem specification
@@ -973,130 +979,132 @@ process. This means implemeting functions to print states and controls:
 >     av : SequentialDecisionProblems.CoreTheory.All (Viable {t = S t} n) (nexts t x Low)
 >     av = viableLemma {t = S t} (support (nexts t x Low))
 
-
-> computation : { [STDIO] } Eff ()
-> computation =
->   do putStr ("enter number of steps:\n")
->      nSteps <- getNat
->      putStrLn "nSteps (number of decision steps):"
->      putStrLn ("  " ++ show nSteps)
->      
->      putStrLn "crE (crit. cumulated emissions threshold):"
->      putStrLn ("  " ++ show crE)
->      putStrLn "crN (crit. number of decision steps):" 
->      putStrLn ("  " ++ show crN)
->      
->      putStrLn "pS1 (prob. of staying in a good world, cumulated emissions below crE):"
->      putStrLn ("  " ++ show pS1)
->      putStrLn "pS2 (prob. of staying in a good world, cumulated emissions above crE):"
->      putStrLn ("  " ++ show pS2)
->      
->      putStrLn "pA1 (prob. of eff. tech. becoming available, number of steps below crN):" 
->      putStrLn ("  " ++ show pA1)
->      putStrLn "pA2 (prob. of eff. tech. becoming available, number of steps above crN):"
->      putStrLn ("  " ++ show pA2)
->      
->      putStrLn "pLL (prob. of low emission policies, emissions low, low selected):"
->      putStrLn ("  " ++ show pLL)
->      putStrLn "pLH (prob. of low emission policies, emissions high, low selected):"
->      putStrLn ("  " ++ show pLH)
->      putStrLn "pHL (prob. of high emission policies, emissions low, high selected):"
->      putStrLn ("  " ++ show pHL)
->      putStrLn "pHH (prob. of high emission policies, emissions high, high selected):"
->      putStrLn ("  " ++ show pHH) 
->      
->      putStrLn "badOverGood (step benefits ratio: bad over good world):"
->      putStrLn ("  " ++ show badOverGood)
->      putStrLn "lowOverGoodUnavailable (benefits ratio: low emissions over step, good world, eff. tech. unavailable):"
->      putStrLn ("  " ++ show lowOverGoodUnavailable) 
->      putStrLn "lowOverGoodAvailable (benefits ratio: low emissions over step, good world, eff. tech. available):"
->      putStrLn ("  " ++ show lowOverGoodAvailable)
->      putStrLn "highOverGood (benefits ratio: High emissions over step, good world):"
->      putStrLn ("  " ++ show highOverGood) 
->                
->      putStrLn "computing constHigh policies ..."
->      constHigh_ps <- pure (constHigh Z nSteps)
+> 
+> using implementation ShowNonNegDouble
+>   
+>   computation : { [STDIO] } Eff ()
+>   computation =
+>     do putStr ("enter number of steps:\n")
+>        nSteps <- getNat
+>        putStrLn "nSteps (number of decision steps):"
+>        putStrLn ("  " ++ show nSteps)
+>        
+>        putStrLn "crE (crit. cumulated emissions threshold):"
+>        putStrLn ("  " ++ show crE)
+>        putStrLn "crN (crit. number of decision steps):" 
+>        putStrLn ("  " ++ show crN)
+>        
+>        putStrLn "pS1 (prob. of staying in a good world, cumulated emissions below crE):"
+>        putStrLn ("  " ++ show pS1)
+>        putStrLn "pS2 (prob. of staying in a good world, cumulated emissions above crE):"
+>        putStrLn ("  " ++ show pS2)
+>        
+>        putStrLn "pA1 (prob. of eff. tech. becoming available, number of steps below crN):" 
+>        putStrLn ("  " ++ show pA1)
+>        putStrLn "pA2 (prob. of eff. tech. becoming available, number of steps above crN):"
+>        putStrLn ("  " ++ show pA2)
+>        
+>        putStrLn "pLL (prob. of low emission policies, emissions low, low selected):"
+>        putStrLn ("  " ++ show pLL)
+>        putStrLn "pLH (prob. of low emission policies, emissions high, low selected):"
+>        putStrLn ("  " ++ show pLH)
+>        putStrLn "pHL (prob. of high emission policies, emissions low, high selected):"
+>        putStrLn ("  " ++ show pHL)
+>        putStrLn "pHH (prob. of high emission policies, emissions high, high selected):"
+>        putStrLn ("  " ++ show pHH) 
+>        
+>        putStrLn "badOverGood (step benefits ratio: bad over good world):"
+>        putStrLn ("  " ++ show badOverGood)
+>        putStrLn "lowOverGoodUnavailable (benefits ratio: low emissions over step, good world, eff. tech. unavailable):"
+>        putStrLn ("  " ++ show lowOverGoodUnavailable) 
+>        putStrLn "lowOverGoodAvailable (benefits ratio: low emissions over step, good world, eff. tech. available):"
+>        putStrLn ("  " ++ show lowOverGoodAvailable)
+>        putStrLn "highOverGood (benefits ratio: High emissions over step, good world):"
+>        putStrLn ("  " ++ show highOverGood) 
+>                  
+>        putStrLn "computing constHigh policies ..."
+>        constHigh_ps <- pure (constHigh Z nSteps)
 >
->      putStrLn "computing constHigh state-control sequences ..."
->      constHigh_mxys <- pure (adHocPossibleStateCtrlSeqs constHigh_ps (FZ, High, Unavailable, Good))
->      putStrLn "pairing constHigh state-control sequences with their values ..."
->      constHigh_mxysv <- pure (possibleStateCtrlSeqsRewards' constHigh_mxys)
->      -- putStrLn "constHigh state-control sequences and their values:"
->      -- putStrLn (showlong constHigh_mxysv)  
->      
->      putStrLn "computing (naively) the number of constHigh state-control sequences ..."
->      constHigh_n <- pure (length (toList constHigh_mxysv))
->      putStrLn "number of constHigh state-control sequences:"
->      putStrLn ("  " ++ show constHigh_n)
->                  
->      putStrLn "computing (naively) the most probable constHigh state-control sequence ..."
->      constHigh_xysv <- pure (naiveMostProbableProb constHigh_mxysv)
->      putStrLn "most probable constHigh state-control sequence and its probability:"
->      putStrLn ("  " ++ show constHigh_xysv)            
->                  
->      putStrLn "sorting (naively) the constHigh state-control sequence ..."
->      constHigh_xysvs <- pure (naiveSortToList constHigh_mxysv)
->      putStrLn "most probable constHigh state-control sequences (first 3) and their probabilities:"
->      putStrLn (showlong (take 3 constHigh_xysvs))
->                      
->      putStrLn "measure of constHigh rewards:"
->      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constHigh_mxysv)))            
+>        putStrLn "computing constHigh state-control sequences ..."
+>        constHigh_mxys <- pure (adHocPossibleStateCtrlSeqs constHigh_ps (FZ, High, Unavailable, Good))
+>        putStrLn "pairing constHigh state-control sequences with their values ..."
+>        constHigh_mxysv <- pure (possibleStateCtrlSeqsRewards' constHigh_mxys)
+>        -- putStrLn "constHigh state-control sequences and their values:"
+>        -- putStrLn (showlong constHigh_mxysv)  
+>        
+>        putStrLn "computing (naively) the number of constHigh state-control sequences ..."
+>        constHigh_n <- pure (length (toList constHigh_mxysv))
+>        putStrLn "number of constHigh state-control sequences:"
+>        putStrLn ("  " ++ show constHigh_n)
+>                    
+>        putStrLn "computing (naively) the most probable constHigh state-control sequence ..."
+>        constHigh_xysv <- pure (naiveMostProbableProb constHigh_mxysv)
+>        putStrLn "most probable constHigh state-control sequence and its probability:"
+>        putStrLn ("  " ++ show constHigh_xysv)            
+>                    
+>        putStrLn "sorting (naively) the constHigh state-control sequence ..."
+>        constHigh_xysvs <- pure (naiveSortToList constHigh_mxysv)
+>        putStrLn "most probable constHigh state-control sequences (first 3) and their probabilities:"
+>        putStrLn (showlong (take 3 constHigh_xysvs))
+>                        
+>        putStrLn "measure of constHigh rewards:"
+>        putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constHigh_mxysv)))            
 >
->      putStrLn "computing constLow policies ..."
->      constLow_ps <- pure (constLow Z nSteps)
+>        putStrLn "computing constLow policies ..."
+>        constLow_ps <- pure (constLow Z nSteps)
 >
->      putStrLn "computing constLow state-control sequences ..."
->      constLow_mxys <- pure (adHocPossibleStateCtrlSeqs constLow_ps (FZ, High, Unavailable, Good))
->      putStrLn "pairing constLow state-control sequences with their values ..."
->      constLow_mxysv <- pure (possibleStateCtrlSeqsRewards' constLow_mxys)
->      
->      putStrLn "computing (naively) the number of constLow state-control sequences ..."
->      constLow_n <- pure (length (toList constLow_mxysv))
->      putStrLn "number of constLow state-control sequences:"
->      putStrLn ("  " ++ show constLow_n)
->                  
->      putStrLn "computing (naively) the most probable constLow state-control sequence ..."
->      constLow_xysv <- pure (naiveMostProbableProb constLow_mxysv)
->      putStrLn "most probable constLow state-control sequence and its probability:"
->      putStrLn ("  " ++ show constLow_xysv)            
->                  
->      putStrLn "sorting (naively) the constLow state-control sequence ..."
->      constLow_xysvs <- pure (naiveSortToList constLow_mxysv)
->      putStrLn "most probable constLow state-control sequences (first 3) and their probabilities:"
->      putStrLn (showlong (take 3 constLow_xysvs))
->                      
->      putStrLn "measure of constLow rewards:"
->      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constLow_mxysv)))            
->                  
->      putStrLn "computing optimal policies ..."
->      ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
->            
->      putStrLn "computing possible state-control sequences ..."
->      mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
->      putStrLn "pairing possible state-control sequences with their values ..."
->      mxysv <- pure (possibleStateCtrlSeqsRewards' mxys)
->      -- putStrLn "possible state-control sequences and their values:"
->      -- putStrLn (showlong mxysv)  
->      
->      putStrLn "computing (naively) the number of possible state-control sequences ..."
->      n <- pure (length (toList mxysv))
->      putStrLn "number of possible state-control sequences:"
->      putStrLn ("  " ++ show n)
->      
->      putStrLn "computing (naively) the most probable state-control sequence ..."
->      xysv <- pure (naiveMostProbableProb mxysv)
->      putStrLn "most probable state-control sequence and its probability:"
->      putStrLn ("  " ++ show xysv)
->                      
->      putStrLn "sorting (naively) the possible state-control sequence ..."
->      xysvs <- pure (naiveSortToList mxysv)
->      putStrLn "most probable state-control sequences (first 3) and their probabilities:"
->      putStrLn (showlong (take 3 xysvs))
->                      
->      putStrLn "measure of possible rewards:"
->      putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd mxysv)))
+>        putStrLn "computing constLow state-control sequences ..."
+>        constLow_mxys <- pure (adHocPossibleStateCtrlSeqs constLow_ps (FZ, High, Unavailable, Good))
+>        putStrLn "pairing constLow state-control sequences with their values ..."
+>        constLow_mxysv <- pure (possibleStateCtrlSeqsRewards' constLow_mxys)
+>        
+>        putStrLn "computing (naively) the number of constLow state-control sequences ..."
+>        constLow_n <- pure (length (toList constLow_mxysv))
+>        putStrLn "number of constLow state-control sequences:"
+>        putStrLn ("  " ++ show constLow_n)
+>                    
+>        putStrLn "computing (naively) the most probable constLow state-control sequence ..."
+>        constLow_xysv <- pure (naiveMostProbableProb constLow_mxysv)
+>        putStrLn "most probable constLow state-control sequence and its probability:"
+>        putStrLn ("  " ++ show constLow_xysv)            
+>                    
+>        putStrLn "sorting (naively) the constLow state-control sequence ..."
+>        constLow_xysvs <- pure (naiveSortToList constLow_mxysv)
+>        putStrLn "most probable constLow state-control sequences (first 3) and their probabilities:"
+>        putStrLn (showlong (take 3 constLow_xysvs))
+>                        
+>        putStrLn "measure of constLow rewards:"
+>        putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constLow_mxysv)))            
+>                    
+>        putStrLn "computing optimal policies ..."
+>        ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
+>              
+>        putStrLn "computing possible state-control sequences ..."
+>        mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
+>        putStrLn "pairing possible state-control sequences with their values ..."
+>        mxysv <- pure (possibleStateCtrlSeqsRewards' mxys)
+>        -- putStrLn "possible state-control sequences and their values:"
+>        -- putStrLn (showlong mxysv)  
+>        
+>        putStrLn "computing (naively) the number of possible state-control sequences ..."
+>        n <- pure (length (toList mxysv))
+>        putStrLn "number of possible state-control sequences:"
+>        putStrLn ("  " ++ show n)
+>        
+>        putStrLn "computing (naively) the most probable state-control sequence ..."
+>        xysv <- pure (naiveMostProbableProb mxysv)
+>        putStrLn "most probable state-control sequence and its probability:"
+>        putStrLn ("  " ++ show xysv)
+>                        
+>        putStrLn "sorting (naively) the possible state-control sequence ..."
+>        xysvs <- pure (naiveSortToList mxysv)
+>        putStrLn "most probable state-control sequences (first 3) and their probabilities:"
+>        putStrLn (showlong (take 3 xysvs))
+>                        
+>        putStrLn "measure of possible rewards:"
+>        putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd mxysv)))
    
->      putStrLn "done!"
+>        putStrLn "done!"
 
 
 > main : IO ()
