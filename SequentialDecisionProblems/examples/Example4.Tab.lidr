@@ -138,7 +138,7 @@ We reimplement "Example2.lidr", this time with |M = SimpleProb|.
 
 * The computation:
 
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show @{ShowLTB}
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
