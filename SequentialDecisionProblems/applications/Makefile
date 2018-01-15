@@ -7,6 +7,8 @@ IDRISFLAGS = -O3 --warnreach \
              -p contrib -p effects \
              -V
 
+all: env newcomb fastnewcomb emissionsgame0 emissionsgame1 emissionsgame2 emissionsgame2.1
+
 env: Env.lidr
 	${IDRIS} ${IDRISFLAGS} --check Env.lidr
 

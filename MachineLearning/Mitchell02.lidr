@@ -1,11 +1,15 @@
 > module MachineLearning.Mitchell02
 
 > import Data.List
+> import Data.List.Quantifiers
 > import Data.Vect
 > import Syntax.PreorderReasoning
 
 > import Enumerated.Enumerated
-> -- import Sigma.Operations
+> import Finite.Predicates
+> import Finite.Operations
+> import List.Operations
+> import List.Properties
 
 > %default total
 > %access public export
@@ -239,7 +243,7 @@ In the "enjoy sport" example, |X = Day| and |X| contains 3 * 2^5 = 96
 values. |H = Hypothesis| and |H| contains 5 * 4^5 = 5120 values. Notice
 that |X -> Bool| contains 2^96 values!
 
-***2.3.1 General-to-Specific Ordering of Hypotheses
+*** 2.3.1 General-to-Specific Ordering of Hypotheses
 
 > LTE : H -> H -> Type
 > LTE h1 h2 = (x : X) -> fulfils x h1 = True -> fulfils x h2 = True
@@ -251,17 +255,110 @@ that |X -> Bool| contains 2^96 values!
 
 > antisymmetricLTE : (h1 : H) -> (h2 : H) -> h1 `LTE` h2 -> h2 `LTE` h1 -> 
 >                    (y : X) -> fulfils y h1 = fulfils y h2 
-> antisymmetricLTE h1 h2 p q y with (fulfils y h1)
->   | True  = ?kika
->   | False = ?kiko
+> antisymmetricLTE h1 h2 p q y with (fulfils y h1) proof prf
+>   | True  = ( True )
+>           ={ (sym (p y (sym prf))) }=
+>             ( fulfils y h2 )
+>           QED
+>   | False with (fulfils y h2) proof prf'
+>       | True  = void (trueNotFalse (sym contra)) where
+>           contra : False = True
+>           contra = ( False )
+>                  ={ prf }=
+>                    ( fulfils y h1 )
+>                  ={ q y (sym prf') }=
+>                    ( True )
+>                  QED
+>       | False = Refl
 
+> transitiveLTE : (h1, h2, h3 : H) -> h1 `LTE` h2 -> h2 `LTE` h3 -> h1 `LTE` h3
+> transitiveLTE h1 h2 h3 p q x fxh1 = q x (p x fxh1)
+
+
+** 2.4 Find-S: Finding a maximally specific hypothesis
+
+> mostSpecific : H
+
+> mostSpecificSpec : (h : H) -> mostSpecific `LTE` h
+
+> next : (h : H) -> (e : E) -> H
+
+> nextSpec1 : (h : H) -> (e : E) -> snd e = False -> next h e = h
+
+> nextSpec2 : (h : H) -> (e : E) -> snd e = True -> fulfils (fst e) (next h e) = True
+
+> nextSpec3 : (h : H) -> (e : E) -> (h' : H) -> fulfils (fst e) h' = True -> (next h e) `LTE` h'
+
+> findS : List E -> H
+> findS      Nil  = mostSpecific
+> findS (e :: es) = next (findS es) e
+
+
+** 2.5 CandidateElimination
+
+*** 2.5.1 Representation
+
+> ClassifiesCorrectly : H -> E -> Type
+> ClassifiesCorrectly h e = fulfils (fst e) h = snd e
+
+> decClassifiesCorrectly : (h : H) -> (e : E) -> Dec (ClassifiesCorrectly h e)
+> decClassifiesCorrectly h e = decEq (fulfils (fst e) h ) (snd e)
+
+> Consistent : H -> List E -> Type
+> Consistent h es = All (ClassifiesCorrectly h) es
+
+> VersionSpace : List E -> Type
+> VersionSpace es = Subset H (\ h => Consistent h es)
+
+> decConsistent : (h : H) -> (es : List E) -> Dec (Consistent h es) 
+> decConsistent h es = decidableAll (decClassifiesCorrectly h) es
+
+*** 2.5.2 The List-Then_Eliminate Algorithm
+
+> listThenEliminate : Finite H -> (es : List E) -> List (VersionSpace es)
+> listThenEliminate fH es = filterTagSubset {A = H} 
+>                                           {P = \ h => Consistent h es} 
+>                                           (\ h => decConsistent h es)
+>                                           (toList (toVect fH))
+
+*** 2.5.3 A more compact Representation for Version Spaces
+
+> Bottom : List E -> H -> Type
+> Bottom es h = (Consistent h es, (h' : H) -> Consistent h' es -> h `LTE` h')
+
+> Top : List E -> H -> Type
+> Top es h = (Consistent h es, (h' : H) -> Consistent h' es -> h' `LTE` h)
+
+> AboveBottom : List E -> H -> Type
+> AboveBottom es h = Exists (\ s => (Bottom es s, s `LTE` h))
+
+> BelowTop : List E -> H -> Type
+> BelowTop es h = Exists (\ g => (Top es g, h `LTE` g))
+
+> VersionSpaceRepr : List E -> Type
+> VersionSpaceRepr es = Subset H (\ h => (AboveBottom es h, BelowTop es h))
+
+> {-
+
+> lemma1 : (es : List E) -> (h : H) -> (AboveBottom es h, BelowTop es h) -> Consistent h es 
+> lemma1  Nil      h (ab, bt) = Nil
+> lemma1 (e :: es) h (ab, bt) = p :: ps where
+>   s  : H
+>   s  = getWitness ab
+>   s1 : s `LTE`h
+>   s1 = snd (getProof ab) 
+>   p  : ClassifiesCorrectly h e
+>   p  = ?kika
+>   ps : All (ClassifiesCorrectly h) es
+>   ps = ?kuka
+
+
+> lemma2 : (es : List E) -> (h : H) -> Consistent h es -> (AboveBottom es h, BelowTop es h)
 
 
 
 
 * Appendix
-
-> {-
 
 > fulfils d (Right None, _, _, _, _, _) = False
 > fulfils d (_, Right None, _, _, _, _) = False
@@ -723,4 +820,5 @@ that |X -> Bool| contains 2^96 values!
 
 
 [1] Tom M. Mitchell; "Machine Learning", McGraw-Hill, 1997
+ 
  

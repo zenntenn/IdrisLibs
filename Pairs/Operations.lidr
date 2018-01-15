@@ -6,9 +6,10 @@
 > %access public export
 > %auto_implicits on
 
-> %hide getWitness
-> %hide getProof
+> -- %hide getWitness
+> -- %hide getProof
 
+> {-
 
 > namespace Exists
 >   getWitness : {P : a -> Type} -> Exists {a} P -> a
@@ -23,6 +24,7 @@
 >   getProof : {P : a -> Type} -> (x : Subset a P) -> P (getWitness x)
 >   getProof (Element x pf) = pf
 
+> ---}
 
 > namespace Sigma
 >   getWitness : {P : a -> Type} -> Sigma a P -> a
@@ -31,6 +33,3 @@
 >   getProof (MkSigma x pf) = pf
 
 
-> {-
-
-> ---}
