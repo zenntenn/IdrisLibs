@@ -19,16 +19,18 @@
 
 * Properties of |toList|:
 
-> |||
-> toListLemma : {A : Type} -> (sp : SimpleProb A) -> Positive (toDouble (sumMapSnd (toList sp)))
-> toListLemma (MkSimpleProb _ prf) = prf
+> using implementation NumNonNegDouble
+>   |||
+>   toListLemma : {A : Type} -> (sp : SimpleProb A) -> Positive (toDouble (sumMapSnd (toList sp)))
+>   toListLemma (MkSimpleProb _ prf) = prf
 
 
 * Properties of weights:
 
-> |||
-> positiveWeights : {A : Type} -> (sp : SimpleProb A) -> Positive (toDouble (sum (weights sp)))
-> positiveWeights = toListLemma
+> using implementation NumNonNegDouble
+>   |||
+>   positiveWeights : {A : Type} -> (sp : SimpleProb A) -> Positive (toDouble (sum (weights sp)))
+>   positiveWeights = toListLemma
 
 
 > |||
@@ -40,9 +42,10 @@
 
 * Implementations:
 
-> ||| SimpleProb is an implementation of Show
-> implementation Show a => Show (SimpleProb a) where
->   show sp = show (toList sp)
+> using implementation ShowNonNegDouble
+>   ||| SimpleProb is an implementation of Show
+>   implementation Show a => Show (SimpleProb a) where
+>     show sp = show (toList sp)
 
 
 > {-

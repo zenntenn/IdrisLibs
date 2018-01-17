@@ -599,7 +599,7 @@
 >   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero =
->   fromInteger 0
+>   fromInteger @{NumNonNegDouble} 0
 
 > SequentialDecisionProblems.CoreTheory.LTE =
 >   NonNegDouble.Predicates.LTE
@@ -662,25 +662,27 @@
 > lowLTEhigh = MkLTE Oh
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable, Good) =
->   one               + one * highOverGood
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable,  Bad) =
->   one * badOverGood + one * highOverGood
+> using implementation NumNonNegDouble
+> 
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable, Good) =
+>     one               + one * highOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High, Unavailable,  Bad) =
+>     one * badOverGood + one * highOverGood
 >
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available, Good) =
->   one               + one * highOverGood
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available,  Bad) =
->   one * badOverGood + one * highOverGood
->   
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable, Good) =
->   one               + one * lowOverGoodUnavailable
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable,  Bad) =
->   one * badOverGood + one * lowOverGoodUnavailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available, Good) =
+>     one               + one * highOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e, High,   Available,  Bad) =
+>     one * badOverGood + one * highOverGood
+>     
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable, Good) =
+>     one               + one * lowOverGoodUnavailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low, Unavailable,  Bad) =
+>     one * badOverGood + one * lowOverGoodUnavailable
 >
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available, Good) =
->   one               + one * lowOverGoodAvailable
-> SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available,  Bad) =
->   one * badOverGood + one * lowOverGoodAvailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available, Good) =
+>     one               + one * lowOverGoodAvailable
+>   SequentialDecisionProblems.CoreTheory.reward _ _ _ (e,  Low,   Available,  Bad) =
+>     one * badOverGood + one * lowOverGoodAvailable
 
  
 * Completing the problem specification
@@ -840,27 +842,29 @@ process. This means implemeting functions to print states and controls:
 >   s2 : M (StateCtrlSeq t n)
 >   s2 = replace {P = \ X => M (StateCtrlSeq t X)} (plusZeroLeftNeutral n) s1
 
-
-> computation : { [STDIO] } Eff ()
-> computation =
->   do putStr ("enter number of steps:\n")
->      nSteps <- getNat
->      case (decidableViable {t = Z} nSteps (FZ, High, Unavailable, Good)) of
->        (Yes v) => do putStrLn ("computing optimal policies ...")
->                      -- ps   <- pure (backwardsInduction Z nSteps)
->                      ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
->                      putStrLn ("computing optimal controls ...")
->                      -- mxys <- pure (possibleStateCtrlSeqs (FZ, High, Unavailable, Good) () v ps)
->                      mxys <- pure (adHocPossibleStateCtrlSeqs (FZ, High, Unavailable, Good) ps)
->                      putStrLn "possible state-control sequences:"
->                      putStr "  "
->                      putStrLn (showlong mxys)
->                      mvs <- pure (possibleRewards' mxys)
->                      putStrLn "possible rewards:"
->                      putStr "  "
->                      putStrLn (show mvs)
->                      putStrLn ("done!")
->        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
+>
+> using implementation ShowNonNegDouble
+> 
+>   computation : { [STDIO] } Eff ()
+>   computation =
+>     do putStr ("enter number of steps:\n")
+>        nSteps <- getNat
+>        case (decidableViable {t = Z} nSteps (FZ, High, Unavailable, Good)) of
+>          (Yes v) => do putStrLn ("computing optimal policies ...")
+>                        -- ps   <- pure (backwardsInduction Z nSteps)
+>                        ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
+>                        putStrLn ("computing optimal controls ...")
+>                        -- mxys <- pure (possibleStateCtrlSeqs (FZ, High, Unavailable, Good) () v ps)
+>                        mxys <- pure (adHocPossibleStateCtrlSeqs (FZ, High, Unavailable, Good) ps)
+>                        putStrLn "possible state-control sequences:"
+>                        putStr "  "
+>                        putStrLn (showlong mxys)
+>                        mvs <- pure (possibleRewards' mxys)
+>                        putStrLn "possible rewards:"
+>                        putStr "  "
+>                        putStrLn (show mvs)
+>                        putStrLn ("done!")
+>          (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
 > main : IO ()
 > main = run computation

@@ -163,6 +163,33 @@
 > sumProds ((b,b') :: bbs) = b * b' + sumProds bbs
 
 
+* Filtering
+
+> ||| Filters a list on a decidable property and pairs elements with proofs
+> filterTagSigma : {A : Type} ->
+>                  {P : A -> Type} ->
+>                  ((a : A) -> Dec (P a)) ->
+>                  List A -> 
+>                  List (Sigma A P)
+> filterTagSigma d1P Nil = Nil
+> filterTagSigma d1P (a :: as) with (filterTagSigma d1P as)
+>   | tail with (d1P a)
+>     | (Yes p) = (MkSigma a p) :: tail
+>     | (No  _) = tail
+
+> ||| Filters a list on a decidable property and pairs elements with proofs
+> filterTagSubset : {A : Type} ->
+>                   {P : A -> Type} ->
+>                   ((a : A) -> Dec (P a)) ->
+>                   List A -> 
+>                   List (Subset A P)
+> filterTagSubset d1P Nil = Nil
+> filterTagSubset d1P (a :: as) with (filterTagSubset d1P as)
+>   | tail with (d1P a)
+>     | (Yes p) = (Element a p) :: tail
+>     | (No  _) = tail
+
+
 * Ad-hoc filtering
 
 > |||

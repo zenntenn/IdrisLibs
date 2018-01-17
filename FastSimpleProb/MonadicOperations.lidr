@@ -26,17 +26,18 @@
 
 * |SimpleProb| is a functor:
 
-> |||
-> fmap : {A, B : Type} -> (A -> B) -> SimpleProb A -> SimpleProb B
-> fmap f (MkSimpleProb aps psum) = MkSimpleProb aps' psum' where
->   aps'  : List (B, NonNegDouble)
->   aps'  = map (cross f id) aps
->   psum' : Positive (toDouble (sumMapSnd aps'))
->   psum' = replace {P = \ X => Positive (toDouble X)} s2 psum where
->     s1 : map snd (map (cross f id) aps) = map snd aps
->     s1 = mapSndMapCrossAnyIdLemma f aps
->     s2 : sumMapSnd aps = sumMapSnd aps'
->     s2 = cong {f = sum} (sym s1)
+> using implementation NumNonNegDouble
+>   |||
+>   fmap : {A, B : Type} -> (A -> B) -> SimpleProb A -> SimpleProb B
+>   fmap f (MkSimpleProb aps psum) = MkSimpleProb aps' psum' where
+>     aps'  : List (B, NonNegDouble)
+>     aps'  = map (cross f id) aps
+>     psum' : Positive (toDouble (sumMapSnd aps'))
+>     psum' = replace {P = \ X => Positive (toDouble X)} s2 psum where
+>       s1 : map snd (map (cross f id) aps) = map snd aps
+>       s1 = mapSndMapCrossAnyIdLemma f aps
+>       s2 : sumMapSnd aps = sumMapSnd aps'
+>       s2 = cong {f = sum} (sym s1)
 
 
 * |SimpleProb| is a monad:
@@ -45,41 +46,43 @@
 > ret : {A : Type} -> A -> SimpleProb A
 > ret a = MkSimpleProb [(a, one)] positiveOne
 
-> |||
-> bind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
-> bind {A} {B} (MkSimpleProb aps psum) f = normalize (MkSimpleProb bps' psum') where
->   f' : A -> List (B, NonNegDouble)
->   f' a = toList (normalize (f a))
->   psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))
->   psums' a = toListLemma (normalize (f a))
->   bps' : List (B, NonNegDouble)
->   bps' = mvMult aps f'  
->   psum' : Positive (toDouble (sumMapSnd bps'))
->   psum' = mvMultLemma aps psum f' psums'
+> using implementation NumNonNegDouble
+>   |||
+>   bind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
+>   bind {A} {B} (MkSimpleProb aps psum) f = normalize (MkSimpleProb bps' psum') where
+>     f' : A -> List (B, NonNegDouble)
+>     f' a = toList (normalize (f a))
+>     psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))
+>     psums' a = toListLemma (normalize (f a))
+>     bps' : List (B, NonNegDouble)
+>     bps' = mvMult aps f'  
+>     psum' : Positive (toDouble (sumMapSnd bps'))
+>     psum' = mvMultLemma aps psum f' psums'
 
-> |||
-> naivebind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
-> {-
-> naivebind {A} {B} (MkSimpleProb aps psum) f = MkSimpleProb bps' psum' where
->   f' : A -> List (B, NonNegDouble)
->   f' a = toList (f a)
->   psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))
->   psums' a = toListLemma (f a)
->   bps' : List (B, NonNegDouble)
->   bps' = mvMult aps f'  
->   psum' : Positive (toDouble (sumMapSnd bps'))
->   psum' = mvMultLemma aps psum f' psums'
-> -}
-> naivebind {A} {B} (MkSimpleProb aps psum) f = 
->   let f'     : (A -> List (B, NonNegDouble))
->              = toList . f in
->   let psums' : ((a : A) -> Positive (toDouble (sumMapSnd (f' a))))
->              = (\ a => toListLemma (f a)) in
->   let bps'   : List (B, NonNegDouble)
->              = mvMult aps f' in
->   let psum'  : Positive (toDouble (sumMapSnd bps'))
->              = mvMultLemma aps psum f' psums' in
->   MkSimpleProb bps' psum'
+> using implementation NumNonNegDouble
+>   |||
+>   naivebind : {A, B : Type} -> SimpleProb A -> (A -> SimpleProb B) -> SimpleProb B
+>   {-
+>   naivebind {A} {B} (MkSimpleProb aps psum) f = MkSimpleProb bps' psum' where
+>     f' : A -> List (B, NonNegDouble)
+>     f' a = toList (f a)
+>     psums' : (a : A) -> Positive (toDouble (sumMapSnd (f' a)))
+>     psums' a = toListLemma (f a)
+>     bps' : List (B, NonNegDouble)
+>     bps' = mvMult aps f'  
+>     psum' : Positive (toDouble (sumMapSnd bps'))
+>     psum' = mvMultLemma aps psum f' psums'
+>   -}
+>   naivebind {A} {B} (MkSimpleProb aps psum) f = 
+>     let f'     : (A -> List (B, NonNegDouble))
+>                = toList . f in
+>     let psums' : ((a : A) -> Positive (toDouble (sumMapSnd (f' a))))
+>                = (\ a => toListLemma (f a)) in
+>     let bps'   : List (B, NonNegDouble)
+>                = mvMult aps f' in
+>     let psum'  : Positive (toDouble (sumMapSnd bps'))
+>                = mvMultLemma aps psum f' psums' in
+>     MkSimpleProb bps' psum'
 
 
 * |SimpleProb| is a container monad:
@@ -96,9 +99,10 @@
 > All : {A : Type} -> (P : A -> Type) -> SimpleProb A -> Type
 > All P sp = All P (support sp) 
 
-> ||| Tagging
-> tagElem  :  {A : Type} -> (sp : SimpleProb A) -> SimpleProb (Sigma A (\ a => a `Elem` sp))
-> tagElem sp = MkSimpleProb aps' psum' where
+> using implementation NumNonNegDouble
+>   ||| Tagging
+>   tagElem  :  {A : Type} -> (sp : SimpleProb A) -> SimpleProb (Sigma A (\ a => a `Elem` sp))
+>   tagElem sp = MkSimpleProb aps' psum' where
 >     ssp  : List A
 >     ssp  = support sp
 >     wsp  : List NonNegDouble

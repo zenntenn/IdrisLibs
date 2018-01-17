@@ -15,7 +15,7 @@
 
 
 > postulate
-> monotoneWorst : (A : Type) ->
+> monotoneWorst : {A : Type} ->
 >                 (f : A -> NonNegDouble) -> (g : A -> NonNegDouble) ->
 >                 (p : (a : A) -> f a `LTE` g a) ->
 >                 (sp : SimpleProb A) ->

@@ -117,18 +117,19 @@
 
 * |SimpleProb|s are never empty
 
-> |||
-> nonEmptyLemma1 : {A : Type} -> (sp : SimpleProb A) -> List.Operations.NonEmpty (toList sp)
-> nonEmptyLemma1 {A} (MkSimpleProb Nil psum) = s4 where
->   s1 : sumMapSnd {A = A} {B = NonNegDouble} Nil = zero
->   s1 = sumMapSndNilLemma {A = A} {B = NonNegDouble}
->   s2 : Positive (toDouble (sumMapSnd {A = A} {B = NonNegDouble} Nil))
->   s2 = psum
->   s3 : Positive (toDouble zero)
->   s3 = replace {P = \ X => Positive (toDouble X)} s1 s2 
->   s4 : List.Operations.NonEmpty {A = (A, NonNegDouble)} (toList (MkSimpleProb Nil psum))
->   s4 = notPositiveZero s3
-> nonEmptyLemma1 (MkSimpleProb (ap :: aps) psum) = () 
+> using implementation NumNonNegDouble
+>   |||
+>   nonEmptyLemma1 : {A : Type} -> (sp : SimpleProb A) -> List.Operations.NonEmpty (toList sp)
+>   nonEmptyLemma1 {A} (MkSimpleProb Nil psum) = s4 where
+>     s1 : sumMapSnd {A = A} {B = NonNegDouble} Nil = zero
+>     s1 = sumMapSndNilLemma {A = A} {B = NonNegDouble}
+>     s2 : Positive (toDouble (sumMapSnd {A = A} {B = NonNegDouble} Nil))
+>     s2 = psum
+>     s3 : Positive (toDouble zero)
+>     s3 = replace {P = \ X => Positive (toDouble X)} s1 s2 
+>     s4 : List.Operations.NonEmpty {A = (A, NonNegDouble)} (toList (MkSimpleProb Nil psum))
+>     s4 = notPositiveZero s3
+>   nonEmptyLemma1 (MkSimpleProb (ap :: aps) psum) = () 
 
 > |||
 > nonEmptyLemma : {A : Type} -> (sp : SimpleProb A) -> NonEmpty sp
@@ -145,21 +146,22 @@
 
 * Properies of |fmap| and |toList|
 
-> |||
-> toListFmapLemma : {A, B : Type} -> 
->                   (f : A -> B) -> (sp : SimpleProb A) ->
->                   toList (fmap f sp) = fmap (cross f id) (toList sp)
-> toListFmapLemma f (MkSimpleProb aps psum) = 
->     ( toList (fmap f (MkSimpleProb aps psum)) )
->   ={ Refl }=
->     ( toList (MkSimpleProb 
->               (fmap (cross f id) aps) 
->               (replace {P = \ X => Positive (toDouble X)} (cong {f = sum} (sym (mapSndMapCrossAnyIdLemma f aps))) psum)) )
->   ={ Refl }=  
->     ( fmap (cross f id) aps )
->   ={ Refl }=
->     ( fmap (cross f id) (toList (MkSimpleProb aps psum)) )
->   QED
+> using implementation NumNonNegDouble
+>   |||
+>   toListFmapLemma : {A, B : Type} -> 
+>                     (f : A -> B) -> (sp : SimpleProb A) ->
+>                     toList (fmap f sp) = fmap (cross f id) (toList sp)
+>   toListFmapLemma f (MkSimpleProb aps psum) = 
+>       ( toList (fmap f (MkSimpleProb aps psum)) )
+>     ={ Refl }=
+>       ( toList (MkSimpleProb 
+>                 (fmap (cross f id) aps) 
+>                 (replace {P = \ X => Positive (toDouble X)} (cong {f = sum} (sym (mapSndMapCrossAnyIdLemma f aps))) psum)) )
+>     ={ Refl }=  
+>       ( fmap (cross f id) aps )
+>     ={ Refl }=
+>       ( fmap (cross f id) (toList (MkSimpleProb aps psum)) )
+>     QED
 
 
 > {-

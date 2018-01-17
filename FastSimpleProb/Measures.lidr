@@ -34,9 +34,10 @@
 >   ne : List.Operations.NonEmpty xs
 >   ne = mapPreservesNonEmpty fst (toList sp) (nonEmptyLemma1 sp)
 
-> ||| Sum
-> sum : SimpleProb NonNegDouble -> NonNegDouble
-> sum = Prelude.Foldable.sum . (map (uncurry (*))) . toList
+> using implementation NumNonNegDouble
+>   ||| Sum
+>   sum : SimpleProb NonNegDouble -> NonNegDouble
+>   sum = Prelude.Foldable.sum . (map (uncurry (*))) . toList
 
 > ||| Expected value
 > expectedValue : SimpleProb NonNegDouble -> NonNegDouble

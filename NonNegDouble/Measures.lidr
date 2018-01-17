@@ -10,9 +10,10 @@
 > %auto_implicits off
 
 
-> ||| 
-> average : List NonNegDouble -> NonNegDouble
-> average xs = (sum xs) * ( one / fromNat (length xs))
+> using implementation FractionalNonNegDouble
+>   ||| 
+>   average : List NonNegDouble -> NonNegDouble
+>   average xs = (sum xs) * ( one / fromNat (length xs))
 
 > {-
 

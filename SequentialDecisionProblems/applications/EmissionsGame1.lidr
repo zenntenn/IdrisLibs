@@ -135,7 +135,7 @@ that |State| is finite:
 >   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero =
->   fromInteger 0
+>   fromInteger @{NumNonNegDouble} 0
 
 > SequentialDecisionProblems.CoreTheory.LTE =
 >   NonNegDouble.Predicates.LTE
@@ -191,20 +191,17 @@ benefits than increasing emissions:
 > freezeLTEincrease = MkLTE Oh
 
 > -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_, Good) =
->   one                       + one * freezeOverGood
-
-> -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_, Good) =
->   one                       + one * increaseOverGood
-
-> -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_,  Bad) =
->   one * badOverGood + one * freezeOverGood
-
-> -- Reward function:
-> SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_,  Bad) =
->   one * badOverGood + one * increaseOverGood
+> 
+> using implementation NumNonNegDouble
+> 
+>   SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_, Good) =
+>     one                       + one * freezeOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_, Good) =
+>     one                       + one * increaseOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ Freeze   (_,  Bad) =
+>     one * badOverGood + one * freezeOverGood
+>   SequentialDecisionProblems.CoreTheory.reward _ _ Increase (_,  Bad) =
+>     one * badOverGood + one * increaseOverGood
 
 
 * Completing the problem specification
@@ -299,26 +296,28 @@ process. This means implemeting functions to print states and controls:
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} Freeze = "Freeze"
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} Increase = "Increase"
 
-
-> computation : { [STDIO] } Eff ()
-> computation =
->   do putStr ("enter number of steps:\n")
->      nSteps <- getNat
->      case (decidableViable {t = Z} nSteps (FZ, Good)) of
->        (Yes v) => do putStrLn ("computing optimal policies ...")
->                      -- ps   <- pure (backwardsInduction Z nSteps)
->                      ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
->                      putStrLn ("computing optimal controls ...")
->                      mxys <- pure (possibleStateCtrlSeqs (FZ, Good) () v ps)
->                      putStrLn "possible state-control sequences:"
->                      putStr "  "
->                      putStrLn (showlong mxys)
->                      mvs <- pure (possibleRewards' mxys)
->                      putStrLn "possible rewards:"
->                      putStr "  "
->                      putStrLn (show mvs)
->                      putStrLn ("done!")
->        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
+>
+> using implementation ShowNonNegDouble
+> 
+>   computation : { [STDIO] } Eff ()
+>   computation =
+>     do putStr ("enter number of steps:\n")
+>        nSteps <- getNat
+>        case (decidableViable {t = Z} nSteps (FZ, Good)) of
+>          (Yes v) => do putStrLn ("computing optimal policies ...")
+>                        -- ps   <- pure (backwardsInduction Z nSteps)
+>                        ps   <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
+>                        putStrLn ("computing optimal controls ...")
+>                        mxys <- pure (possibleStateCtrlSeqs (FZ, Good) () v ps)
+>                        putStrLn "possible state-control sequences:"
+>                        putStr "  "
+>                        putStrLn (showlong mxys)
+>                        mvs <- pure (possibleRewards' mxys)
+>                        putStrLn "possible rewards:"
+>                        putStr "  "
+>                        putStrLn (show mvs)
+>                        putStrLn ("done!")
+>          (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
 > main : IO ()
 > main = run computation

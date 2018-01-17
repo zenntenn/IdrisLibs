@@ -41,103 +41,116 @@
 * Implementations:
 
 > ||| NonNegDouble is an implementation of Show
-> implementation Show NonNegDouble where
+> implementation [ShowNonNegDouble] Show NonNegDouble where
 >   show = show . toDouble 
 
 > ||| NonNegDouble is an implementation of Num
-> implementation Num NonNegDouble where
+> implementation [NumNonNegDouble] Num NonNegDouble where
 >   (+) = plus
 >   (*) = mult
 >   fromInteger = fromNat . fromIntegerNat
 
-> ||| NonNegDouble is an implementation of Fractional
-> implementation Fractional NonNegDouble where
->   (/) = div
+> using implementation NumNonNegDouble
+>   ||| NonNegDouble is an implementation of Fractional
+>   implementation [FractionalNonNegDouble] Fractional NonNegDouble where
+>     (/) = div
 
 > ||| NonNegDouble is an implementation of Eq
-> implementation Eq NonNegDouble where
+> implementation [EqNonNegDouble] Eq NonNegDouble where
 >   (==) x y = (toDouble x) == (toDouble y)
 
-> ||| NonNegDouble is an implementation of Ord
-> implementation Ord NonNegDouble where
->   compare x y = compare (toDouble x) (toDouble y)
+> using implementation NumNonNegDouble
+>   using implementation EqNonNegDouble
+>     ||| NonNegDouble is an implementation of Ord
+>     implementation [OrdNonNegDouble] Ord NonNegDouble where
+>       compare x y = compare (toDouble x) (toDouble y)
 
 
 * Properties of |toDouble|:
 
-> ||| 
-> toDoublePlusLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x + y) = (toDouble x) + (toDouble y)
-> toDoublePlusLemma (Element x px) (Element y py) = 
->     ( toDouble ((Element x px) + (Element y py)) )
->   ={ Refl }=
->     ( toDouble (plus (Element x px) (Element y py)) )
->   ={ Refl }=
->     ( toDouble (Element (x + y) (plusPreservesNonNegativity px py)) )
->   ={ Refl }=
->     ( x + y )
->   ={ Refl }=
->     ( (toDouble (Element x px)) + (toDouble (Element y py)) )
->   QED
+> using implementation NumNonNegDouble
+>   ||| 
+>   toDoublePlusLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x + y) = (toDouble x) + (toDouble y)
+>   toDoublePlusLemma (Element x px) (Element y py) = 
+>       ( toDouble ((Element x px) + (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (plus (Element x px) (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (Element (x + y) (plusPreservesNonNegativity px py)) )
+>     ={ Refl }=
+>       ( x + y )
+>     ={ Refl }=
+>       ( (toDouble (Element x px)) + (toDouble (Element y py)) )
+>     QED
 
-> ||| 
-> toDoubleMultLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x * y) = (toDouble x) * (toDouble y)
-> toDoubleMultLemma (Element x px) (Element y py) = 
->     ( toDouble ((Element x px) * (Element y py)) )
->   ={ Refl }=
->     ( toDouble (mult (Element x px) (Element y py)) )
->   ={ Refl }=
->     ( toDouble (Element (x * y) (multPreservesNonNegativity px py)) )
->   ={ Refl }=
->     ( x * y )
->   ={ Refl }=
->     ( (toDouble (Element x px)) * (toDouble (Element y py)) )
->   QED
+> using implementation NumNonNegDouble
+>   ||| 
+>   toDoubleMultLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x * y) = (toDouble x) * (toDouble y)
+>   toDoubleMultLemma (Element x px) (Element y py) = 
+>       ( toDouble ((Element x px) * (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (mult (Element x px) (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (Element (x * y) (multPreservesNonNegativity px py)) )
+>     ={ Refl }=
+>       ( x * y )
+>     ={ Refl }=
+>       ( (toDouble (Element x px)) * (toDouble (Element y py)) )
+>     QED
 
-> ||| 
-> toDoubleDivLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x / y) = (toDouble x) / (toDouble y)
-> toDoubleDivLemma (Element x px) (Element y py) = 
->     ( toDouble ((Element x px) / (Element y py)) )
->   ={ Refl }=
->     ( toDouble (div (Element x px) (Element y py)) )
->   ={ Refl }=
->     ( toDouble (Element (x / y) (divPreservesNonNegativity px py)) )
->   ={ Refl }=
->     ( x / y )
->   ={ Refl }=
->     ( (toDouble (Element x px)) / (toDouble (Element y py)) )
->   QED
+> using implementation FractionalNonNegDouble
+>   ||| 
+>   toDoubleDivLemma : (x : NonNegDouble) -> (y : NonNegDouble) -> toDouble (x / y) = (toDouble x) / (toDouble y)
+>   toDoubleDivLemma (Element x px) (Element y py) = 
+>       ( toDouble ((Element x px) / (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (div (Element x px) (Element y py)) )
+>     ={ Refl }=
+>       ( toDouble (Element (x / y) (divPreservesNonNegativity px py)) )
+>     ={ Refl }=
+>       ( x / y )
+>     ={ Refl }=
+>       ( (toDouble (Element x px)) / (toDouble (Element y py)) )
+>     QED
 
 
 * Properties entailed by postulates and properties of |Double|s:
 
-> |||
-> divPreservesPositivity : {x, y : NonNegDouble} -> 
->                          Positive (toDouble x) -> Positive (toDouble y) -> Positive (toDouble (x / y))
-> divPreservesPositivity {x} {y} pdx pdy = replace s1 s2 where
->   s1 : (toDouble x) / (toDouble y) = toDouble (x / y)
->   s1 = sym (toDoubleDivLemma x y)
->   s2 : Positive ((toDouble x) / (toDouble y))
->   s2 = Double.Postulates.divPreservesPositivity pdx pdy
+> using implementation FractionalNonNegDouble
+>   |||
+>   divPreservesPositivity : {x, y : NonNegDouble} -> 
+>                            Positive (toDouble x) -> Positive (toDouble y) -> Positive (toDouble (x / y))
+>   divPreservesPositivity {x} {y} pdx pdy = replace s1 s2 where
+>     s1 : (toDouble x) / (toDouble y) = toDouble (x / y)
+>     s1 = sym (toDoubleDivLemma x y)
+>     s2 : Positive ((toDouble x) / (toDouble y))
+>     s2 = Double.Postulates.divPreservesPositivity pdx pdy
 
-> |||
-> plusAssociative : (x : NonNegDouble) -> (y : NonNegDouble) -> (z : NonNegDouble) -> 
->                   x + (y + z) = (x + y) + z
-> plusAssociative (Element x px) (Element y py) (Element z pz) =
->     ( Element x px + ((Element y py) + (Element z pz)) )
->   ={ Refl }=
->     ( Element x px + Element (y + z) (plusPreservesNonNegativity py pz) )  
->   ={ Refl }=
->     ( Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz)) )    
->   ={ subsetEqLemma1 (Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz))) 
->                     (Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz)) 
->                     (plusAssociative x y z) uniqueLTE }=
->     ( Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz) )
->   ={ Refl }=
->     ( Element (x + y) (plusPreservesNonNegativity px py) + Element z pz )
->   ={ Refl }=
->     ( ((Element x px) + (Element y py)) + Element z pz )
->   QED                   
+> using implementation NumNonNegDouble
+>   |||
+>   plusAssociative : (x : NonNegDouble) -> (y : NonNegDouble) -> (z : NonNegDouble) -> 
+>                     x + (y + z) = (x + y) + z
+>   plusAssociative (Element x px) (Element y py) (Element z pz) =
+>       ( Element x px + ((Element y py) + (Element z pz)) )
+>     ={ Refl }=
+>       ( Element x px + Element (y + z) (plusPreservesNonNegativity py pz) )  
+>     ={ Refl }=
+>       ( Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz)) )    
+>     ={ subsetEqLemma1 (Element (x + (y + z)) (plusPreservesNonNegativity px (plusPreservesNonNegativity py pz))) 
+>                       (Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz)) 
+>                       (plusAssociative x y z) uniqueLTE }=
+>       ( Element ((x + y) + z) (plusPreservesNonNegativity (plusPreservesNonNegativity px py) pz) )
+>     ={ Refl }=
+>       ( Element (x + y) (plusPreservesNonNegativity px py) + Element z pz )
+>     ={ Refl }=
+>       ( ((Element x px) + (Element y py)) + Element z pz )
+>     QED                   
 
 > {-
 
 > ---}
+
+
+
+
+
