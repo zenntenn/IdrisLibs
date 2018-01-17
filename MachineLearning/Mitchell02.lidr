@@ -338,8 +338,6 @@ that |X -> Bool| contains 2^96 values!
 > VersionSpaceRepr : List E -> Type
 > VersionSpaceRepr es = Subset H (\ h => (AboveBottom es h, BelowTop es h))
 
-> {-
-
 > lemma1 : (es : List E) -> (h : H) -> (AboveBottom es h, BelowTop es h) -> Consistent h es 
 > lemma1  Nil      h (ab, bt) = Nil
 > lemma1 (e :: es) h (ab, bt) = p :: ps where
@@ -352,6 +350,8 @@ that |X -> Bool| contains 2^96 values!
 >   ps : All (ClassifiesCorrectly h) es
 >   ps = ?kuka
 
+
+> {-
 
 > lemma2 : (es : List E) -> (h : H) -> Consistent h es -> (AboveBottom es h, BelowTop es h)
 
