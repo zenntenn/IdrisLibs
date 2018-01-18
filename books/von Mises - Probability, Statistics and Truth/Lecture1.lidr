@@ -48,12 +48,26 @@ certain observable attributes, say colours, numbers, or anything else.
 
 
 > Collective : Type -> Type
-> Collective Attribute = Nat -> Attribute
+> Collective A = Nat -> A
 
 ...
 
 
 ** The first step towards a definition
+
+> Real : Type
+
+> Sequence : Type
+> Sequence = Nat -> Real
+
+> Lala : Real -> Real -> Type
+
+> hasLimit : Sequence -> Real -> Type
+> hasLimit f x = (eps : Real) -> eps `Lala` 0 -> existsNat (P f x eps) where
+>   P         : Sequence -> Real -> Real -> Nat -> Type
+>   p f x eps N = (n : Nat) -> N `LTE` n -> abs (f n - x) `LTE` eps 
+>   existsNat : (Nat -> Type) -> Type
+>   existsNat Q = Exists {a = Nat} (\ N => Q N)
 
 > count : {A : Type} -> (Eq A) => A -> (Nat -> A) -> Nat -> Nat
 > count x f  Z    = Z
@@ -62,7 +76,8 @@ certain observable attributes, say colours, numbers, or anything else.
 >           then S res
 >           else   res
 
-> freq : {Attribute : Type} -> (Eq Attribute) => Attribute -> Collective Attribute -> Nat -> Double
+> partial 
+> freq : {A : Type} -> (Eq A) => A -> Collective A -> Nat -> Double
 > freq x c (S m) = num / den where
 >   num : Double
 >   num = cast (count x c (S m))
