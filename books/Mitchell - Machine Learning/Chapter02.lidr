@@ -1,4 +1,4 @@
-> module MachineLearning.Mitchell02
+> module Chapter02
 
 > import Data.List
 > import Data.List.Quantifiers
