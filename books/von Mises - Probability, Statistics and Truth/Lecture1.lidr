@@ -1,5 +1,9 @@
 > module Lecture1
 
+> import Real.Postulates
+> import Real.Properties
+> import Real.Sequence
+
 > %default total
 > %access public export
 > %auto_implicits off
@@ -55,20 +59,6 @@ certain observable attributes, say colours, numbers, or anything else.
 
 ** The first step towards a definition
 
-> Real : Type
-
-> Sequence : Type
-> Sequence = Nat -> Real
-
-> Lala : Real -> Real -> Type
-
-> hasLimit : Sequence -> Real -> Type
-> hasLimit f x = (eps : Real) -> eps `Lala` 0 -> existsNat (P f x eps) where
->   P         : Sequence -> Real -> Real -> Nat -> Type
->   p f x eps N = (n : Nat) -> N `LTE` n -> abs (f n - x) `LTE` eps 
->   existsNat : (Nat -> Type) -> Type
->   existsNat Q = Exists {a = Nat} (\ N => Q N)
-
 > count : {A : Type} -> (Eq A) => A -> (Nat -> A) -> Nat -> Nat
 > count x f  Z    = Z
 > count x f (S m) with (count x (f . S) m) 
@@ -76,17 +66,32 @@ certain observable attributes, say colours, numbers, or anything else.
 >           then S res
 >           else   res
 
-> partial 
-> freq : {A : Type} -> (Eq A) => A -> Collective A -> Nat -> Double
-> freq x c (S m) = num / den where
->   num : Double
->   num = cast (count x c (S m))
->   den : Double
->   den = cast (S m)
+> {-
+
+> using implementation FractionalReal
+>   ||| relFreq x c 
+>   relFreq : {A : Type} -> (Eq A) => A -> Collective A -> Nat -> Real
+>   relFreq x c  Z    = zero
+>   relFreq x c (S m) = fromNat (count x c (S m)) / (fromNat (S m))
+
+
+> frequencies : {A : Type} -> (Eq A) => A -> Collective A -> Sequence
+> frequencies x c = \ n => relFreq x c n
+
+
+> hasLimits : {A : Type} -> (Eq A) => Collective A -> Type
+> hasLimits c {A} = (x : A) -> Exists (\ l => hasLimit (frequencies x c) l)
+
+
+> prob : {A : Type} -> (Eq A) => (c : Collective A) -> hasLimits c -> A -> Real
+> prob c prf x = getWitness (prf x)
+
+
 
 ** Two different pairs of dice
 
 ** Limiting value of relative frequency
 
+> ---}
 
 
