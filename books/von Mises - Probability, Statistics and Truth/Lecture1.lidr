@@ -59,28 +59,27 @@ certain observable attributes, say colours, numbers, or anything else.
 
 ** The first step towards a definition
 
-> count : {A : Type} -> (Eq A) => A -> (Nat -> A) -> Nat -> Nat
-> count x f  Z    = Z
-> count x f (S m) with (count x (f . S) m) 
+> count : {A : Type} -> (Eq A) => (Nat -> A) -> Nat -> A -> Nat
+> count f  Z    x = Z
+> count f (S m) x with (count (f . S) m x) 
 >   | res = if x == f Z
 >           then S res
 >           else   res
 
-> {-
 
 > using implementation FractionalReal
 >   ||| relFreq x c 
->   relFreq : {A : Type} -> (Eq A) => A -> Collective A -> Nat -> Real
->   relFreq x c  Z    = zero
->   relFreq x c (S m) = fromNat (count x c (S m)) / (fromNat (S m))
+>   relFreq : {A : Type} -> (Eq A) => Collective A -> Nat -> A -> Real
+>   relFreq c  Z    x = zero
+>   relFreq c (S m) x = fromNat (count c (S m) x) / (fromNat (S m))
 
 
-> frequencies : {A : Type} -> (Eq A) => A -> Collective A -> Sequence
-> frequencies x c = \ n => relFreq x c n
+> frequencies : {A : Type} -> (Eq A) => Collective A -> A -> Sequence
+> frequencies c x = \ n => relFreq c n x
 
 
 > hasLimits : {A : Type} -> (Eq A) => Collective A -> Type
-> hasLimits c {A} = (x : A) -> Exists (\ l => hasLimit (frequencies x c) l)
+> hasLimits c {A} = (x : A) -> Exists (\ l => hasLimit (frequencies c x) l)
 
 
 > prob : {A : Type} -> (Eq A) => (c : Collective A) -> hasLimits c -> A -> Real
@@ -91,6 +90,8 @@ certain observable attributes, say colours, numbers, or anything else.
 ** Two different pairs of dice
 
 ** Limiting value of relative frequency
+
+> {-
 
 > ---}
 
