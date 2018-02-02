@@ -3,6 +3,9 @@
 > import Real.Postulates
 > import Real.Properties
 > import Real.Sequence
+> import Fun.Properties
+> import Sigma.Sigma
+> import Pairs.Operations
 
 > %default total
 > %access public export
@@ -79,17 +82,56 @@ certain observable attributes, say colours, numbers, or anything else.
 
 
 > hasLimits : {A : Type} -> (Eq A) => Collective A -> Type
-> hasLimits c {A} = (x : A) -> Exists (\ l => hasLimit (frequencies c x) l)
-
-
-> prob : {A : Type} -> (Eq A) => (c : Collective A) -> hasLimits c -> A -> Real
-> prob c prf x = getWitness (prf x)
-
-
+> -- hasLimits c {A} = (x : A) -> Exists (\ l => hasLimit (frequencies c x) l)
+> hasLimits c {A} = (x : A) -> Exists (hasLimit (frequencies c x))
 
 ** Two different pairs of dice
 
+
 ** Limiting value of relative frequency
+
+
+** The probability of death
+
+
+** First the collective - then the probability
+
+
+** Probability in gas theory
+
+
+** An historical remark
+
+
+** Randomness
+
+
+** Definition of randomness: place selection
+
+> PlaceSelection : Type
+> PlaceSelection = Sigma (Nat -> Nat) Injective1 
+
+> select : {A : Type} -> Collective A -> PlaceSelection -> Collective A
+> -- select c ps = c . (getWitness ps) 
+> select c ps n = c ((getWitness ps) n) 
+
+> isRandom1 : {A : Type} -> (Eq A) => (c : Collective A) -> Type
+> isRandom1 {A} c = (ps : PlaceSelection) -> hasLimits (select c ps)
+
+> isRandom2 : {A : Type} -> (Eq A) => (c : Collective A) -> hasLimits c -> isRandom1 c -> Type
+> isRandom2 {A} c prf rc = 
+>   (x : A) -> 
+>   (ps : PlaceSelection) -> 
+>   limit (frequencies (select c ps) x) ((rc ps) x) = limit (frequencies c x) (prf x)
+
+> prob : {A : Type} -> (Eq A) => (c : Collective A) -> hasLimits c -> A -> Real
+> prob c prf x = limit (frequencies c x) (prf x) -- getWitness (prf x)
+
+
+
+
+
+
 
 > {-
 
