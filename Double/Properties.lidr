@@ -158,6 +158,10 @@
 
 * Properties of constants:
 
+> ||| one is not zero
+> notOneEqZero : Not (1.0 = 0.0)
+> notOneEqZero Refl impossible
+
 > ||| zero is not positive
 > notPositiveZero : Not (Positive 0.0)
 > notPositiveZero (MkLT prf) = contra Refl prf
