@@ -56,14 +56,15 @@ The idea is that, given a sequential neural network of type |A| with |n|
 inputs and |m| outputs and a vector of |n| inputs of matching type, one
 can compute a vector of |n| outputs.
 
-The computation is called feed-forward. It requires |A| to be a type for
-which ... and depends on an "activation" function of type |A -> A|:
+The computation is called feed-forward. It requires |A| to implement
+addition and multiplication and depends on an "activation" function |s :
+A -> A|:
 
 > feedForward : {n, m : Nat} -> {ks : List Nat} -> {A : Type} -> Num A => 
 >               (A -> A) -> Vect n A -> Network n ks m A -> Vect m A
 
-The idea is to feed the input into the first layer and pass its
-"activated" output as input for the next layer. With
+The idea is to feed the input into the first layer and pass its output
+(activated through |s|) as input for the next layer. With
 
 > evalLayer : {n, m : Nat} -> {t : Type} -> Num t => 
 >             Vect n t -> Layer n m t -> Vect m t
@@ -79,8 +80,8 @@ the implementation of |feedForward| is trivial:
 
 * Error
 
-Given a training pair |(x, y)|, the error is just the difference between
-|y| and the output of the network when fed with the input |x|:
+Given a training pair |(x, y)|, the error is simply the difference
+between |y| and the output of the network when fed with the input |x|:
 
 > error : {n, m : Nat} -> {ks : List Nat} -> {t : Type} -> Num t => Neg t =>
 >         (t -> t) -> Vect n t -> Vect m t -> Network n ks m t -> Vect m t
@@ -105,8 +106,8 @@ Given a training pair |(x, y)|, the error is just the difference between
 >   where go : {n, m : Nat} -> {ks : List Nat} ->
 >              Vect n t -> Vect m t ->  Network n ks m t -> (Network n ks m t, Vect n t)
 >   
->         go input target (layer@(MkLayer bias weights) :>: rest) =
->           let y             = evalLayer input layer
+>         go input target ((MkLayer bias weights) :>: rest) =
+>           let y             = evalLayer input (MkLayer bias weights)
 >               output        = map s y
 >               (rest', dWs') = go output target rest
 >               dEdy          = (map s' y) * dWs'
@@ -116,8 +117,8 @@ Given a training pair |(x, y)|, the error is just the difference between
 >               dWs           = (transpose weights) </> dEdy
 >           in (layer' :>: rest', dWs)
 >
->         go input target (Output layer@(MkLayer bias weights)) =
->           let y = evalLayer input layer
+>         go input target (Output (MkLayer bias weights)) =
+>           let y        = evalLayer input (MkLayer bias weights)
 >               output   = map s y
 >               dEdy     = (map s' y) * (output - target)
 >               bias'    = bias - (eta <# dEdy)
