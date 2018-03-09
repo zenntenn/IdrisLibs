@@ -101,16 +101,16 @@ between |y| and the output of the network when fed with the input |x|:
 >               w'   = w - (eta <#> (dEdy >< x))
 >               dWs  = (transpose w) </> dEdy
 >           in ((s, b', w') :>: Id, dWs)
->
+> 
 >         go x y ((s, b, w) :>: l :>: ls) =
->           let z           = b + (w </> x)
->               x'          = map (eval s) z
->               (ls', dWs') = go x' y (l :>: ls)
->               dEdy        = (map (eval (derivative s)) z) * dWs'
->               b'          = b - (eta <# dEdy)
->               w'          = w - (eta <#> (dEdy >< x))
->               dWs         = (transpose w) </> dEdy
->           in ((s, b', w') :>: ls', dWs)
+>           let z                  = b + (w </> x)
+>               x'                 = map (eval s) z
+>               (l' :>: ls', dWs') = go x' y (l :>: ls)
+>               dEdy               = (map (eval (derivative s)) z) * dWs'
+>               b'                 = b - (eta <# dEdy)
+>               w'                 = w - (eta <#> (dEdy >< x))
+>               dWs                = (transpose w) </> dEdy
+>           in ((s, b', w') :>: l' :>: ls', dWs)
 
 
 * Example

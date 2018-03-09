@@ -2,6 +2,8 @@
 
 from https://github.com/DSLsofMath/DSLsofMath/blob/master/L/DSLsofMath/FunExp.lhs
 
+> import Interfaces.Math
+
 > %default total
 > %access public export
 > %auto_implicits on -- off
@@ -19,13 +21,6 @@ from https://github.com/DSLsofMath/DSLsofMath/blob/master/L/DSLsofMath/FunExp.lh
 >   (.)   : MathExpr t -> MathExpr t -> MathExpr t
 >   Exp   : MathExpr t -> MathExpr t
 >   -- etc.
-
-
-> interface (Num ty) => Math ty where
->   exp : ty -> ty 
-
-> implementation Math Double where
->   exp = Prelude.Doubles.exp
 
 
 > ||| Evaluation
