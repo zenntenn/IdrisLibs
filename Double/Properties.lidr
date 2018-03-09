@@ -9,10 +9,18 @@
 > import Ordering.Properties
 > import Rel.TotalPreorder
 > import So.Properties
+> import Interfaces.Math
+
 
 > %default total
 > %access public export
 > %auto_implicits on
+
+
+* Implementations
+
+> implementation Math Double where
+>   exp = Prelude.Doubles.exp
 
 
 * Decidability of EQ
