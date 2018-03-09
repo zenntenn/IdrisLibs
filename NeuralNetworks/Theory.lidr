@@ -5,6 +5,8 @@
 > import Data.Matrix
 > import Data.Matrix.Numeric
 
+> import Fun.MathExpr
+
 > %default total
 > %access public export
 > %auto_implicits off
@@ -29,7 +31,7 @@ type |X| (the biases) and a |n| x |m| matrix of elements of type |X|
 (the weights):
 
 > Layer : (X : Type) -> (m : Nat) -> (n : Nat) -> Type
-> Layer X m n = (X -> X, Vect n X, Matrix n m X)
+> Layer X m n = (MathExpr X, Vect n X, Matrix n m X)
 
 
 * Sequential neural networks
@@ -41,10 +43,10 @@ a sequence of intermediate layers is a sequence of layers of type
 > infixr 5 :>:
 
 > data Net : (X : Type) -> (m : Nat) -> List Nat -> (n : Nat) -> Type where
->   Id     :  {X : Type} -> {m : Nat} -> 
->             Net X m [] m
->   (:>:)  :  {X : Type} -> {m, m', n : Nat} -> {ms' : List Nat} -> 
->             Layer X m m' -> Net X m' ms' n -> Net X m (m' :: ms') n
+>   Id    : {X : Type} -> {m : Nat} -> 
+>           Net X m [] m
+>   (:>:) : {X : Type} -> {m, m', n : Nat} -> {ms' : List Nat} -> 
+>           Layer X m m' -> Net X m' ms' n -> Net X m (m' :: ms') n
 
 
 * Feed-forward
@@ -54,11 +56,11 @@ inputs and |n| outputs and a vector of |m| inputs of matching type, one
 can compute a vector of |n| outputs. The computation is called
 feed-forward.
 
-> eval : {X : Type} -> {m, n : Nat} -> {ms : List Nat} -> 
->        Num X => 
->        Net X m ms n -> Vect m X -> Vect n X
-> eval Id x         = id x
-> eval ((s, b, w) :>: ls) x = eval ls (map s (b + (w </> x)))
+> ff : {X : Type} -> {m, n : Nat} -> {ms : List Nat} -> 
+>      (Num X, Fractional X, Neg X, Math X) => 
+>      Net X m ms n -> Vect m X -> Vect n X
+> ff Id x         = id x
+> ff ((s, b, w) :>: ls) x = ff ls (map (eval s) (b + (w </> x)))
 
 
 * Error
@@ -66,21 +68,16 @@ feed-forward.
 Given a training pair |(x, y)|, the error is simply the difference
 between |y| and the output of the network when fed with the input |x|:
 
-> error : {X : Type} -> {n, m : Nat} -> {ms : List Nat} -> Num X => Neg X =>
+> error : {X : Type} -> {n, m : Nat} -> {ms : List Nat} -> 
+>         (Num X, Fractional X, Neg X, Math X) => 
 >         Net X m ms n -> Vect m X -> Vect n X -> Vect n X
-> error net x y = y - (eval net x)
+> error net x y = y - (ff net x)
 
 
 * Back propagation
 
-> -- derivative : {X : Type} -> (X -> X) -> X -> X
-> derivative : (Double -> Double) -> Double -> Double
-> derivative (\ x => 1.0 / (1.0 + exp (-x))) = \ a => a
-
-> {-
-
 > backPropagation : {X : Type} -> {m, m', n : Nat} -> {ms' : List Nat} -> 
->                   Num X => Neg X =>
+>                   (Num X, Fractional X, Neg X, Math X) => 
 >                   (eta : X) ->
 >                   (x   : Vect m X) ->
 >                   (y   : Vect n X) ->
@@ -96,8 +93,8 @@ between |y| and the output of the network when fed with the input |x|:
 >   
 >         go x y ((s, b, w) :>: Id) =
 >           let z    = b + (w </> x)
->               x'   = map s z
->               dEdy = (map (derivative s) z) * (x' - y)
+>               x'   = map (eval s) z
+>               dEdy = (map (eval (derivative s)) z) * (x' - y)
 >               b'   = b - (eta <# dEdy)
 >               w'   = w - (eta <#> (dEdy >< x))
 >               dWs  = (transpose w) </> dEdy
@@ -105,9 +102,9 @@ between |y| and the output of the network when fed with the input |x|:
 >
 >         go x y ((s, b, w) :>: l :>: ls) =
 >           let z           = b + (w </> x)
->               x'          = map s z
+>               x'          = map (eval s) z
 >               (ls', dWs') = go x' y (l :>: ls)
->               dEdy        = (map (derivative s) z) * dWs'
+>               dEdy        = (map (eval (derivative s)) z) * dWs'
 >               b'          = b - (eta <# dEdy)
 >               w'          = w - (eta <#> (dEdy >< x))
 >               dWs         = (transpose w) </> dEdy
@@ -116,16 +113,15 @@ between |y| and the output of the network when fed with the input |x|:
 
 * Example
 
-> s : Double -> Double
-> s x = 1 / (1 + exp (-x))
+> s : MathExpr Double
+> s = (Const 1) / (Const 1 + Exp (Const 0 - Id))
 
-> s' : Double -> Double
-> s' x = (s x) * (1 - s x)
-
-> initial : Network Double [2,2] 2 
-> initial = (s, s', [0.35, 0.35], [[0.15, 0.20], [0.25, 0.30]])
+> initial : Net Double 2 [2,2] 2 
+> initial = (s, [0.35, 0.35], [[0.15, 0.20], [0.25, 0.30]])
 >           :>:
->           Single (s, s', [0.60, 0.60], [[0.40, 0.45], [0.50, 0.55]])
+>           (s, [0.60, 0.60], [[0.40, 0.45], [0.50, 0.55]]) 
+>           :>: 
+>           Id
 
 > input : Vect 2 Double
 > input = [0.05, 0.10]
@@ -146,3 +142,4 @@ between |y| and the output of the network when fed with the input |x|:
 
 
 
+ 
