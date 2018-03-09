@@ -6,6 +6,8 @@
 > import Data.Matrix.Numeric
 
 > import Fun.MathExpr
+> import Double.Properties
+> import Interfaces.Math
 
 > %default total
 > %access public export
@@ -134,6 +136,9 @@ between |y| and the output of the network when fed with the input |x|:
 >            errorF = \ net => error net input target
 >            states = iterate step initial
 >        in putStrLn . unlines $ map (show . errorF) (take 100 states)
+
+
+> {-
 
 > ---}
 
