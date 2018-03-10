@@ -21,6 +21,8 @@
 
 > implementation Math Double where
 >   exp = Prelude.Doubles.exp
+>   sin = Prelude.Doubles.sin
+>   cos = Prelude.Doubles.cos
 
 
 * Decidability of EQ

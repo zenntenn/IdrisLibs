@@ -116,7 +116,7 @@ between |y| and the output of the network when fed with the input |x|:
 * Example
 
 > s : MathExpr Double
-> s = (Const 1) / (Const 1 + Exp (Const 0 - Id))
+> s = (Const 1) / (Const 1 + Exp . Neg)
 
 > initial : Net Double 2 [2,2] 2 
 > initial = (s, [0.35, 0.35], [[0.15, 0.20], [0.25, 0.30]])
