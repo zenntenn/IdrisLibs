@@ -76,6 +76,45 @@ between |y| and the output of the network when fed with the input |x|:
 > error net x y = y - (ff net x)
 
 
+* Gradients
+
+> nInputs : {X : Type} -> {m : Nat} -> {n : Nat} -> Layer X m n -> Nat
+> nInputs {m} _ = m
+
+> nOutputs : {X : Type} -> {m : Nat} -> {n : Nat} -> Layer X m n -> Nat
+> nOutputs {n} _ = n
+
+> nLayers : {X : Type} -> {m, n : Nat} -> {ms : List Nat} -> 
+>           Net X m ms n -> Nat
+> nLayers Id         = Z
+> nLayers (l :>: ls) = S (nLayers ls)
+
+> dimOutputs : {X : Type} -> {m, n : Nat} -> {ms : List Nat} -> 
+>             Net X m ms n -> List Nat
+> dimOutputs Id         = []
+> dimOutputs (l :>: ls) = (nOutputs l) :: (dimOutputs ls)
+
+> data ListVect : List Nat -> Type -> Type where
+>   Nil  : {X : Type} -> 
+>          ListVect [] X
+>   (::) : {m : Nat} -> {ms : List Nat} -> {X : Type} -> 
+>          Vect m X -> ListVect ms X -> ListVect (m :: ms) X
+
+> gradZ : {X : Type} -> {m, m', n : Nat} -> {ms' : List Nat} -> 
+>         (Num X, Fractional X, Neg X, Math X) =>
+>         (f   : Vect n X -> X) -> 
+>         (net : Net X m (m' :: ms') n) -> 
+>         ListVect (dimOutputs net) X
+
+
+
+
+
+> {-
+
+> -}
+
+
 * Back propagation
 
 > backPropagation : {X : Type} -> {m, m', n : Nat} -> {ms' : List Nat} -> 
