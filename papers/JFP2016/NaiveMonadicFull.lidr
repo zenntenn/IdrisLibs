@@ -56,6 +56,12 @@
 > nilOptPolicySeq : OptPolicySeq Nil
 > nilOptPolicySeq x ps' = reflexiveLTE zero
 
+** Bellman's principle of optimality:
+
+> Bellman  :  (ps  :  PolicySeq (S t) m)  ->   OptPolicySeq ps ->
+>             (p   :  Policy t (S m))     ->   OptExt ps p ->
+>             OptPolicySeq (p :: ps)
+
 
 > {-
 

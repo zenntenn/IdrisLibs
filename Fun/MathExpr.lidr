@@ -47,7 +47,7 @@ from https://github.com/DSLsofMath/DSLsofMath/blob/master/L/DSLsofMath/FunExp.lh
 > derivative Sin       = Cos
 > derivative Cos       = Neg . Sin
 > derivative (Const c) = Const 0
-> derivative (e1 + e2) = derivative e1 + derivative e2 
+> derivative (e1 + e2) = derivative e1 + derivative e2
 > derivative (e1 - e2) = derivative e1 - derivative e2 
 > derivative (e1 * e2) = (derivative e1) * e2 + e1 * (derivative e2)  
 > derivative (e1 / e2) = (derivative e1) / e2 - e1 * (derivative e2) / (e2 * e2)
