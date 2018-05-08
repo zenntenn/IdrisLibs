@@ -13,10 +13,11 @@
 > %auto_implicits off
 
 
-> |||
-> data SimpleProb : Type -> Type where
->   MkSimpleProb : {A : Type} -> 
->                  (aps : List (A, NonNegDouble)) -> 
->                  Positive (toDouble (sumMapSnd aps)) ->
->                  SimpleProb A
+> using implementation NumNonNegDouble
+>   |||
+>   data SimpleProb : Type -> Type where
+>     MkSimpleProb : {A : Type} -> 
+>                    (aps : List (A, NonNegDouble)) -> 
+>                    Positive (toDouble (sumMapSnd aps)) ->
+>                    SimpleProb A
 

@@ -30,6 +30,5 @@
 >   (==) x y = (toDouble x) == (toDouble y)
 
 > using implementation EqNonNegDouble
->   %assert_total 
 >   implementation [OrdNonNegDouble] Ord NonNegDouble where
 >     compare x y = compare (toDouble x) (toDouble y)

@@ -130,7 +130,7 @@ We reimplement "Example1.lidr", this time with |M = List|.
 
 * The computation:
 
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show @{ShowLTB}
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()

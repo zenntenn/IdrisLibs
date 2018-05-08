@@ -25,6 +25,7 @@
 > import FastSimpleProb.MonadicProperties
 > import FastSimpleProb.MeasuresPostulates
 > import FastSimpleProb.Measures
+> import FastSimpleProb.MeasuresProperties
 > import Sigma.Sigma
 > import Sigma.Operations
 > import Sigma.Properties
@@ -181,10 +182,10 @@ current state:
 >   NonNegDouble.NonNegDouble
 
 > SequentialDecisionProblems.CoreTheory.plus = 
->   NonNegDouble.BasicOperations.plus
+>   NonNegDouble.Operations.plus
 
 > SequentialDecisionProblems.CoreTheory.zero = 
->   fromInteger 0
+>   fromInteger @{NumNonNegDouble} 0
 
 > SequentialDecisionProblems.CoreTheory.LTE = 
 >   NonNegDouble.Predicates.LTE
@@ -213,14 +214,17 @@ rewards in units of millions of dollars
 > oneThousand : NonNegDouble
 > oneThousand = mkNonNegDouble 0.001
 
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = oneMillion + oneThousand
-> SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       =       zero + oneThousand
+>
+> using implementation NumNonNegDouble
+>
+>   SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox OneMillion = oneMillion
+>   SequentialDecisionProblems.CoreTheory.reward Z () TakeOpaqueBox Zero       =       zero
+>   SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes OneMillion = oneMillion + oneThousand
+>   SequentialDecisionProblems.CoreTheory.reward Z () TakeBothBoxes Zero       =       zero + oneThousand
 
 For all subsequent steps, rewards are simply zero:
 
-> SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = zero
+>   SequentialDecisionProblems.CoreTheory.reward (S n) _ _ _       = zero
 
 
 * Completing the problem specification
@@ -318,45 +322,48 @@ means implemeting functions to print states and controls:
 > SequentialDecisionProblems.Utils.showCtrl {t = Z}   {x = ()} TakeBothBoxes = "Take both boxes"
 > SequentialDecisionProblems.Utils.showCtrl {t = S n} {x}      ()            = ""
 
-> computation : { [STDIO] } Eff ()
-> computation =
->   do putStr ("enter number of steps:\n")
->      nSteps <- getNat
->      case (decidableViable {t = Z} nSteps ()) of
->        (Yes v) => do putStrLn ("computing optimal policies ...")
->                      ps   <- pure (backwardsInduction Z nSteps)
->                      putStrLn ("computing optimal controls ...")
->                      mxys <- pure (possibleStateCtrlSeqs () () v ps)
->                      putStrLn "possible state-control sequences:"
->                      putStr "  "
->                      putStrLn (show mxys)
->                      mvs <- pure (possibleRewards' mxys)
->                      putStrLn "possible rewards:"
->                      putStr "  "
->                      putStrLn (show mvs)
->                      -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
->                      -- putStrLn "possible state-control sequences and rewards:"
->                      -- putStr "  "
->                      -- putStrLn (show mxyvs)
->                      -- putStrLn "measure of possible rewards: "
->                      -- putStr "  "
->                      -- putStrLn (show (meas mvs))
->                      -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                      -- putStrLn "best possible state-control sequence: "
->                      -- putStr "  "
->                      -- putStrLn (show (fst argmaxmax))
->                      -- putStrLn "best possible reward: "
->                      -- putStr "  "
->                      -- putStrLn (show (snd argmaxmax))
->                      -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
->                      -- -- putStrLn "worst possible state-control sequence: "
->                      -- -- putStr "  "
->                      -- -- putStrLn (show (fst argminmin))
->                      -- -- putStrLn "worst possible reward: "
->                      -- -- putStr "  "
->                      -- -- putStrLn (show (snd argminmin))
->                      putStrLn ("done!")                       
->        (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
+>
+> using implementation ShowNonNegDouble
+> 
+>   computation : { [STDIO] } Eff ()
+>   computation =
+>     do putStr ("enter number of steps:\n")
+>        nSteps <- getNat
+>        case (decidableViable {t = Z} nSteps ()) of
+>          (Yes v) => do putStrLn ("computing optimal policies ...")
+>                        ps   <- pure (backwardsInduction Z nSteps)
+>                        putStrLn ("computing optimal controls ...")
+>                        mxys <- pure (possibleStateCtrlSeqs () () v ps)
+>                        putStrLn "possible state-control sequences:"
+>                        putStr "  "
+>                        putStrLn (show mxys)
+>                        mvs <- pure (possibleRewards' mxys)
+>                        putStrLn "possible rewards:"
+>                        putStr "  "
+>                        putStrLn (show mvs)
+>                        -- mxyvs <- pure (possibleStateCtrlSeqsRewards' mxys)
+>                        -- putStrLn "possible state-control sequences and rewards:"
+>                        -- putStr "  "
+>                        -- putStrLn (show mxyvs)
+>                        -- putStrLn "measure of possible rewards: "
+>                        -- putStr "  "
+>                        -- putStrLn (show (meas mvs))
+>                        -- argmaxmax <- pure (argmaxMax {A = StateCtrlSeq Z nSteps} {B = Val} totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                        -- putStrLn "best possible state-control sequence: "
+>                        -- putStr "  "
+>                        -- putStrLn (show (fst argmaxmax))
+>                        -- putStrLn "best possible reward: "
+>                        -- putStr "  "
+>                        -- putStrLn (show (snd argmaxmax))
+>                        -- -- argminmin <- pure (argminMin totalPreorderLTE (support mxyvs) (nonEmptyLemma mxyvs))
+>                        -- -- putStrLn "worst possible state-control sequence: "
+>                        -- -- putStr "  "
+>                        -- -- putStrLn (show (fst argminmin))
+>                        -- -- putStrLn "worst possible reward: "
+>                        -- -- putStr "  "
+>                        -- -- putStrLn (show (snd argminmin))
+>                        putStrLn ("done!")                       
+>          (No _)  => putStrLn ("initial state non viable for " ++ cast {from = Int} (cast nSteps) ++ " steps")
 
 > main : IO ()
 > main = run computation

@@ -142,7 +142,7 @@ probablility to move "Ahead"!
 
 * The computation:
 
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show @{ShowLTB}
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > %freeze possibleStateCtrlSeqs

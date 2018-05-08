@@ -164,7 +164,7 @@ cannot be reached should be detected and rejected.
 
 * The computation:
 
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show @{ShowLTB}
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()

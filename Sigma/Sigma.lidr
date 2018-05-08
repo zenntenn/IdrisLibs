@@ -4,8 +4,8 @@
 > %access public export
 > %auto_implicits on
 
-> %hide Sigma
-> %hide MkSigma
+> -- %hide Sigma
+> -- %hide MkSigma
 
 
 > data Sigma : (A : Type) -> (P : A -> Type) -> Type where

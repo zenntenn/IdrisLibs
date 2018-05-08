@@ -3,6 +3,31 @@ SHELL := /bin/bash
 IDRIS = idris
 IDRISFLAGS = -i .. -i ../.. --sourcepath .. --sourcepath ../.. +RTS -K32000000 -RTS -p contrib -p effects -V
 
+all: example1 \
+     example1.tab \
+     example1.noviabilitydefaults \
+     example1.noviabilitydefaults.tab \
+     example2 \
+     example2.tab \
+     example2.noviabilitydefaults \
+     example2.noviabilitydefaults.tab \
+     example3 \
+     example3.tab \
+     example3.noviabilitydefaults \
+     example3.noviabilitydefaults.tab \
+     example4 \
+     example4.tab \
+     example4.noviabilitydefaults \
+     example4.noviabilitydefaults.tab \
+     example5 \
+     example5.tab \
+     example5.noviabilitydefaults \
+     example5.noviabilitydefaults.tab \
+     example6 \
+     example6.tab \
+     example7.noviabilitydefaults \
+     example7.noviabilitydefaults.tab 
+
 example1: 
 	${IDRIS} ${IDRISFLAGS} Example1.lidr -o example1
 

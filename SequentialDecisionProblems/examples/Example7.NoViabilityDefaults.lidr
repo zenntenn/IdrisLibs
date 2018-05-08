@@ -152,7 +152,7 @@ without the costs computations with non-negative rational numbers.
 
 * The computation:
 
-> SequentialDecisionProblems.Utils.showState = show
+> SequentialDecisionProblems.Utils.showState = show @{ShowLTB}
 > SequentialDecisionProblems.Utils.showCtrl = show
 
 > computation : { [STDIO] } Eff ()
