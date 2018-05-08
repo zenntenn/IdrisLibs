@@ -96,7 +96,7 @@
 
 > OptExt : {t, m : Nat} -> 
 >          PolicySeq (S t) m -> Policy t -> Type
-> OptExt {t} {m} ps p  =  (x : State t) -> (p' : Policy t) -> val x (p' :: ps) `LTE` val x (p :: ps)
+> OptExt {t} ps p  =  (x : State t) -> (p' : Policy t) -> val x (p' :: ps) `LTE` val x (p :: ps)
 
 > cval : {t, n : Nat} -> 
 >        (x  : State t) -> (ps : PolicySeq (S t) n) -> Ctrl t x -> Val
