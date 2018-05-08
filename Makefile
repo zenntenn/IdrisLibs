@@ -19,6 +19,7 @@ libs:
   -not \( -path "./*/tests" -prune \) \
   -not \( -path "./*/open_issues" -prune \) \
   -not \( -path "./*/issues" -prune \) \
+  -not \( -path "./lectures/2017.maths_in_the_humanities_I/slides.lidr" -prune \) \
   -name '*.lidr' | xargs -n 1 ${IDRIS} ${IDRISFLAGS} --check
 
 clean:
