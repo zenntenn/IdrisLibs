@@ -166,6 +166,14 @@ This representation of |State| is guaranteed to be complete
 > completeVectState : (x : State) -> Elem x vectState
 > completeVectState = toVectComplete finiteState
 
+and injective
+
+> inj1VectState : Injective1 vectState
+> inj1VectState = toVectInjective1 finiteState
+
+> inj2VectState : Injective2 vectState
+> inj2VectState = injectiveLemma vectState inj1VectState
+
 We can also represent the value of a policy by a value table
 
 > vt : Policy -> Vect cardState Val
@@ -220,7 +228,6 @@ To derive |equation|, it is useful to prove three intermediate results:
 >          reward (index k vectState) (p (index k vectState)) (next (index k vectState) (p (index k vectState)))
 >          =
 >          rewardR k (pR p k)
-> lemma2 p k = Refl
 
 > lemma3 : (p : Policy) -> (k : Fin cardState) -> 
 >          val p (next (index k vectState) (p (index k vectState)))
@@ -240,21 +247,6 @@ To derive |equation|, it is useful to prove three intermediate results:
 >                 QED
 
 
-val (index k vectState) p 
-  = { def. val }
-index (lookup (index k vectState) vectState (toVectComplete finiteState (index k vectState))) (vt p)
-  = { lookup-index property} 
-index k (vt p)
-
-val (next (index k vectState) (p (index k vectState))) p
-  = { let pR = \ k => p (index k vectState) }
-val (next (index k vectState) (pR k)) p
-  = { def. val }
-index (lookup (next (index k vectState) (pR k)) vectState (toVectComplete finiteState (next (index k vectState) (pR k)))) (vt p)
-  = { def. nextR } 
-index (nextR k (pR k)) (vt p)
-
-
 * --------
 * Appendix
 * --------
@@ -266,6 +258,23 @@ index (nextR k (pR k)) (vt p)
 >                 ( next (index k vectState) y )
 >               QED
 
+> lemma1 p k = ( index k (vt p) )
+>            ={ replace {P = \ W => index k (vt p) = index W (vt p)} (sym (lookupIndexLemma k vectState inj2VectState (toVectComplete finiteState (index k vectState)))) Refl }=
+>              ( index (lookup (index k vectState) vectState (toVectComplete finiteState (index k vectState))) (vt p) )
+>            ={ Refl }=
+>              ( val p (index k vectState) )
+>            QED
+
+> lemma2 p k = Refl
+
+> lemma3 p k = ( val p (next (index k vectState) (p (index k vectState))) )
+>            ={ Refl }= -- def. pR
+>              ( val p (next (index k vectState) (pR p k)) )
+>            ={ Refl }= -- def. val
+>              ( index (lookup (next (index k vectState) (pR p k)) vectState (completeVectState (next (index k vectState) (pR p k)))) (vt p) )
+>            ={ Refl }= -- def. nextR
+>              ( index (nextR k (pR p k)) (vt p) )
+>            QED
 
 
 > {-
