@@ -9,10 +9,20 @@
 > import Ordering.Properties
 > import Rel.TotalPreorder
 > import So.Properties
+> import Interfaces.Math
+
 
 > %default total
 > %access public export
 > %auto_implicits on
+
+
+* Implementations
+
+> implementation Math Double where
+>   exp = Prelude.Doubles.exp
+>   sin = Prelude.Doubles.sin
+>   cos = Prelude.Doubles.cos
 
 
 * Decidability of EQ
@@ -157,6 +167,10 @@
 
 
 * Properties of constants:
+
+> ||| one is not zero
+> notOneEqZero : Not (1.0 = 0.0)
+> notOneEqZero Refl impossible
 
 > ||| zero is not positive
 > notPositiveZero : Not (Positive 0.0)

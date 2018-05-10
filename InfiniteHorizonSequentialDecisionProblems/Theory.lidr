@@ -1,5 +1,12 @@
 > module InfiniteHorizonSequentialDecisionProblems.Theory
 
+> import Data.Vect
+
+> import Finite.Predicates
+> import Finite.Operations
+> import Finite.Properties
+> import Vect.Operations
+
 > %default total
 > %access public export
 > %auto_implicits off
@@ -127,8 +134,43 @@
 >     s9 = replace {P = \ W => val x p' `LTE` W} (trans (trans s4 s5) s6) s8
 
 
-> {-
+* Can one compute optimal policies?
 
+If |State| is finite
+
+> finiteState : Finite State
+
+we can compute the number of values of type |State| and collect them in
+a vector
+
+> cardState : Nat
+> cardState = card finiteState
+
+> vectState : Vect cardState State
+> vectState = toVect finiteState
+
+For a fixed policy |p|, we can represent the value of |p| by a value table
+
+> vt : Policy -> Vect cardState Val
+
+> val x p = index k (vt p) where
+>   k : Fin cardState
+>   k = lookup x vectState (toVectComplete finiteState x)
+
+In this case, the specification of |val| 
+
+< valSpec  =  (x : State) -> (p : Policy) -> 
+<             val x p 
+<             = 
+<             meas (fmap (\ x' => reward x (p x) x' `plus` val x' p) (nexts x (p x)))
+
+defines a linear, implicit problem for the components |vt p|. Let
+
+
+
+
+
+> {-
 
 > ---}
 

@@ -1,13 +1,15 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -p effects -V
-# #IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -V
+IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -p effects -V --allow-capitalized-pattern-variables
+# IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -V --allow-capitalized-pattern-variables
 
 libs:
 	find . \
+  -not \( -path "./books" -prune \) \
   -not \( -path "./examples" -prune \) \
   -not \( -path "./issues" -prune \) \
+  -not \( -path "./lectures" -prune \) \
   -not \( -path "./papers" -prune \) \
   -not \( -path "./projects" -prune \) \
   -not \( -path "./tmp" -prune \) \

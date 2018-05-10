@@ -118,20 +118,16 @@
 > %freeze uniqueElem -- frozen
 
 
-Eq
+> {-
+
+These properties are already defined in base/Control/Monad/Identity.idr
 
 > using (A : Type)
 >   implementation (Eq A) => Eq (Identity A) where
 >     (Id a) == (Id b) = a == b
 
-
-Show
-
 > using (A : Type)
 >   implementation (Show A) => Show (Identity A) where
 >     show (Id a) = show a
-
-
-> {-
 
 > ---}
