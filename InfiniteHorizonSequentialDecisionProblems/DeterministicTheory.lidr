@@ -63,7 +63,7 @@ yiels a possibly non total function. In contrast to SDPs with a finite
 number of decision steps, we cannot rely on an induction principle for
 decision problems over an infinite number of steps. Obviously, there are
 cases in which |val| can be implemented. For instance, if all states
-have the same successor. An important is when |State| is finite. We
+have the same successor. An important case is when |State| is finite. We
 discuss this case below.
 
 
@@ -174,7 +174,8 @@ and injective
 > inj2VectState : Injective2 vectState
 > inj2VectState = injectiveLemma vectState inj1VectState
 
-We can also represent the value of a policy by a value table
+by construction. We can also represent the value of a policy by a value
+table
 
 > vt : Policy -> Vect cardState Val
 
@@ -213,7 +214,7 @@ and for policies:
 
 With |nextR|, |rewardR| and |pR|, we can derive the system of equations for
 the components of |vt| by rewriting |valSpec p| for each component of
-|vectSpace|:
+|vectState|:
 
 > equation : (vs : valSpec) -> (p : Policy) -> (k : Fin cardState) -> 
 >            index k (vt p) 
@@ -233,6 +234,10 @@ To derive |equation|, it is useful to prove three intermediate results:
 >          val p (next (index k vectState) (p (index k vectState)))
 >          =
 >          index (nextR k (pR p k)) (vt p)
+
+The implementations are given in the Appendix. With these lemmas, the
+implementation of |equation| is directly follows from the definition of
+|valSpec|:
 
 > equation vs p k = let x = index k vectState in
 >                   ( index k (vt p) )
