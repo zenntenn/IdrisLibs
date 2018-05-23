@@ -86,7 +86,7 @@ sets
 > find : {X : Type} -> (xs : List X) -> NonEmpty xs -> J Bool X
 > find      Nil  _ p impossible
 > find (x :: xs) _ p with (nonEmpty xs)
->   | (Yes prf) = find xs prf p
+>   | (Yes prf) = if p x then x else find xs prf p
 >   | ( No prf) = x
 
 > forsome : {X : Type} -> (xs : List X) -> NonEmpty xs -> K Bool X
@@ -155,6 +155,62 @@ again know how to formalize condition 2
 
 
 ** Section 2.2
+
+Hilbert's condition
+
+  ϕ p = p (ε p)
+
+is used to express what it means for a selection function to be
+compatible with a quantifier:
+
+> infixl 9 <> 
+
+> (<>) : {X, R : Type} -> (eps : J R X) -> (phi : K R X) -> Type
+> (<>) {X} {R} eps phi = (p : X -> R) -> phi p = p (eps p)  
+
+This trivially implies
+
+> overlineLemma : {X, R : Type} -> (eps : J R X) -> eps <> overline eps
+> overlineLemma eps = \ p => Refl
+
+Then they give examples of selection functions that are compatible with
+given quantifiers. One for the universal quantifier
+
+< forevery : {X : Type} -> (xs : List X) -> NonEmpty xs -> K Bool X
+< forevery xs ne p = not (forsome xs ne (not . p))
+
+is |findnot|:
+
+> findnot : {X : Type} -> (xs : List X) -> NonEmpty xs -> J Bool X
+> findnot      Nil  _ p impossible
+> findnot (x :: xs) _ p with (nonEmpty xs)
+>   | (Yes prf) = if p x then find xs prf p else x
+>   | ( No prf) = x
+
+they argue. They first notice that
+
+> findnotLemma : {X : Type} -> 
+>                (xs : List X) -> (ne : NonEmpty xs) ->
+>                (p : X -> Bool) -> findnot xs ne p = find xs ne (not . p)
+
+and 
+
+> foreveryFindnotLemma : {X : Type} -> 
+>                        (xs : List X) -> (ne : NonEmpty xs) -> 
+>                        (p : X -> Bool) -> 
+>                        forevery xs ne p = overline (findnot xs ne) p
+
+from which they conclude
+
+> findnotForeveryLemma : {X : Type} -> 
+>                        (xs : List X) -> (ne : NonEmpty xs) -> 
+>                        findnot xs ne <> forevery xs ne
+> findnotForeveryLemma xs ne p = ( forevery xs ne p )
+>                              ={ foreveryFindnotLemma xs ne p }=
+>                                ( overline (findnot xs ne) p )
+>                              ={ overlineLemma (findnot xs ne) p }=
+>                                ( p (findnot xs ne p) )
+>                              QED
 
 
 
