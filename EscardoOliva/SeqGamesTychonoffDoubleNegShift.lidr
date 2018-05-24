@@ -7,7 +7,7 @@
 > %access public export
 > %auto_implicits off
 
-* Section 1
+* 1. An amazingly versatile functional 
 
 They start from the offset with |bigotimes|, the function to be
 discussed in the paper
@@ -30,7 +30,7 @@ players), with the Tychonoff theorem and with the Double-Negation Shift
 (DNS). Then they present an outline of the paper.
 
 
-* Section 2
+* 2. Selection functions
 
 They start by introducing shortcuts for (flipped) selection functions
 
@@ -74,7 +74,7 @@ They then introduce
 and start discussing selection functions for sets in a subsection. 
 
 
-** Section 2.1 
+** 2.1 Selection functions for sets 
 
 Escardo-Oliva start by stating that "A selection function for a set S
 finds an element of S for which a given predicate holds". They require
@@ -154,7 +154,7 @@ again know how to formalize condition 2
 < SpecJ2 : {X : Type} -> (eps : J Type X) -> (p : X -> Type) -> (x : X) -> p x -> p (eps p)
 
 
-** Section 2.2
+** 2.2 Selection functions for quantifiers
 
 Hilbert's condition
 
@@ -212,56 +212,104 @@ from which they conclude
 >                                ( p (findnot xs ne p) )
 >                              QED
 
+Further examples of selection functions are given for "predicates" that
+return numbers rather than Boolean values:
+
+> argsup : {X : Type} -> (xs : List X) -> (ne : NonEmpty xs) -> J Int X
+> argsup      Nil  _ p impossible
+> argsup (x :: xs) _ p with (nonEmpty xs)
+>   | (Yes prf) = if p x < p x' then x' else x 
+>       where x' = argsup xs prf p
+>   | ( No prf) = x
+
+> arginf : {X : Type} -> (xs : List X) -> (ne : NonEmpty xs) -> J Int X
+> arginf xs ne p = argsup xs ne (\ x => - p x)
+
+
+* 3 Products of selection functions
+
+** 3.1 Binary product
+
+> opairJ : {X, Y, R : Type} -> J R X -> J R Y -> J R (X,Y)
+> opairJ epsx epsy p = (a, b) where
+>   a = epsx (\ x => overline epsy (\ y => p (x, y)))
+>   b = epsy (\ y => p (a, y))
+
+> opairK : {X, Y, R : Type} -> K R X -> K R Y -> K R (X,Y)
+> opairK phix phiy p = phix (\ x => phiy (\ y => p (x, y)))
+
+
+** 3.2 Iterated product
+
+Define the product of a "sequence of sets |X 0|, |X 1|, ..., |X n|,
+...". First we need a tail function for families of types:
+
+> Tail : (Nat -> Type) -> (Nat -> Type)
+> Tail X = \ n => X (S n) 
+
+Then we can define the product as a list
+
+> data Prod : (Nat -> Type) -> Type where
+>   Nil   :  {X : Nat -> Type} -> Prod X
+>   (::)  :  {X : Nat -> Type} -> (x : X Z) -> Prod (Tail X) -> Prod X
+
+We cannot implement the iterated product in terms of |opairJ| because
+the types of the arguments have to be in the relation implied by
+|Prod|. We need a more specific helper:
+
+> oprodJ : {X : Nat -> Type} -> {R : Type} ->
+>          J R (X Z) -> J R (Prod (Tail X)) -> J R (Prod X)  
+> oprodJ e ep p = a :: as where
+>   a  = e (\ x => overline ep (\ xs => p (x :: xs)))
+>   as = ep (\ xs => p (a :: xs))
+
+With |oprodJ| implementing the iterated product is easy: 
+
+> bigoprodJ : {X : Nat -> Type} -> {R : Type} ->
+>             Prod ((J R) . X) -> J R (Prod X)
+> bigoprodJ      Nil  = \ p => Nil
+> bigoprodJ (e :: es) = oprodJ e (bigoprodJ es)
+
+We can do othe same with vectors instead of lists 
+
+< data Prod : Nat -> (Nat -> Type) -> Type where
+<   Nil   :               {X : Nat -> Type} -> Prod Z X
+<   (::)  :  {n : Nat} -> {X : Nat -> Type} -> (x : X Z) -> Prod n (Tail X) -> Prod (S n) X
+
+< oprodJ : {X : Nat -> Type} -> {R : Type} -> {n : Nat} ->
+<          J R (X Z) -> J R (Prod n (Tail X)) -> J R (Prod (S n) X)  
+< oprodJ e ep p = a :: as where
+<   a  = e (\ x => overline ep (\ xs => p (x :: xs)))
+<   as = ep (\ xs => p (a :: xs))
+
+< bigoprodJ : {X : Nat -> Type} -> {R : Type} -> {n : Nat} -> 
+<             Prod n ((J R) . X) -> J R (Prod n X)
+< bigoprodJ      Nil  = \ p => Nil
+< bigoprodJ (e :: es) = oprodJ e (bigoprodJ es)
+
+Because they do not have dependent types, they implement |bigoprodJ| in
+Haskell for the special case of a constant family of types:
+
+> otimesJ : {X : Type} -> {R : Type} ->
+>           J R X -> J R (List X) -> J R (List X)  
+> otimesJ e ep p = a :: as where
+>   a  = e (\ x => overline ep (\ xs => p (x :: xs)))
+>   as = ep (\ xs => p (a :: xs))
+
+> bigotimesJ : {X, R : Type} -> List (J R X) -> J R (List X)
+> bigotimesJ      Nil  = \ p => Nil
+> bigotimesJ (e :: es) = otimesJ e (bigotimesJ es)
+
+
+* 4, Playing games
 
 
 
 > {-
 
-> SpecJ : {X : Type} -> (e : J Type X) -> (P : X -> Type) -> P (e P) -> (x ** P x) 
-
-> SpecJ' : {X : Type} -> (e : J Type X) -> (P : X -> Type) -> (x ** P x) -> P (e P)
-
-> Phi : {X : Type} -> (X -> Type) -> Type
-> Phi P = (x ** P x) 
-
-trivially
-
-> Lemma : {X : Type} -> (e : J Type X) -> (P : X -> Type) -> Phi P -> P (e P)
-> Lemma = SpecJ'
-
-> Lemma' : {X : Type} -> (e : J Type X) -> (P : X -> Type) -> P (e P) -> Phi P
-> Lemma' = SpecJ
-
-but proving |phi p = p (e p)| as in the beginning Section 2.2
-
-> HC : {X : Type} -> (e : J Type X) -> (P : X -> Type) -> Phi P = P (e P)
-
-is not going to work I think. Perhaps we can try to implement some sort
-of Hilbert's condition for the specific case in which properties are
-represented by Boolean functions:
-
-> specJ : {X : Type} -> (e : J Bool X) -> (p : X -> Bool) -> p (e p) = True -> (x ** p x = True) 
-
-> specJ' : {X : Type} -> (e : J Bool X) -> (p : X -> Bool) -> (x ** p x = True) -> p (e p) = True
-
-> phi : {X : Type} -> (X -> Bool) -> Type
-> phi p = (x ** p x = True)
-
-In this case one has trivially
-
-> hc : {X : Type} -> (e : J Bool X) -> (p : X -> Bool) -> (exists : phi p) -> (p . fst) exists = p (e p)
-> hc e p exists = ( (p . fst) exists )
->               ={ snd exists }=
->                 ( True )
->               ={ sym (specJ' e p exists)}=
->                 ( p (e p) )
->               QED
- 
-Is this what |phi p = p (e p)| is meant to say? The whole point of the
-discussion about Hilbert's condition seems to be 
-
 
 > ---}
 
 
+ 
  
