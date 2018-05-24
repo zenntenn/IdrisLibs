@@ -1,7 +1,10 @@
-> module SeqGamesTychonoffDoubleNegShift
+> module Main
 
 > import Syntax.PreorderReasoning
 > import Data.List
+> import Effects
+> import Effect.Exception
+> import Effect.StdIO
 
 > %default total
 > %access public export
@@ -215,6 +218,8 @@ from which they conclude
 Further examples of selection functions are given for "predicates" that
 return numbers rather than Boolean values:
 
+> {-
+
 > argsup : {X : Type} -> (xs : List X) -> (ne : NonEmpty xs) -> J Int X
 > argsup      Nil  _ p impossible
 > argsup (x :: xs) _ p with (nonEmpty xs)
@@ -224,6 +229,19 @@ return numbers rather than Boolean values:
 
 > arginf : {X : Type} -> (xs : List X) -> (ne : NonEmpty xs) -> J Int X
 > arginf xs ne p = argsup xs ne (\ x => - p x)
+
+>-}
+
+> partial
+> argsup : {X : Type} -> (xs : List X) -> J Int X
+> argsup (x :: xs) p with (nonEmpty xs)
+>   | (Yes prf) = if p x < p x' then x' else x 
+>       where x' = argsup xs p
+>   | ( No prf) = x
+
+> partial
+> arginf : {X : Type} -> (xs : List X) -> J Int X
+> arginf xs p = argsup xs (\ x => - p x)
 
 
 * 3 Products of selection functions
@@ -301,13 +319,161 @@ Haskell for the special case of a constant family of types:
 > bigotimesJ (e :: es) = otimesJ e (bigotimesJ es)
 
 
-* 4, Playing games
+* 4. Playing games
+
+** 4.2 History dependent games
+
+> hotimesJ : {X : Type} -> {R : Type} ->
+>           J R X -> (X -> J R (List X)) -> J R (List X)  
+> hotimesJ e f p = a :: as where
+>   a  = e (\ x => overline (f x) (\ xs => p (x :: xs)))
+>   as = (f a) (\ xs => p (a :: xs))
+
+> bighotimesJ : {X, R : Type} -> List (List X -> J R X) -> J R (List X)
+> bighotimesJ {X} {R}      Nil  = \ p => []
+> bighotimesJ {X} {R} (f :: fs) = hotimesJ (f []) g where
+>   g    :  X -> J R (List X)
+>   g x  =  assert_total (bighotimesJ fs') where
+>     fs'  :  List (List X -> J R X)
+>     fs'  =  [\ xs => f' (x :: xs) | f' <- fs]
 
 
+** 4.3 Implementation of games and optimal strategies
+
+> data Game : Type -> Type -> Type where
+>   MkGame : {Move, Outcome : Type} -> 
+>            (p : List Move -> Outcome) -> 
+>            (es : List (List Move -> J Outcome Move)) -> 
+>            Game Move Outcome
+
+> pred : {Move, Outcome : Type} -> Game Move Outcome -> (List Move -> Outcome)
+> pred (MkGame p _) = p
+
+> epss : {Move, Outcome : Type} -> Game Move Outcome -> List (List Move -> J Outcome Move)
+> epss (MkGame _ es) = es
+
+> optimalPlay : {Move, Outcome : Type} -> Game Move Outcome -> List Move
+> optimalPlay g = bighotimesJ (epss g) (pred g)
+
+> optimalOutcome : {Move, Outcome : Type} -> Game Move Outcome -> Outcome
+> optimalOutcome g = (pred g) (optimalPlay g)
+
+> {-
+> optimalStrategy : {Move, Outcome : Type} -> Game Move Outcome -> List Move -> Move
+> optimalStrategy {Move} {Outcome} g ms = head (optimalPlay g') where
+>   g' : Game Move Outcome
+>   g' = MkGame p' es' where
+>     p'   :  List Move -> Outcome
+>     p'   =  \ ms' => (pred g) (ms ++ ms') 
+>     es'  :  List (List Move -> J Outcome Move)
+>     es'  =  drop (length ms) (epss g)
+> -}
+
+
+** 4.5 Tic-Tac-Toe
+
+> data Player =  X | O
+
+> Outcome : Type
+> Outcome = Int
+
+> Move : Type
+> Move = Int
+
+> Board : Type
+> Board = (List Move, List Move)
+
+> someContained : {X : Type} -> Ord X => 
+>                 List (List X) -> List X -> Bool
+
+
+> wins : List Move -> Bool
+> wins = someContained [[0,1,2],[3,4,5],[6,7,8],
+>                       [0,3,6],[1,4,7],[2,5,8],
+>                       [0,4,8],[2,4,6]]
+
+> value : Board -> Outcome
+> value (xs, os) = if wins xs 
+>                  then 1
+>                  else if wins os 
+>                       then -1
+>                       else 0
+
+> insert : {X : Type} -> Ord X => X -> List X -> List X
+
+> outcome : Player -> List Move -> Board -> Board
+> outcome _      Nil     board = board
+> outcome X (m :: ms) (xs, os) = if wins os 
+>                                then (xs, os)
+>                                else outcome O ms (insert m xs, os)
+> outcome O (m :: ms) (xs, os) = if wins xs 
+>                                then (xs, os)
+>                                else outcome X ms (xs, insert m os)
+
+> p : List Move -> Outcome
+> p ms = value (outcome X ms (Nil, Nil))
+
+> setMinus : {X : Type} -> Ord X => 
+>            List X -> List X -> List X
+
+> partial 
+> es : List (List Move -> J Outcome Move)
+> es = take 9 all where
+>   partial
+>   eX  :  List Move -> J Outcome Move
+>   eX  =  \ h => argsup (setMinus [0..8] h)
+>   partial
+>   eO  :  List Move -> J Outcome Move
+>   eO  =  \ h => arginf (setMinus [0..8] h)
+>   partial
+>   all :  List (List Move -> J Outcome Move)
+>   all =  [eX, eO, eX, eO, eX, eO, eX, eO, eX, eO]
+
+> partial
+> ticTacToe : Game Move Outcome
+> ticTacToe = MkGame p es
+
+> partial
+> main : IO ()
+> main = 
+>   do putStr ("An optimal play for Tic-Tac-Toe is "
+>              ++
+>              show (optimalPlay ticTacToe) ++ "\n"
+>              ++
+>              "and the optimal outcome is"
+>              ++
+>              show (optimalOutcome ticTacToe) ++ "\n"
+>              )
+
+
+** 4.7 Appendix
+
+> contained : {X : Type} -> Ord X => List X -> List X -> Bool
+> contained       []        ys  = True
+> contained       xs        []  = False
+> contained (x :: xs) (y :: ys) = if x == y 
+>                                 then contained xs ys
+>                                 else if x >= y
+>                                      then contained (x :: xs) ys
+>                                      else False
+
+> someContained         []  ys  = False
+> someContained        xss  []  = False
+> someContained (xs :: xss) ys = contained xs ys || someContained xss ys
+
+> insert x [] = [x]
+> insert x (y :: ys) = if x == y 
+>                      then (y :: ys)
+>                      else if x < y
+>                           then x :: (y :: ys)
+>                           else y :: (insert x ys) 
+
+> setMinus xs       []  = xs
+> setMinus xs (y :: ys) = setMinus (delete y xs) ys
 
 > {-
 
-
+ 
 > ---}
 
 
