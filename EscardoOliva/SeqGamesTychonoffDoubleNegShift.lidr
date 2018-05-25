@@ -86,7 +86,7 @@ no element of S satisfying the predicate, we select an arbitrary element
 of S". Thus, selection functions for sets are only defined for non-empty
 sets
 
-> find : {X : Type} -> (xs : List X) -> NonEmpty xs -> J Bool X
+> find : {X : Type} -> (xs : List X) -> NonEmpty xs -> J Bool X -- J Bool xs
 > find      Nil  _ p impossible
 > find (x :: xs) _ p with (nonEmpty xs)
 >   | (Yes prf) = if p x then x else find xs prf p
@@ -232,12 +232,36 @@ return numbers rather than Boolean values:
 
 >-}
 
+-- > partial
+-- > argsup : {X : Type} -> List X -> J Int X  --  here Int is just {-1, 0, 1}
+-- > -- argsup [] p  =  undefined
+-- > argsup {X} (x :: xs) p  =  f xs x (p x)
+-- >   where
+-- >   f : List X -> X -> Int -> X
+-- >   f xs' a 1  =  a
+-- >   f [] a r  =  a
+-- >   f xs'       a  0    =  g xs'
+-- >     where
+-- >     g []  =  a
+-- >     g (a :: as)  = if  p a  ==  1  then  a else g as
+-- >   f (x' :: xs') a r  =  f xs' x' (p x') -- at this point, r = -1
+                 
+-- > {- original implementation (non-optimised) -}
+-- > partial
+-- > argsup : {X : Type} -> (xs : List X) -> J Int X
+-- > argsup (x :: xs) p with (nonEmpty xs)
+-- >   | (Yes prf) = if p x < p x' then x' else x 
+-- >       where x' = argsup xs p
+-- >   | ( No prf) = x
+
 > partial
 > argsup : {X : Type} -> (xs : List X) -> J Int X
-> argsup (x :: xs) p with (nonEmpty xs)
->   | (Yes prf) = if p x < p x' then x' else x 
->       where x' = argsup xs p
->   | ( No prf) = x
+> argsup (x :: Nil) p = x
+> argsup (x :: x' :: xs) p = if p x < p x' then argsup (x' :: xs) p else argsup (x :: xs) p
+
+
+-- > findnot xs prf p  =  find xs prf (not . p)
+
 
 > partial
 > arginf : {X : Type} -> (xs : List X) -> J Int X
@@ -323,40 +347,39 @@ Haskell for the special case of a constant family of types:
 
 ** 4.2 History dependent games
 
+-- > hotimesJ : {X : Type} -> {R : Type} ->
+-- >           J R X -> (X -> J R (List X)) -> J R (List X)  
+-- > hotimesJ e f p = a :: as where
+-- >   a  = e (\ x => overline (f x) (\ xs => p (x :: xs)))
+-- >   as = (f a) (\ xs => p (a :: xs))
+
 > hotimesJ : {X : Type} -> {R : Type} ->
 >           J R X -> (X -> J R (List X)) -> J R (List X)  
-> hotimesJ e f p = a :: as where
->   a  = e (\ x => overline (f x) (\ xs => p (x :: xs)))
->   as = (f a) (\ xs => p (a :: xs))
+> hotimesJ e0 e1 p = a0 :: a1
+>   where
+>   a0 = e0 (\ x0 => overline (e1 x0) (\ x1 => p (x0 :: x1)))
+>   a1 = e1 a0 (\ x1 => p (a0 :: x1))
 
 > bighotimesJ : {X, R : Type} -> List (List X -> J R X) -> J R (List X)
-> bighotimesJ {X} {R}      Nil  = \ p => []
-> bighotimesJ {X} {R} (f :: fs) = hotimesJ (f []) g where
->   g    :  X -> J R (List X)
->   g x  =  assert_total (bighotimesJ fs') where
->     fs'  :  List (List X -> J R X)
->     fs'  =  [\ xs => f' (x :: xs) | f' <- fs]
+> bighotimesJ [] = \p => []
+> bighotimesJ (e :: es)  =  (e []) `hotimesJ` (\x => bighotimesJ [\ xs => d (x :: xs) | d <- es])
 
 
 ** 4.3 Implementation of games and optimal strategies
 
-> data Game : Type -> Type -> Type where
->   MkGame : {Move, Outcome : Type} -> 
->            (p : List Move -> Outcome) -> 
->            (es : List (List Move -> J Outcome Move)) -> 
->            Game Move Outcome
 
-> pred : {Move, Outcome : Type} -> Game Move Outcome -> (List Move -> Outcome)
-> pred (MkGame p _) = p
+-- > data Game : Type -> Type -> Type where
+-- >   MkGame : {Move, Outcome : Type} -> 
+-- >            (p : List Move -> Outcome) -> 
+-- >            (es : List (List Move -> J Outcome Move)) -> 
+-- >            Game Move Outcome
 
-> epss : {Move, Outcome : Type} -> Game Move Outcome -> List (List Move -> J Outcome Move)
-> epss (MkGame _ es) = es
+-- > pred : {Move, Outcome : Type} -> Game Move Outcome -> (List Move -> Outcome)
+-- > pred (MkGame p _) = p
 
-> optimalPlay : {Move, Outcome : Type} -> Game Move Outcome -> List Move
-> optimalPlay g = bighotimesJ (epss g) (pred g)
+-- > epss : {Move, Outcome : Type} -> Game Move Outcome -> List (List Move -> J Outcome Move)
+-- > epss (MkGame _ es) = es
 
-> optimalOutcome : {Move, Outcome : Type} -> Game Move Outcome -> Outcome
-> optimalOutcome g = (pred g) (optimalPlay g)
 
 > {-
 > optimalStrategy : {Move, Outcome : Type} -> Game Move Outcome -> List Move -> Move
@@ -382,6 +405,10 @@ Haskell for the special case of a constant family of types:
 
 > Board : Type
 > Board = (List Move, List Move)
+
+
+
+
 
 > someContained : {X : Type} -> Ord X => 
 >                 List (List X) -> List X -> Bool
@@ -410,15 +437,31 @@ Haskell for the special case of a constant family of types:
 >                                then (xs, os)
 >                                else outcome X ms (xs, insert m os)
 
-> p : List Move -> Outcome
-> p ms = value (outcome X ms (Nil, Nil))
 
 > setMinus : {X : Type} -> Ord X => 
 >            List X -> List X -> List X
 
+-- > partial 
+-- > es : List (List Move -> J Outcome Move)
+-- > es = take 3 all where
+-- >   partial
+-- >   eX  :  List Move -> J Outcome Move
+-- >   eX  =  \ h => argsup (setMinus [0..8] h)
+-- >   partial
+-- >   eO  :  List Move -> J Outcome Move
+-- >   eO  =  \ h => arginf (setMinus [0..8] h)
+-- >   partial
+-- >   all :  List (List Move -> J Outcome Move)
+-- >   all =  [eX, eO, eX, eO, eX, eO, eX, eO, eX, eO]
+
+-- > partial
+-- > ticTacToe : Game Move Outcome
+-- > ticTacToe = MkGame p es
+
+
 > partial 
-> es : List (List Move -> J Outcome Move)
-> es = take 9 all where
+> epsilons : List (List Move -> J Outcome Move)
+> epsilons = take 3 all where
 >   partial
 >   eX  :  List Move -> J Outcome Move
 >   eX  =  \ h => argsup (setMinus [0..8] h)
@@ -429,20 +472,29 @@ Haskell for the special case of a constant family of types:
 >   all :  List (List Move -> J Outcome Move)
 >   all =  [eX, eO, eX, eO, eX, eO, eX, eO, eX, eO]
 
+> p : List Move -> Outcome
+> p ms = value (outcome X ms (Nil, Nil))
+
 > partial
-> ticTacToe : Game Move Outcome
-> ticTacToe = MkGame p es
+> optimalPlay : List Move
+> optimalPlay = bighotimesJ epsilons p
+
+> partial
+> optimalOutcome : Outcome
+> optimalOutcome = p optimalPlay
+
+
 
 > partial
 > main : IO ()
 > main = 
 >   do putStr ("An optimal play for Tic-Tac-Toe is "
 >              ++
->              show (optimalPlay ticTacToe) ++ "\n"
+>              show optimalPlay ++ "\n"
 >              ++
->              "and the optimal outcome is"
+>              "and the optimal outcome is "
 >              ++
->              show (optimalOutcome ticTacToe) ++ "\n"
+>              show optimalOutcome ++ "\n"
 >              )
 
 
@@ -468,8 +520,16 @@ Haskell for the special case of a constant family of types:
 >                           then x :: (y :: ys)
 >                           else y :: (insert x ys) 
 
+> delete : {X : Type} -> Ord X => X -> List X -> List X
+> delete x [] = []
+> delete x (y :: ys) = if x == y
+>                      then ys
+>                      else if x < y
+>                           then y :: ys
+>                           else y :: Main.delete x ys
+
 > setMinus xs       []  = xs
-> setMinus xs (y :: ys) = setMinus (delete y xs) ys
+> setMinus xs (y :: ys) = setMinus (Main.delete y xs) ys
 
 > {-
 
