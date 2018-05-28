@@ -1,11 +1,13 @@
 SHELL := /bin/bash
 
 IDRIS = idris
-IDRISFLAGS = -p contrib -p effects -V --allow-capitalized-pattern-variables -O2
+IDRISFLAGS = -O3 --warnreach \
+             -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
+             -p contrib -p effects -V --allow-capitalized-pattern-variables
 # IDRISFLAGS = +RTS -K32000000 -RTS -p contrib -V --allow-capitalized-pattern-variables
 
-tictactoe: SeqGamesTychonoffDoubleNegShift.lidr Makefile
-	${IDRIS} ${IDRISFLAGS} SeqGamesTychonoffDoubleNegShift.lidr -o tictactoe
+tictactoe: TicTacToe.lidr Makefile
+	${IDRIS} ${IDRISFLAGS} TicTacToe.lidr -o TicTacToe
 
 clean:
 	rm -f tictactoe
