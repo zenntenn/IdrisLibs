@@ -27,7 +27,19 @@
 > partial
 > bigotimes : {X, R : Type} -> List (List X -> J R X) -> J R (List X)
 > bigotimes       []   =  \ p => []
-> bigotimes (e :: es)  =  (e []) `otimes` (\x => bigotimes [\ xs => d (x :: xs) | d <- es])
+> -- bigotimes (e :: es)  =  (e []) `otimes` (\x => bigotimes [\ xs => d (x :: xs) | d <- es])
+> {-
+> bigotimes {X} {R} (e :: es)  =  (e []) `otimes` f where
+>   partial
+>   f : X -> J R (List X)
+>   f x = bigotimes (map h es) where
+>     h : (List X -> J R X) -> List X -> J R X
+>     h d = \ xs => d (x :: xs) 
+> -}
+> bigotimes {X} {R} (e :: es)  =  let f = \ x => bigotimes (map (\ d => \ xs => d (x :: xs) ) es) in
+>                                 (e []) `otimes` f
+
+
 
 
 > {-

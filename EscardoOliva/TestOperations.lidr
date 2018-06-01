@@ -10,7 +10,7 @@
 > %auto_implicits off
 
 > xs : List Int
-> xs = [7,-3]
+> xs = [7,-3, 0]
 
 > partial 
 > e : J Int Int

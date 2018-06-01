@@ -1,9 +1,6 @@
 > module Main
 
 > import Data.List
-> import Effects
-> import Effect.Exception
-> import Effect.StdIO
 
 > import EscardoOliva.SelectionFunction
 > import EscardoOliva.Quantifier
@@ -81,7 +78,6 @@
 >            List X -> List X -> List X
 > setMinus xs       []  = xs
 > setMinus xs (y :: ys) = setMinus (Main.delete y xs) ys
-
 
 > partial 
 > epsilons : List (List Move -> J Outcome Move)
