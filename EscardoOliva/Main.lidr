@@ -28,24 +28,16 @@
 > argsup (x :: Nil) p = x
 > argsup (x :: x' :: xs) p = if p x < p x' then argsup (x' :: xs) p else argsup (x :: xs) p
 
-> setMinus : {X : Type} -> Ord X => List X -> List X -> List X
-> setMinus xs       []  = xs
-> setMinus xs (y :: ys) = setMinus (delete y xs) ys
-
 > partial
 > e : List Int -> J Int Int
-> e ms = argsup (setMinus [0..6] ms)
+> e _ = argsup [0..2]
 
 > p : List Int -> Int
-> p ms = 0
-
-> n : Nat
-> n = 3
+> p _ = 0
 
 > partial
 > main : IO ()
-> main = 
->   do putStr ("bigotimes (replicate n e) p = "
->              ++
->              show (bigotimes (replicate n e) p) ++ "\n"
->              )
+> main = do putStr ("bigotimes (replicate 3 e) p = "
+>                   ++
+>                   show (bigotimes (replicate 3 e) p) ++ "\n")
+
