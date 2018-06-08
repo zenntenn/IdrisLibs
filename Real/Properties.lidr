@@ -28,6 +28,11 @@
 >     (/) = div
 
 
+> using implementation NegReal
+>   |||
+>   minusLemma : {x : Real} -> x - x = 0
+
+
 > {-
 
 > ---}
