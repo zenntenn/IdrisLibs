@@ -21,28 +21,22 @@
 > FixPoint x f = x = f x
 
 
-* -----------------------------
-* Sequential decision processes
-* -----------------------------
-
-> State  :  Type
-> Ctrl   :  (x : State) -> Type
-> next   :  (x : State) -> (y : Ctrl x) -> State
-
-
 * ----------------------------
 * Sequential decision problems
 * ----------------------------
 
-> Val              :  Type
-> reward           :  (x : State) -> (y : Ctrl x) -> State -> Val
-> (<+>)            :  Val -> Val -> Val
-> LTE              :  Val -> Val -> Type
+> State  :  Type
+> Ctrl   :  (x : State) -> Type
+> next   :  (x : State) -> (y : Ctrl x) -> State
+> Val    :  Type
+> reward :  (x : State) -> (y : Ctrl x) -> State -> Val
+> (<+>)  :  Val -> Val -> Val
+> LTE    :  Val -> Val -> Type
 
 
-* -----------------------------
-* Policies and policy sequences
-* -----------------------------
+* --------------------------------------
+* Policies and infinite policy sequences
+* --------------------------------------
 
 > Policy  :  Type
 > Policy  =  (x : State) -> Ctrl x
@@ -60,10 +54,20 @@
 > cons a f    Z  = a
 > cons a f (S n) = f n 
 
+> headLemma : {A : Type} -> (a : A) -> (f : Nat -> A) -> head (cons a f) = a
+> headLemma a f = Refl
 
-* ------------------------------
-* The value of policiy sequences
-* ------------------------------
+> tailLemma : {A : Type} -> (a : A) -> (f : Nat -> A) -> tail (cons a f) = f
+> tailLemma a d = Refl
+
+> consLemma : {A : Type} -> (f : Nat -> A) -> (n : Nat) -> cons (head f) (tail f) n = f n
+> consLemma f    Z  = Refl
+> consLemma f (S n) = Refl
+
+
+* ---------------------------------------
+* The value of infinite policiy sequences
+* ---------------------------------------
 
 The value of making infinite many decision steps with a policy sequence
 by starting from a given state is given by a "value" function
@@ -138,190 +142,53 @@ extensions of arbitrary policy sequences:
 > optExt : (ps : PolicySeq) -> Policy
 > optExt = cvalargmax
 
+> optExtLemma : (ps : PolicySeq) -> (optExt ps) `OptExt` ps
+> optExtLemma ps p' x = s5 where
+>   p  : Policy
+>   p  = optExt ps
+>   s1 : cval ps x (p' x) `LTE` cvalmax ps x
+>   s1 = cvalmaxSpec ps x (p' x)
+>   s2 : reward x (p' x) (next x (p' x)) <+> val ps (next x (p' x))  `LTE` cvalmax ps x
+>   s2 = s1
+>   s3 : reward x (p' x) (next x (p' x)) <+> val ps (next x (p' x))  `LTE` cval ps x (p x)
+>   s3 = replace {P = \ X => reward x (p' x) (next x (p' x)) <+> val ps (next x (p' x))  `LTE` X} (cvalargmaxSpec ps x) s2
+>   s4 : reward x (p' x) (next x (p' x)) <+> val ps (next x (p' x))  `LTE` reward x (p x) (next x (p x)) <+> val ps (next x (p x))
+>   s5 : val (cons p' ps) x `LTE` val (cons p ps) x
+>   s5 = ?s5prf -- via valSpec, headLemma, tailLemma
+
+This is interesting because of
+
+> Bellman  :  (ps  :  PolicySeq)  ->   Opt ps ->
+>             (p   :  Policy)     ->   p `OptExt` ps ->
+>             Opt (cons p ps)
+> Bellman ps ops p oep = opps where
+>   opps : Opt (cons p ps)
+>   opps ps' x = s7 where
+>     p'   : Policy
+>     p'   = head ps'
+>     ps'' : PolicySeq
+>     ps'' = tail ps'
+>     s4   : val (cons p' ps'') x `LTE` val (cons p' ps) x
+>     s4   = ?s4prf
+>     s5   : val (cons p' ps) x `LTE` val (cons p ps) x
+>     s5   = ?s5prf
+>     s6   : val (cons p' ps'') x `LTE` val (cons p ps) x
+>     s6   = transitiveLTE s4 s5
+>     s7   : val ps' x `LTE` val (cons p ps) x
+>     s7   = ?s7prf -- via valSpec, consLemma, ... 
+
+I am not sure that this is going to help us but it looks remarkably
+similar to the finite horizon case. Perhaps a first step towards
+deriving something like
+
+> Conj : (p : Policy) -> (ps : PolicySeq) -> 
+>        (p, ps) `FixPoint` (\ (p', ps') => (optExt ps', cons (optExt ps') ps')) ->
+>        Opt (cons p ps) 
+
+that we could use as a justifications for iterative method?
 
 
-
-> optSpec  =  FixPoint opt cvalargmax -- (x : State) -> opt x = cvalargmax opt x  
-
-is optimal
-
-> optLemma : (vs : valSpec) -> (os : optSpec) -> Opt opt
-
-As in the case of |val|, we cannot implement |optLemma| in general. But
-it is useful to look at a (possibly non total) implementation. First we
-deduce
-
-> optSpecLemma : (p : Policy) -> FixPoint p cvalargmax -> (x : State) -> p x = cvalargmax p x
 > {-
-> optSpecLemma p pfp x = ( opt x )
->                      ={ replace {P = \ F => p x = F x} pfp Refl }=
->                        ( cvalargmax p x )
->                      QED
-> -}
-
-> optLemma vs os p' x = s9 where
->   s1 : val p' (next x (p' x)) `LTE` val opt (next x (p' x))
->   s1 = assert_total (optLemma vs os p' (next x (p' x)))
->   s2 : cval p' x (p' x) `LTE` cval opt x (p' x)
->   s2 = monotonePlusLTE (reflexiveLTE (reward x (p' x) (next x (p' x)))) s1
->   s3 : cval opt x (p' x) `LTE` cvalmax opt x
->   s3 = cvalmaxSpec opt x (p' x)
->   s4 : cvalmax opt x = cval opt x (cvalargmax opt x)
->   s4 = cvalargmaxSpec opt x
->   s5 : cval opt x (cvalargmax opt x) = cval opt x (opt x)
->   -- s5 = replace {P = \ U => cval opt x U = cval opt x (opt x)} (os x) Refl
->   s5 = replace {P = \ U => cval opt x U = cval opt x (opt x)} (optSpecLemma opt os x) Refl
->   s6 : cval opt x (opt x) = val opt x
->   s6 = sym (vs opt x)
->   s7 : cval p' x (p' x) `LTE` cvalmax opt x
->   s7 = transitiveLTE s2 s3
->   s8 : val p' x `LTE` cvalmax opt x
->   s8 = replace {P = \ W => W `LTE` cvalmax opt x} (sym (vs p' x)) s7
->   s9 : val p' x `LTE` val opt x
->   s9 = replace {P = \ W => val p' x `LTE` W} (trans (trans s4 s5) s6) s8
-
-> ---}
-
-> {-
-
-* -------------------------
-* The case of finite states
-* -------------------------
-
-If |State| is finite
-
-> finiteState : Finite State
-
-we can compute the number of values of type |State| 
-
-> cardState : Nat
-> cardState = card finiteState
-
-and collect them in a vector
-
-> vectState : Vect cardState State
-> vectState = toVect finiteState
-
-This representation of |State| is guaranteed to be complete
-
-> completeVectState : (x : State) -> Elem x vectState
-> completeVectState = toVectComplete finiteState
-
-and injective
-
-> inj1VectState : Injective1 vectState
-> inj1VectState = toVectInjective1 finiteState
-
-> inj2VectState : Injective2 vectState
-> inj2VectState = injectiveLemma vectState inj1VectState
-
-by construction. We can also represent the value of a policy by a value
-table
-
-> vt : Policy -> Vect cardState Val
-
-and implement |val| in terms of the values of the table
-
-> val p x = index k (vt p) where
->   k : Fin cardState
->   k = lookup x vectState (completeVectState x)
-
-In this case, the specification of |val| defines a linear system of
-equations for the components of the value table. To derive these
-equations, consider, first the representation of |next|
-
-> nextR : (k : Fin cardState) -> (y : Ctrl (index k vectState)) -> Fin cardState
-> nextR k y = lookup x' vectState (completeVectState x') where
->   x' : State
->   x' = next (index k vectState) y
-
-|nextR| is a representations of |next| in the sense that
-
-> nextLemma  : (k : Fin cardState) -> (y : Ctrl (index k vectState)) ->
->              index (nextR k y) vectState = next (index k vectState) y
-
-A proof of |nextLemma| is straightforward, see Appendix below. It is
-also useful to define a representation for the reward function
-
-> rewardR : (k : Fin cardState) -> (y : Ctrl (index k vectState)) -> Val
-> rewardR k y = reward x y (next x y) where
->   x : State
->   x = index k vectState
-
-and for policies:
-
-> pR : (p : Policy) -> (k : Fin cardState) -> Ctrl (index k vectState)
-> pR p k = p (index k vectState) 
-
-With |nextR|, |rewardR| and |pR|, we can derive the system of equations for
-the components of |vt| by rewriting |valSpec p| for each component of
-|vectState|:
-
-> equation : (vs : valSpec) -> (p : Policy) -> (k : Fin cardState) -> 
->            index k (vt p) 
->            = 
->            rewardR k (pR p k) <+> index (nextR k (pR p k)) (vt p)
-
-To derive |equation|, it is useful to prove three intermediate results:
-
-> lemma1 : (p : Policy) -> (k : Fin cardState) -> index k (vt p) = val p (index k vectState)
-
-> lemma2 : (p : Policy) -> (k : Fin cardState) -> 
->          reward (index k vectState) (p (index k vectState)) (next (index k vectState) (p (index k vectState)))
->          =
->          rewardR k (pR p k)
-
-> lemma3 : (p : Policy) -> (k : Fin cardState) -> 
->          val p (next (index k vectState) (p (index k vectState)))
->          =
->          index (nextR k (pR p k)) (vt p)
-
-The implementations are given in the Appendix. With these lemmas, the
-implementation of |equation| is directly follows from the definition of
-|valSpec|:
-
-> equation vs p k = let x = index k vectState in
->                   ( index k (vt p) )
->                 ={ lemma1 p k }=
->                   ( val p x )
->                 ={ vs p x }=
->                   ( reward x (p x) (next x (p x)) <+> val p (next x (p x)) )
->                 ={ replace {P = \ W => reward x (p x) (next x (p x)) <+> val p (next x (p x)) = W <+> val p (next x (p x))} (lemma2 p k) Refl }=
->                   ( rewardR k (pR p k) <+> val p (next x (p x)) )
->                 ={ replace {P = \ W => rewardR k (pR p k) <+> val p (next x (p x)) = rewardR k (pR p k) <+> W} (lemma3 p k) Refl }=
->                   ( rewardR k (pR p k) <+> index (nextR k (pR p k)) (vt p) )
->                 QED
-
-
-* --------
-* Appendix
-* --------
-
-> nextLemma k y = ( index (nextR k y) vectState )
->               ={ Refl }=
->                 ( index (lookup (next (index k vectState) y) vectState (completeVectState (next (index k vectState) y))) vectState )
->               ={ indexLookupLemma (next (index k vectState) y) vectState (completeVectState (next (index k vectState) y)) }=
->                 ( next (index k vectState) y )
->               QED
-
-> lemma1 p k = ( index k (vt p) )
->            ={ replace {P = \ W => index k (vt p) = index W (vt p)} (sym (lookupIndexLemma k vectState inj2VectState (toVectComplete finiteState (index k vectState)))) Refl }=
->              ( index (lookup (index k vectState) vectState (toVectComplete finiteState (index k vectState))) (vt p) )
->            ={ Refl }=
->              ( val p (index k vectState) )
->            QED
-
-> lemma2 p k = Refl
-
-> lemma3 p k = ( val p (next (index k vectState) (p (index k vectState))) )
->            ={ Refl }= -- def. pR
->              ( val p (next (index k vectState) (pR p k)) )
->            ={ Refl }= -- def. val
->              ( index (lookup (next (index k vectState) (pR p k)) vectState (completeVectState (next (index k vectState) (pR p k)))) (vt p) )
->            ={ Refl }= -- def. nextR
->              ( index (nextR k (pR p k)) (vt p) )
->            QED
-
 
 > ---}
 
