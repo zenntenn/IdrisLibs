@@ -8,6 +8,7 @@
 > import Finite.Properties
 > import Vect.Operations
 > import Vect.Properties
+> import Pair.Properties
 
 > %default total
 > %access public export
@@ -44,6 +45,8 @@
 > PolicySeq  :  Type
 > PolicySeq  =  Nat -> Policy
 
+-- Start "move to a 'Sequence' module"
+
 > head : {A : Type} -> (Nat -> A) -> A
 > head f = f Z
 
@@ -64,6 +67,7 @@
 > consLemma f    Z  = Refl
 > consLemma f (S n) = Refl
 
+-- End "move to a 'Sequence' module"
 
 * ---------------------------------------
 * The value of infinite policiy sequences
@@ -179,11 +183,32 @@ This is interesting because of
 
 I am not sure that this is going to help us but it looks remarkably
 similar to the finite horizon case. Perhaps a first step towards
-deriving something like
+something like
 
 > Conj : (p : Policy) -> (ps : PolicySeq) -> 
 >        (p, ps) `FixPoint` (\ (p', ps') => (optExt ps', cons (optExt ps') ps')) ->
 >        Opt (cons p ps) 
+> Conj p ps fp = opps where
+>   opps : Opt (cons p ps)
+>   opps = s9 where
+>     s0 : (p, ps) = (optExt ps, cons (optExt ps) ps)
+>     s0 = fp
+>     s1 : p = optExt ps
+>     s1 = pairEqElimFst s0
+>     s2 : ps = cons (optExt ps) ps
+>     s2 = pairEqElimSnd s0
+>     s3 : ps = cons p ps
+>     s3 = replace {P = \ X => ps = cons X ps} (sym s1) s2
+>     s4 : (optExt ps) `OptExt` ps
+>     s4 = optExtLemma ps
+>     s5 : p `OptExt` ps
+>     s5 = replace {P = \ X => X `OptExt` ps} (sym s1) s4
+>     s9 : Opt (cons p ps)
+>     s9 = Bellman ps ops p oep where
+>       ops : Opt ps
+>       ops = assert_total (replace {P = \ X => Opt X} (sym s3) s9)
+>       oep : p `OptExt` ps
+>       oep = s5       
 
 that we could use as a justifications for iterative method?
 
