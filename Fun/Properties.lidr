@@ -13,6 +13,12 @@
 > %auto_implicits on
 
 
+> ||| Functionality of dependent functions 
+> functionality : {A : Type} -> {B : A -> Type} -> 
+>                 {f : (a : A) -> B a} -> {g : (a : A) -> B a} -> 
+>                 f = g -> (a : A) -> f a = g a
+> functionality Refl x = Refl
+
 > ||| Injectivity (one direction)
 > Injective1 : {A, B : Type} -> (f : A -> B) -> Type
 > Injective1 {A} f = (a1 : A) -> (a2 : A) -> f a1 = f a2 -> a1 = a2
