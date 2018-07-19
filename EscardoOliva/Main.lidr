@@ -30,7 +30,7 @@
 
 > partial
 > e : List Int -> J Int Int
-> e _ = argsup [0..2]
+> e _ = argsup [0..7]
 
 > p : List Int -> Int
 > p _ = 0

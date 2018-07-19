@@ -5,6 +5,7 @@
 > -- import Data.List
 > -- import Data.List.Quantifiers
 
+> import Sigma.Sigma
 > -- import Rel.TotalPreorder
 > -- import NonNegDouble.NonNegDouble
 > -- import NonNegDouble.BasicOperations
@@ -27,17 +28,32 @@
 > lookup  :  {X : Type} -> {n : Nat} -> 
 >            (x : X) -> (xs : Vect n X) -> Elem x xs -> Fin n
 
+> lookup'  :  {X : Type} -> {n : Nat} -> 
+>             (x : X) -> (xs : Vect n X) -> List (Fin n)
+
 > ilSpec  :  {X : Type} -> {n : Nat} -> 
 >            (x : X) -> (xs : Vect n X) -> (p : Elem x xs) -> index (lookup x xs p) xs = x
 
 > liSpec  :  {X : Type} -> {n : Nat} -> 
 >            (k : Fin n) -> (xs : Vect n X) -> (p : Injective2 xs) -> (q : Elem (index k xs) xs) -> lookup (index k xs) xs q = k
 
+> indexSpec  :  {X : Type} -> {n : Nat} -> 
+>               (k : Fin n) -> (xs : Vect n X) -> Elem (index k xs) xs
+
+> index'   :  {X : Type} -> {n : Nat} -> 
+>             (k : Fin n) -> (xs : Vect n X) -> Sigma X (\ x => Elem x xs) 
+
+> liSpec'  :  {X : Type} -> {n : Nat} -> 
+>             (k : Fin n) -> (xs : Vect n X) -> (p : Injective2 xs) -> lookup (index k xs) xs (indexSpec k xs) = k
 
 * Finite function maximization
 
+> M : Type -> Type
 
+> monadM : Functor M
 
+> lala : {A, B : Type} -> (A -> B) -> M A -> M B
+> lala = map
 
 
 
