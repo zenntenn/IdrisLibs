@@ -14,9 +14,38 @@
 > %access public export
 > %auto_implicits off
 
-* -----------------
-* Fix point notions
-* -----------------
+
+* ---------
+* Sequences
+* ---------
+
+> Seq : Type -> Type
+> Seq A = Nat -> A
+
+> head : {A : Type} -> Seq A -> A
+> head f = f Z
+
+> tail : {A : Type} -> Seq A -> Seq A
+> tail f = f . S
+
+> cons : {A : Type} -> A -> Seq A -> Seq A
+> cons a f    Z  = a
+> cons a f (S n) = f n 
+
+> headLemma : {A : Type} -> (a : A) -> (f : Seq A) -> head (cons a f) = a
+> headLemma a f = Refl
+
+> tailLemma : {A : Type} -> (a : A) -> (f : Seq A) -> tail (cons a f) = f
+> tailLemma a d = Refl
+
+> consLemma : {A : Type} -> (f : Seq A) -> (n : Nat) -> cons (head f) (tail f) n = f n
+> consLemma f    Z  = Refl
+> consLemma f (S n) = Refl
+
+
+* ---------
+* Fix point
+* ---------
 
 > FixPoint : {X : Type} -> X -> (X -> X) -> Type
 > FixPoint x f = x = f x
@@ -43,31 +72,9 @@
 > Policy  =  (x : State) -> Ctrl x
 
 > PolicySeq  :  Type
-> PolicySeq  =  Nat -> Policy
+> -- PolicySeq  =  Nat -> Policy
+> PolicySeq  =  Seq Policy
 
--- Start "move to a 'Sequence' module"
-
-> head : {A : Type} -> (Nat -> A) -> A
-> head f = f Z
-
-> tail : {A : Type} -> (Nat -> A) -> (Nat -> A)
-> tail f = f . S
-
-> cons : {A : Type} -> A -> (Nat -> A) -> (Nat -> A)
-> cons a f    Z  = a
-> cons a f (S n) = f n 
-
-> headLemma : {A : Type} -> (a : A) -> (f : Nat -> A) -> head (cons a f) = a
-> headLemma a f = Refl
-
-> tailLemma : {A : Type} -> (a : A) -> (f : Nat -> A) -> tail (cons a f) = f
-> tailLemma a d = Refl
-
-> consLemma : {A : Type} -> (f : Nat -> A) -> (n : Nat) -> cons (head f) (tail f) n = f n
-> consLemma f    Z  = Refl
-> consLemma f (S n) = Refl
-
--- End "move to a 'Sequence' module"
 
 * ---------------------------------------
 * The value of infinite policiy sequences
@@ -185,8 +192,39 @@ I am not sure that this is going to help us but it looks remarkably
 similar to the finite horizon case. Perhaps a first step towards
 something like
 
+> piter : (Policy, PolicySeq) -> (Policy, PolicySeq)
+> piter (p, ps) = (optExt ps, cons (optExt ps) ps)
+
+> piterLemma : (p : Policy) -> (ps : PolicySeq) -> 
+>              (p, ps) `FixPoint` piter ->
+>              (n : Nat) -> ps n = p
+> piterLemma p ps fp  Z    = ( ps Z )
+>                          ={ Refl }=
+>                            ( head ps )
+>                          ={ cong (pairEqElimSnd fp) }=  
+>                            ( head (cons (optExt ps) ps) )
+>                          ={ headLemma (optExt ps) ps }=  
+>                            ( optExt ps )
+>                          ={ sym (pairEqElimFst fp) }=
+>                            ( p )
+>                          QED
+> piterLemma p ps fp (S m) = ( ps (S m) )
+>                          ={ sym (consLemma ps (S m)) }=
+>                            ( cons (head ps) (tail ps) (S m) )
+>                          ={ Refl }=
+>                            ( (tail ps) m )
+>                          ={ replace {P = \ X => (tail ps) m = (tail X) m} (pairEqElimSnd fp) Refl }=
+>                            ( (tail (cons (optExt ps) ps)) m )
+>                          ={ replace {P = \ X => (tail (cons (optExt ps) ps)) m = (tail (cons X ps)) m} (sym (pairEqElimFst fp)) Refl }=
+>                            ( (tail (cons p ps)) m )  
+>                          ={ replace {P = \ X => (tail (cons p ps)) m = X m} (tailLemma p ps) Refl }=
+>                            ( ps m )
+>                          ={ piterLemma p ps fp m }=
+>                            ( p )
+>                          QED
+
 > Conj : (p : Policy) -> (ps : PolicySeq) -> 
->        (p, ps) `FixPoint` (\ (p', ps') => (optExt ps', cons (optExt ps') ps')) ->
+>        (p, ps) `FixPoint` piter ->
 >        Opt (cons p ps) 
 > Conj p ps fp = opps where
 >   opps : Opt (cons p ps)
@@ -210,13 +248,10 @@ something like
 >       oep : p `OptExt` ps
 >       oep = s5       
 
-that we could use as a justifications for iterative method?
-
 
 > {-
 
 > ---}
 
 
- 
- 
+
