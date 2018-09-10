@@ -12,6 +12,8 @@ With Idris 1.2.0-git:d77513b9, you should be able to type check all the
 basic libraries by entering "make libs" in the top-level
 repository.
 
+It also seems to work with Idris 1.3.0. (Using the flag `--allow-capitalized-pattern-variables`.)
+
 
 ## Research papers
 
@@ -41,12 +43,19 @@ Published in Logical Methods in Computer Science, March 17, 2017, Volume 13, Iss
 
 Authors: [Nicola Botta](https://www.pik-potsdam.de/members/botta/publications), Patrik Jansson, Cezar Ionescu
 
+Paper: http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2017_postprint.pdf
+
+Published in Journal of Functional Programming: https://doi.org/10.1017/S0956796817000156
+
 * 2016-01-06: Submitted to the Journal of Functional Programming (JFP) Special issue on Dependently Typed Programming. (JFP is a [RoMEO Green journal](http://www.sherpa.ac.uk/romeo/search.php?issn=0956-7968).)
     * [Full text pre-print available](http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2016_preprint.pdf)
 * 2016-07: Review verdict: "Reject and resubmit"
 * 2016-11-11: Re-submitted to the Journal of Functional Programming (JFP)
     * [Full text pre-print available](http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2016-11_preprint.pdf)
 * 2017-03: Review verdict: "Revise and resubmit"
+    * [Full text pre-print available](http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2017-04_preprint.pdf)
+* 2017-09: Accept!
+    * [Full text post-print available](http://www.cse.chalmers.se/~patrikj/papers/CompTheoryPolicyAdviceAvoidability_JFP_2017_postprint.pdf)
 
 The work was partially supported by the
 [GRACeFUL project](https://www.graceful-project.eu/)
