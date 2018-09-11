@@ -101,7 +101,26 @@
    
 * *Viability*. The notion of viability plays a crucial role in the
   theory of monadic sequential decision problems and, more generally, in
-  sustainability science.
+  sustainability science. Informally, a state is viable for `n` decision
+  steps iff it is possible to take 'n' decisions starting from that
+  state while avoiding "dead-ends" with certainty. In the context of
+  sequential decision problems, a dead-end is a state whose
+  corresponding set of available controls is empty. We have discussed
+  concrete examples of decision problems in which viability is
+  constrained in [Sequential decision problems, dependent types and
+  generic solutions](https://lmcs.episciences.org/3202) and in
+  [Contributions to a computational theory of policy advice and
+  avoidability](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/contributions-to-a-computational-theory-of-policy-advice-and-avoidability/CDB4C9601702AAB336A2FB2C34B8F49B). In
+  practice, viability is needed to make sure that a decision problem is
+  well-posed: the system detects attempts at computing optimal policy
+  sequences of length `n` for initial states that are not viable for `n`
+  decision steps and rejects such states. Formally, the notion of
+  viability is encoded in `Viable` in [CoreTheory](CoreTheory.lidr). As
+  for reachability, also `Viable` has to fulfill a specification. If a
+  state `x` has a control `y` such that all the states that can be
+  obtained by selecting `y` in `x` are viable `n` steps, then `x` is
+  viable `n + 1` steps. A default implementation of `Viable` is provided
+  in [ViabilityDefaults](ViabilityDefaults.lidr).
 
 * *Avoidability*.
 
