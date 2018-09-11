@@ -15,7 +15,7 @@
 > import Sigma.Sigma
 > import Pairs.Operations
 > import Basic.Operations
-> import Isomorphism.Operations
+> -- import Isomorphism.Operations
 > import Fin.Properties
 > import Void.Properties
 > import Unit.Properties

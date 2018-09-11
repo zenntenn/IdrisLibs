@@ -15,7 +15,7 @@
 > import Vect.Operations
 > import Vect.Properties
 > import Fin.Operations
-> import Isomorphism.Operations
+> -- import Isomorphism.Operations
 > import Isomorphism.Properties
 > import Basic.Operations
 > import Basic.Properties

@@ -7,7 +7,7 @@
 
 > import Finite.Predicates
 > import Fin.Operations
-> import Isomorphism.Operations
+> --import Isomorphism.Operations
 > import Sigma.Sigma
 > import Pairs.Operations
 

@@ -17,9 +17,9 @@
 > from (MkIso to from toFrom fromTo) = from
 
 
-> toFrom : {A, B : Type} -> (iso : Iso A B) -> (b : B) -> to iso (from iso b) = b
+> toFrom : {A, B : Type} -> (iso : Iso A B) -> (b : B) -> Isomorphism.Operations.to iso (Isomorphism.Operations.from iso b) = b
 > toFrom (MkIso to from toFrom fromTo) = toFrom
 
 
-> fromTo : {A, B : Type} -> (iso : Iso A B) -> (a : A) -> from iso (to iso a) = a
+> fromTo : {A, B : Type} -> (iso : Iso A B) -> (a : A) -> Isomorphism.Operations.from iso (Isomorphism.Operations.to iso a) = a
 > fromTo (MkIso to from toFrom fromTo) = fromTo

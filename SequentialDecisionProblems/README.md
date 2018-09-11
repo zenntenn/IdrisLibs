@@ -72,8 +72,7 @@
   in by applications) `nexts` in [CoreTheory](CoreTheory.lidr). The
   monad `M` in the signature of `nexts` encodes the uncertainties
   affecting the decision problem. Typically `M = Id` (deterministic
-  problem, no uncertainty), `M = List` (non-deterministic problem) or `M
-  = Prob` (stochastic problem). 
+  problem, no uncertainty), `M = List` (non-deterministic problem) or `M = Prob` (stochastic problem).
 
 * *Reachability*. When computing optimal policy sequences, we can
    potentially save a lot of CPU-time by avoiding considering future
@@ -100,7 +99,9 @@
    "container monad" condition, see `allElemSpec1` in
    [ReachabilityDefaults](ReachabilityDefaults.lidr).
    
-* *Viability*.
+* *Viability*. The notion of viability plays a crucial role in the
+  theory of monadic sequential decision problems and, more generally, in
+  sustainability science.
 
 * *Avoidability*.
 

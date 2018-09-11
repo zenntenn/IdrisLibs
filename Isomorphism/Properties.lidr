@@ -2,7 +2,7 @@
 
 > import Control.Isomorphism
 
-> import Isomorphism.Operations
+> -- import Isomorphism.Operations
 > import Fun.Properties
 > import Basic.Operations
 
