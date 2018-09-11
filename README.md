@@ -8,11 +8,10 @@ collection of Idris Libraries. Some related Agda code is available in
 
 ## Type checking
 
-With Idris 1.2.0-git:d77513b9, you should be able to type check all the
-basic libraries by entering "make libs" in the top-level
-repository.
-
-It also seems to work with Idris 1.3.0. (Using the flag `--allow-capitalized-pattern-variables`.)
+With Idris 1.3.0-git:80293ba0f, you should be able to type check all the
+basic libraries by entering "make libs" in the top-level repository. The
+flag `--allow-capitalized-pattern-variables` is needed, see
+[Makefile](Makefile).
 
 
 ## Research papers
