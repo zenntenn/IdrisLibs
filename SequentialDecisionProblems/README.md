@@ -7,7 +7,7 @@
   for computing optimal policy sequences.
 
 * [FullTheory](FullTheory.lidr) The full theory with a machine checkable
-  proof that the generic beackwards induction implementation of the core
+  proof that the generic backwards induction implementation of the core
   theory is correct.
 
 * [AvoidabilityTheory](AvoidabilityTheory.lidr) A tentative theory of
@@ -61,17 +61,48 @@
 
 ## Main concepts (see also CoeGSS's [DSLH](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/projects/CoeGSS/DSLH.md)) 
 
-* "Monadic dynamical system with control" The notion of a monadic
+* *Monadic dynamical system with control*. The notion of a monadic
   dynamical system with control is at the core of the theory of monadic
-  sequential decision problems. It is formalized through the *hole*
-  (unimplemented element, to be filled in by applications) `nexts` in
-  [CoreTheory](CoreTheory.lidr).
+  sequential decision problems, see [Sequential decision problems,
+  dependent types and generic
+  solutions](https://lmcs.episciences.org/3202) and [Contributions to a
+  computational theory of policy advice and
+  avoidability](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/contributions-to-a-computational-theory-of-policy-advice-and-avoidability/CDB4C9601702AAB336A2FB2C34B8F49B). It
+  is formalized through the *hole* (unimplemented element, to be filled
+  in by applications) `nexts` in [CoreTheory](CoreTheory.lidr). The
+  monad `M` in the signature of `nexts` encodes the uncertainties
+  affecting the decision problem. Typically `M = Id` (deterministic
+  problem, no uncertainty), `M = List` (non-deterministic problem) or `M
+  = Prob` (stochastic problem). 
 
-* "Reachability"
+* *Reachability*. When computing optimal policy sequences, we can
+   potentially save a lot of CPU-time by avoiding considering future
+   states that cannot be reached by any initial state, see [Sequential
+   decision problems, dependent types and generic
+   solutions](https://lmcs.episciences.org/3202) and [Contributions to a
+   computational theory of policy advice and
+   avoidability](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/contributions-to-a-computational-theory-of-policy-advice-and-avoidability/CDB4C9601702AAB336A2FB2C34B8F49B). Technically,
+   this is done by restricting the domain of policies (functions that
+   maps states to controls, see `Policy` in
+   [CoreTheory](CoreTheory.lidr)) to reachable states. The notion of
+   reachability is formalized through the *hole* `Reachable` in
+   [CoreTheory](CoreTheory.lidr). The idea is that every initial state
+   is reachable and that a state `x'` at decision step `t + 1` is
+   reachable iff there exists a reachable state `x` at decision step `t`
+   and a control that make a transition from `x` to `x'` possible. This
+   specification is encoded in the holes `reachableSpec0`,
+   `reachableSpec1` and `reachableSpec2` also in
+   [CoreTheory](CoreTheory.lidr). Of these, only `reachableSpec1` is
+   actually needed in order to apply the theory. The other two are just
+   "moral" requirements and can simply be postulated. We support users
+   by providing a default definition of `Reachable` that fulfills
+   `reachableSpec1` under the assumption that `M` fulfills a natural
+   "container monad" condition, see `allElemSpec1` in
+   [ReachabilityDefaults](ReachabilityDefaults.lidr).
+   
+* *Viability*.
 
-* "Viability"
-
-* "Avoidability"
+* *Avoidability*.
 
 
 ## Timeline
