@@ -21,11 +21,11 @@ This file describes the current implementation of *DSLH*, the DSL for determinin
 A first example application is outlined in the recent paper [The impact of uncertainty on optimal emission policies](https://www.earth-syst-dynam-discuss.net/esd-2017-86/), [@botta2018impact].
 
 We have currently implemented the following high-level concepts: viability, reachability, vulnerability, and avoidability.  Each of these concepts has a computational formalisation that can be found in, respectively
-  - ```SequentialDecisionProblems/CoreTheory.lidr``` (for viability and reachability)
-  - ```SequentialDecisionProblems/AvoidabilityTheory.lidr``` (for avoidability)
+  - [SequentialDecisionProblems/CoreTheory.lidr](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems/CoreTheory.lidr) (for viability and reachability)
+  - [SequentialDecisionProblems/AvoidabilityTheory.lidr](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems/AvoidabilityTheory.lidr) (for avoidability)
   - TODO (for vulnerability)
 
-The structure of simulations needed for computations related to these concepts is given by the unimplemented elements ("*holes*") in these files.  They are automatically discovered and highlighted by loading the files in an Idris-aware  editor such  as Emacs.   Examples  of implementing viability and reachability are found in the files ```SequentialDecisionProblems/ViabilityDefaults.lidr``` and ```SequentialDecisionProblems/ReachabilityDefaults.lidr```, respectively.  For example of applications, see the directory ```SequentialDecisionProblems/applications```.
+The structure of simulations needed for computations related to these concepts is given by the unimplemented elements ("*holes*") in these files.  They are automatically discovered and highlighted by loading the files in an Idris-aware  editor such  as Emacs.   Examples  of implementing viability and reachability are found in the files [SequentialDecisionProblems/ViabilityDefaults.lidr](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems/ViabilityDefaults.lidr) and [SequentialDecisionProblems/ReachabilityDefaults.lidr](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems/ReachabilityDefaults.lidr), respectively.  For example of applications, see the directory [SequentialDecisionProblems/applications](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/SequentialDecisionProblems/applications).
 
 
-The bibliographic references of the three CoeGSS-co-funded papers are available in [CoeGSS.bib](CoeGSS.bib).
+The bibliographic references are available below.
