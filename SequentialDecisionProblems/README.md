@@ -1,12 +1,5 @@
 # SequentialDecisionProblems (SDPs)
 
-## Notions
-
-* *Monadic dynamical system with control* The notion of a monadic
-  dynamical system with control is at the core of the theory of monadic
-  sequential decision problems. It is formalized through the function
-  `nexts` in [CoreTheory](CoreTheory.lidr).
-
 ## Files
 
 * [CoreTheory](CoreTheory.lidr) The core theory of monadic sequential
@@ -64,6 +57,21 @@
   vs. [Example5.NoViabilityDefaults](examples/Example5.NoViabilityDefaults.lidr).
 
 * [README](README.md) This file
+
+
+## Main concepts (see also CoeGSS's [DSLH](https://gitlab.pik-potsdam.de/botta/IdrisLibs/tree/master/projects/CoeGSS/DSLH.md)) 
+
+* "Monadic dynamical system with control" The notion of a monadic
+  dynamical system with control is at the core of the theory of monadic
+  sequential decision problems. It is formalized through the *hole*
+  (unimplemented element, to be filled in by applications) `nexts` in
+  [CoreTheory](CoreTheory.lidr).
+
+* "Reachability"
+
+* "Viability"
+
+* "Avoidability"
 
 
 ## Timeline
