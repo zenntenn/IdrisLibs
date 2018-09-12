@@ -122,8 +122,37 @@
   viable `n + 1` steps. A default implementation of `Viable` is provided
   in [ViabilityDefaults](ViabilityDefaults.lidr).
 
-* *Avoidability*.
-
+* *Avoidability*. In Global Systems Science (GSS), decision makers are
+   often faced with the problem of implementing decisions that avoid (or
+   avoid with a probability that exceeds a given threshold) certain
+   possible future outcomes that are felt to be dangerous, unacceptable
+   or, perhaps, just unmanageable. In climate impact research, for
+   instance, the notion of avoidability is closely related to that of
+   adaptation and mitigation and central to the idea of "avoiding the
+   unmanageable" and of "managing the unavoidable". But what does it
+   mean for future states to be avoidable? Under which conditions is it
+   possible to decide if a state is avoidable or not? How do sets of
+   avoidable states look like? Are they well-separated or are they
+   entangled with unavoidable states? In
+   [AvoidabilityTheory](AvoidabilityTheory.lidr) we lay down the
+   preliminaries of a computational theory of avoidability. Again, we
+   build upon the notion of monadic dynamical systems, reachability and
+   viability and put forward a first notion of avoidability, see
+   `AvoidableFrom`. The basic idea is that a future state `x'` is
+   avoidable from a "current" state `x` iff there exists a distinct
+   alternative state `x''`. The latter is required to be reachable from
+   `x` and at least as viable as `x'`. This is clearly a weak notion of
+   avoidability: it might happen that the probability of actually
+   obtaining an alternative state is very low no matter which decisions
+   are taken. But this notion is an important first step towards
+   building more refined notions. These will necessarily involve the
+   construction of ad hoc rewards for "potentially avoidable" states and
+   the computation of optimal "avoidance" policies. Here, again, we see
+   that the methods for computing provably optimal policy sequences
+   implemented in [CoreTheory](CoreTheory.lidr) and
+   [FullTheory](FullTheory.lidr) are crucial for building strong,
+   operational notions of "actual" avoidability.
+   
 
 ## Timeline
 
