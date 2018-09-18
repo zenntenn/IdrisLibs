@@ -261,6 +261,7 @@ We apply these patterns, for instance, in |ViabilityDefaults|.
 > possibleStateCtrlSeqs  :  {t, n : Nat} -> (x : State t) -> (r : Reachable x) -> (v : Viable n x) ->
 >                           (ps : PolicySeq t n) -> M (StateCtrlSeq t n)
 > possibleStateCtrlSeqs {t} {n = Z}    x r v Nil         =  ret (Nil x)
+> {-
 > possibleStateCtrlSeqs {t} {n = S m}  x r v (p :: ps')  =
 >   fmap g (bind (tagElem mx') f) where
 >     y   :  Ctrl t x
@@ -279,6 +280,26 @@ We apply these patterns, for instance, in |ViabilityDefaults|.
 >       r'  =  allElemSpec0 x' mx' ar x'emx'
 >       v'  :  Viable m x'
 >       v'  =  allElemSpec0 x' mx' av x'emx'
+> -}
+> possibleStateCtrlSeqs {t} {n = S m}  x r v (p :: ps')  =
+>   let y   :  Ctrl t x                                      
+>           =  ctrl (p x r v) in
+>   let mx' :  M (State (S t))
+>           =  nexts t x y in
+>   let av  :  All (Viable m) mx'
+>           =  allViable (p x r v) in
+>   let g   :  (StateCtrlSeq (S t) m -> StateCtrlSeq t (S m))
+>           =  ((MkSigma x y) ::) in
+>   let ar  :  All Reachable mx'
+>           =  reachableSpec1 x r y in
+>   let r'  :  ((x' : State (S t)) -> x' `Elem` mx' -> Reachable x')
+>           =  \ x' => \ x'emx' => allElemSpec0 x' mx' ar x'emx' in
+>   let v'  :  ((x' : State (S t)) -> x' `Elem` mx' -> Viable m x')
+>           =  \ x' => \ x'emx' => allElemSpec0 x' mx' av x'emx' in
+>   let f   :  (Sigma (State (S t)) (\ x' => x' `Elem` mx') -> M (StateCtrlSeq (S t) m))
+>           =  \ (MkSigma x' x'emx') => possibleStateCtrlSeqs {n = m} x' (r' x' x'emx') (v' x' x'emx') ps' in
+>   fmap g (bind (tagElem mx') f)
+
 
 > |||
 > morePossibleStateCtrlSeqs  :  {t, n : Nat} -> (mx : M (State t)) -> 
