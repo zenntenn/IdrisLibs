@@ -41,6 +41,7 @@
 * Implementations:
 
 > ||| NonNegDouble is an implementation of Show
+> -- implementation [ShowNonNegDouble] Show NonNegDouble where
 > implementation [ShowNonNegDouble] Show NonNegDouble where
 >   show = show . toDouble 
 

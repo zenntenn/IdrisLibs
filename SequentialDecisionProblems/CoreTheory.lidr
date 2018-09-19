@@ -346,6 +346,7 @@ to be available, we can implement
 >            (x  : State t) -> (r  : Reachable x) -> (v  : Viable (S m) x) ->
 >            (gy  : GoodCtrl t x m) -> (ps : PolicySeq (S t) m) ->
 >            PossibleNextState x (ctrl gy) -> Val
+> {-         
 >   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = reward t x y x' `plus` val x' r' v' ps where
 >     y   : Ctrl t x
 >     y   = ctrl gy
@@ -359,6 +360,21 @@ to be available, we can implement
 >     r'  = allElemSpec0 x' mx' ar' x'emx'
 >     v'  : Viable m x'
 >     v'  = allElemSpec0 x' mx' av' x'emx'
+> -}
+>   sval {t} {m} x r v gy ps (MkSigma x' x'emx') = 
+>     let y   : Ctrl t x 
+>             = ctrl gy in
+>     let mx' : M (State (S t))
+>             = nexts t x y in
+>     let ar' : All Reachable mx'
+>             = reachableSpec1 x r y in
+>     let av' : All (Viable m) mx'
+>             = allViable gy in
+>     let r'  : Reachable x'
+>             = allElemSpec0 x' mx' ar' x'emx' in
+>     let v'  : Viable m x'
+>             = allElemSpec0 x' mx' av' x'emx' in
+>     reward t x y x' `plus` val x' r' v' ps
 
 And finally
 
