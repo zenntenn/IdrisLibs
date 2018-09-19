@@ -950,7 +950,7 @@ process. This means implemeting functions to print states and controls:
 >     f   =  adHocPossibleStateCtrlSeqs {n = m} ps'
 > ---}
 > --{-
->   let y   = ctrl (p x () ()) in
+>   let y   =  ctrl (p x () ()) in
 >   let mx' =  nexts t x y in
 >   let f   =  adHocPossibleStateCtrlSeqs {n = m} ps' in
 >   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f)

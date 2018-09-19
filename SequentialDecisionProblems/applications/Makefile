@@ -5,6 +5,7 @@ IDRISFLAGS = -O3 --warnreach \
              -i .. -i ../.. --sourcepath .. --sourcepath ../.. \
              +RTS -K64000000 -RTS \
              -p contrib -p effects \
+             --allow-capitalized-pattern-variables \
              -V
 
 all: env newcomb fastnewcomb emissionsgame0 emissionsgame1 emissionsgame2 emissionsgame2.1
