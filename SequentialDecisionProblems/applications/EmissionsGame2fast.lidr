@@ -11,7 +11,7 @@
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.FullTheory
-> import SequentialDecisionProblems.TabBackwardsInduction
+> import SequentialDecisionProblems.TabBackwardsInduction1
 > import SequentialDecisionProblems.Utils
 > import SequentialDecisionProblems.FastStochasticDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
@@ -890,7 +890,7 @@ which immediately implies |reachableSpec1|:
 
 and decidability of |Reachable|:
 
-> SequentialDecisionProblems.TabBackwardsInduction.decidableReachable x = decidableUnit
+> SequentialDecisionProblems.TabBackwardsInduction1.decidableReachable x = decidableUnit
 
 Finally, we have to show that controls are finite
 
@@ -900,7 +900,7 @@ Finally, we have to show that controls are finite
 and, in order to use the fast, tail-recursive tabulated version of
 backwards induction, that states are finite:
 
-> SequentialDecisionProblems.TabBackwardsInduction.finiteState t =
+> SequentialDecisionProblems.TabBackwardsInduction1.finiteState t =
 >   finiteTuple4 finiteFin finiteLowHigh finiteAvailableUnavailable finiteGoodBad
 
 
@@ -933,6 +933,7 @@ process. This means implemeting functions to print states and controls:
 > SequentialDecisionProblems.Utils.showCtrl {t} {x}  Low = "L"
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} High = "H"
 
+> {-
 > -- ad-hoc trajectories computation
 > adHocPossibleStateCtrlSeqs : {t, n : Nat} -> 
 >                              (ps : PolicySeq t n) ->
@@ -956,6 +957,33 @@ process. This means implemeting functions to print states and controls:
 >   let f   =  adHocPossibleStateCtrlSeqs {n = m} ps' in
 >   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f)
 > ---}
+> -}
+
+> -- ad-hoc trajectories computation
+> %logging 5
+> adHocPossibleStateCtrlSeqs1 : {t, n : Nat} -> 
+>                               (pts : PolicyTableSeq t n) ->
+>                               (x : State t) -> 
+>                               SimpleProb (StateCtrlSeq t n)
+> adHocPossibleStateCtrlSeqs1 {t} {n = Z}         Nil  x =  
+>   FastSimpleProb.MonadicOperations.ret (Nil x)
+> adHocPossibleStateCtrlSeqs1 {t} {n = S m} (pt :: pts') x = ?lolo
+> {-
+>   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f) where
+>     -- prf :  Elem x (vectReachableAndViableState t (S m))
+>     -- prf =  ?kiku -- believe_me
+>     k   :  Fin (cardReachableAndViableState t (S m))
+>     k   =  lookup x (vectReachableAndViableState t (S m)) prf
+>     gy  :  GoodCtrl t x m
+>     gy  =  snd (outr (index k pts))
+>     y   :  Ctrl t x
+>     y   =  ctrl gy
+>     mx' :  SimpleProb (State (S t))
+>     mx' =  nexts t x y
+>     f   :  State (S t) -> M (StateCtrlSeq (S t) m)
+>     f   =  adHocPossibleStateCtrlSeqs1 {n = m} ps'
+> -}
+> %logging 0
 
 > constHigh : (t : Nat) -> (n : Nat) -> PolicySeq t n
 > constHigh t  Z    = Nil
@@ -1077,10 +1105,10 @@ process. This means implemeting functions to print states and controls:
 >        putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constLow_mxysv)))            
 >                    
 >        putStrLn "computing optimal policies ..."
->        ps <- pure (tabTailRecursiveBackwardsInduction Z nSteps)
+>        ps <- pure (tabTailRecursiveBackwardsInduction1 Z nSteps)
 >              
 >        putStrLn "computing possible state-control sequences ..."
->        mxys <- pure (adHocPossibleStateCtrlSeqs ps (FZ, High, Unavailable, Good))
+>        mxys <- pure (adHocPossibleStateCtrlSeqs1 ps (FZ, High, Unavailable, Good))
 >        putStrLn "pairing possible state-control sequences with their values ..."
 >        mxysv <- pure (possibleStateCtrlSeqsRewards' mxys)
 >        -- putStrLn "possible state-control sequences and their values:"
