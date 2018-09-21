@@ -16,7 +16,7 @@
 > import SequentialDecisionProblems.FastStochasticDefaults
 > import SequentialDecisionProblems.CoreTheoryOptDefaults
 > import SequentialDecisionProblems.FullTheoryOptDefaults
-> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults
+> import SequentialDecisionProblems.TabBackwardsInductionOptDefaults1
 
 > import SequentialDecisionProblems.applications.LowHigh
 > import SequentialDecisionProblems.applications.AvailableUnavailable
@@ -51,6 +51,7 @@
 > import LocalEffect.StdIO
 > import Fin.Operations
 > import List.Operations
+> import Vect.Operations
 > import Unit.Properties
 
 > -- %default total
@@ -933,7 +934,6 @@ process. This means implemeting functions to print states and controls:
 > SequentialDecisionProblems.Utils.showCtrl {t} {x}  Low = "L"
 > SequentialDecisionProblems.Utils.showCtrl {t} {x} High = "H"
 
-> {-
 > -- ad-hoc trajectories computation
 > adHocPossibleStateCtrlSeqs : {t, n : Nat} -> 
 >                              (ps : PolicySeq t n) ->
@@ -957,33 +957,32 @@ process. This means implemeting functions to print states and controls:
 >   let f   =  adHocPossibleStateCtrlSeqs {n = m} ps' in
 >   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f)
 > ---}
-> -}
 
 > -- ad-hoc trajectories computation
-> %logging 5
+> %freeze cardReachableAndViableState
 > adHocPossibleStateCtrlSeqs1 : {t, n : Nat} -> 
 >                               (pts : PolicyTableSeq t n) ->
 >                               (x : State t) -> 
 >                               SimpleProb (StateCtrlSeq t n)
 > adHocPossibleStateCtrlSeqs1 {t} {n = Z}         Nil  x =  
 >   FastSimpleProb.MonadicOperations.ret (Nil x)
-> adHocPossibleStateCtrlSeqs1 {t} {n = S m} (pt :: pts') x = ?lolo
 > {-
+> adHocPossibleStateCtrlSeqs1 {t} {n = S m} (pt :: pts') x =
 >   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f) where
->     -- prf :  Elem x (vectReachableAndViableState t (S m))
->     -- prf =  ?kiku -- believe_me
->     k   :  Fin (cardReachableAndViableState t (S m))
->     k   =  lookup x (vectReachableAndViableState t (S m)) prf
 >     gy  :  GoodCtrl t x m
->     gy  =  snd (outr (index k pts))
+>     gy  =  goodCtrl x () () pt
 >     y   :  Ctrl t x
 >     y   =  ctrl gy
 >     mx' :  SimpleProb (State (S t))
 >     mx' =  nexts t x y
 >     f   :  State (S t) -> M (StateCtrlSeq (S t) m)
->     f   =  adHocPossibleStateCtrlSeqs1 {n = m} ps'
+>     f   =  adHocPossibleStateCtrlSeqs1 {n = m} pts'
 > -}
-> %logging 0
+> adHocPossibleStateCtrlSeqs1 {t} {n = S m} (pt :: pts') x =
+>   let y   =  ctrl (goodCtrl x () () pt) in
+>   let mx' =  nexts t x y in
+>   let f   =  adHocPossibleStateCtrlSeqs1 {n = m} pts' in
+>   FastSimpleProb.MonadicOperations.fmap ((MkSigma x y) ::) (FastSimpleProb.MonadicOperations.naivebind mx' f)
 
 > constHigh : (t : Nat) -> (n : Nat) -> PolicySeq t n
 > constHigh t  Z    = Nil
