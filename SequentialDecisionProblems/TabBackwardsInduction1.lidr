@@ -93,7 +93,7 @@ taking |n| decision steps with |ps| starting from that state. Also ...
 >                       (Sigma (State t) (\x => (ReachableAndViable (S m) x, GoodCtrl t x m)))
 
 > goodCtrl : {t, m : Nat} ->
->            (x : State t) -> Reachable x -> Viable (S m) x ->
+>            (x : State t) -> .(r : Reachable x) -> .(v : Viable (S m) x) ->
 >            PolicyTable t (S m) -> GoodCtrl t x m
 > goodCtrl {t} {m} x r v pt =
 >   let xs   : Vect (cardState t) (State t)
