@@ -2,6 +2,7 @@
 
 > import Data.Vect
 > import Control.Isomorphism
+> import Debug.Trace
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.Utils
@@ -155,7 +156,7 @@ of the core theory. We start with a tabulated version of |sval|:
 >   let prf' : Elem x' rvxs
 >            = filterTagSigmaLemma {P = ReachableAndViable n} dRV x' (vectState (S t)) prf (r',v') in
 >   let k    : Fin (cardReachableAndViableState (S t) n)
->            = lookup x' rvxs prf' in
+>            = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
 >   reward t x y x' `plus` index k vt
 
 Next, we implement a tabulated version of |cval|:
@@ -170,14 +171,17 @@ Next, we implement a tabulated version of |cval|:
 >                                    = nexts t x y in
 >                           meas (fmap (tabSval x r v gy vt) (tagElem mx'))
 
-> tcvalargmax : {t, n : Nat} -> 
->               (x  : State t) -> .(r : Reachable x) -> .(v : Viable (S n) x) ->
->               (vt : Vect (cardReachableAndViableState (S t) n) Val) -> GoodCtrl t x n
+> tabCvalargmaxMax : {t, n : Nat} -> 
+>                    (x  : State t) -> .(r : Reachable x) -> .(v : Viable (S n) x) ->
+>                    (vt : Vect (cardReachableAndViableState (S t) n) Val) -> (GoodCtrl t x n, Val)
 
 
 < tabOptExt : {t, n : Nat} -> 
 <             (vt : ValueTable (S t) n) -> 
 <             (PolicyTable t (S n), ValueTable t (S n))
+
+< vectReachableAndViableState : (t : Nat) -> (n : Nat) -> 
+<                               Vect (cardReachableAndViableState t n) (Sigma (State t) (ReachableAndViable n))
 
 > tabOptExt {t} {n} vt = 
 >   let xrv  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Sigma (State t) (ReachableAndViable (S n)))
@@ -186,12 +190,12 @@ Next, we implement a tabulated version of |cval|:
 >            = \ k => outl (xrv k) in
 >   let rv   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x k))
 >            = \ k => outr (xrv k) in
->   let gy   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->            = \ k => tcvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
+>   let gyv  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (GoodCtrl t (x k) n), Val)
+>            = \ k => tabCvalargmaxMax (x k) (fst (rv k)) (snd (rv k)) vt in
 >   let ptf  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n))))
->            = \ k => MkSigma (x k) (rv k, gy k) in
->   let vtf' -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
->            = \ k => tabCval (x k) (fst (rv k)) (snd (rv k)) vt (gy k) in
+>            = \ k => MkSigma (x k) (rv k, fst (gyv k)) in
+>   let vtf' : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
+>            = \ k => snd (gyv k) in
 >   let pt   : PolicyTable t (S n)
 >            = toVect ptf in
 >   let vt'  : ValueTable t (S n)

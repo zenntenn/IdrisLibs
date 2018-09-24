@@ -34,6 +34,9 @@ emissionsgame2.1: EmissionsGame2.1.lidr
 emissionsgame2fast: EmissionsGame2fast.lidr
 	${IDRIS} ${IDRISFLAGS} EmissionsGame2fast.lidr -o emissionsgame2fast
 
+emissionsgame2fast2: EmissionsGame2fast2.lidr
+	${IDRIS} ${IDRISFLAGS} EmissionsGame2fast2.lidr -o emissionsgame2fast2
+
 clean:
 	rm -f newcomb
 	rm -f fastnewcomb
@@ -42,5 +45,6 @@ clean:
 	rm -f emissionsgame2
 	rm -f emissionsgame2.1
 	rm -f emissionsgame2fast
+	rm -f emissionsgame2fast2
 	-find . -name '*.ibc' -delete
 	-find . -name '*~' -delete

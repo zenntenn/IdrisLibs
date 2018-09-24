@@ -2,6 +2,7 @@
 
 > import Data.Vect
 > import Control.Isomorphism
+> import Debug.Trace
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.Utils
@@ -92,37 +93,12 @@ taking |n| decision steps with |ps| starting from that state. Also ...
 >                       (cardReachableAndViableState t (S m)) 
 >                       (Sigma (State t) (\x => (ReachableAndViable (S m) x, GoodCtrl t x m)))
 
-> goodCtrl : {t, m : Nat} ->
->            (x : State t) -> .(r : Reachable x) -> .(v : Viable (S m) x) ->
->            PolicyTable t (S m) -> GoodCtrl t x m
-> goodCtrl {t} {m} x r v pt =
->   let xs   : Vect (cardState t) (State t)
->            = vectState t in   
->   let prf  : Elem x xs
->            = toVectComplete (finiteState t) x in
->   let rvxs : Vect (cardReachableAndViableState t (S m)) (State t)
->            = map outl (vectReachableAndViableState t (S m)) in
->   let dRV  : ((x : State t) -> Dec (ReachableAndViable (S m) x))
->            = decidableReachableAndViable (S m) in                  
->   let prf' : Elem x rvxs
->            = filterTagSigmaLemma {P = ReachableAndViable (S m)} dRV x xs prf (r,v) in
->   let k    : Fin (cardReachableAndViableState t (S m))
->            = lookup x rvxs prf' in
->   let x'   : State t
->            = outl (index k pt) in
->   let gy'  : GoodCtrl t x' m 
->            = snd (outr (index k pt)) in
->   let gy   : GoodCtrl t x m
->            = replace {P = \ X => GoodCtrl t X m} (believe_me gy') gy' in
->   gy
-
 > |||
 > data PolicyTableSeq : (t : Nat) -> (n : Nat) -> Type where
 >   Nil   :  {t : Nat} -> 
 >            PolicyTableSeq t Z
 >   (::)  :  {t, n : Nat} -> 
 >            PolicyTable t (S n) -> PolicyTableSeq (S t) n -> PolicyTableSeq t (S n)
-
 
 > |||
 > toptExt : {t, n : Nat} -> 
@@ -158,7 +134,7 @@ of the core theory. We start with a tabulated version of |sval|:
 >   let prf' : Elem x' rvxs
 >            = filterTagSigmaLemma {P = ReachableAndViable n} dRV x' (vectState (S t)) prf (r',v') in
 >   let k    : Fin (cardReachableAndViableState (S t) n)
->            = lookup x' rvxs prf' in
+>            = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
 >   reward t x y x' `plus` index k vt
 
 Next, we implement a tabulated version of |cval|:
