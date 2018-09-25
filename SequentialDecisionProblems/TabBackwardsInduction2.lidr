@@ -87,7 +87,7 @@ sequence of policies and the other one representing their value:
 > PolicyTable t  Z    = Unit
 > PolicyTable t (S m) = Vect 
 >                       (cardReachableAndViableState t (S m)) 
->                       (Sigma (State t) (\x => (ReachableAndViable {t = t} (S m) x, GoodCtrl t x m)))
+>                       (Sigma (State t) (\x => (ReachableAndViable (S m) x, GoodCtrl t x m)))
 
 > |||
 > data PolicyTableSeq : (t : Nat) -> (n : Nat) -> Type where
@@ -229,7 +229,7 @@ Next, we implement a tabulated version of |cval|:
 >   let rv'   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x' k))
 >             = \ k => fst (outr (xrvgy k)) in
 >   -- let r'    -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Reachable (x' k))
->             -- = \ k => fst (rv' k) in                    
+>   --           = \ k => fst (rv' k) in                    
 >   let vtf'  : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
 >             = \ k => tabCval (x k) (fst (rv k)) (snd (rv k)) vt (gy k) in
 >             -- = \ k => tabCval (x' k) (fst (rv' k)) (snd (rv' k)) vt ?kiku in
