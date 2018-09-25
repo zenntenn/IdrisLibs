@@ -27,6 +27,9 @@
 > SequentialDecisionProblems.TabBackwardsInduction2.tabCvalargmaxMax {n} x r v ps =
 >   Opt.Operations.argmaxMax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (tabCval x r v ps)
 
+> SequentialDecisionProblems.TabBackwardsInduction2.tabCvalargmax {n} x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (tabCval x r v ps)
+
 > |||
 > goodCtrl : {t, m : Nat} ->
 >            (x : State t) -> .(r : Reachable x) -> .(v : Viable (S m) x) ->

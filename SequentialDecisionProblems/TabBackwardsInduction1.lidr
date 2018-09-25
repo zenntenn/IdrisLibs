@@ -100,19 +100,25 @@ taking |n| decision steps with |ps| starting from that state. Also ...
 >   (::)  :  {t, n : Nat} -> 
 >            PolicyTable t (S n) -> PolicyTableSeq (S t) n -> PolicyTableSeq t (S n)
 
-> |||
-> toptExt : {t, n : Nat} -> 
->           (vt : Vect (cardReachableAndViableState (S t) n) Val) -> PolicyTable t (S n)
+> ||| 
+> ValueTable : Nat -> Nat -> Type
+> ValueTable t n = Vect (cardReachableAndViableState t n) Val
 
-We implement |toptExt| on the basis of the implementation of |optExt|
+> |||
+> tabOptExt : {t, n : Nat} -> 
+>             (vt : ValueTable (S t) n) -> 
+>             -- (vt : Vect (cardReachableAndViableState (S t) n) Val) -> 
+>             PolicyTable t (S n)
+
+We implement |tabOptExt| on the basis of the implementation of |optExt|
 of the core theory. We start with a tabulated version of |sval|:
 
-> tsval : {t,n : Nat} -> 
+> tabSval : {t,n : Nat} -> 
 >         (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
 >         (gy  : GoodCtrl t x n) -> 
 >         (vt : Vect (cardReachableAndViableState (S t) n) Val) ->
 >         PossibleNextState x (ctrl gy) -> Val
-> tsval {t} {n} x r v gy vt (MkSigma x' x'emx') =
+> tabSval {t} {n} x r v gy vt (MkSigma x' x'emx') =
 >   let y    : Ctrl t x
 >            = ctrl gy in
 >   let mx'  : M (State (S t))
@@ -139,24 +145,24 @@ of the core theory. We start with a tabulated version of |sval|:
 
 Next, we implement a tabulated version of |cval|:
 
-> tcval : {t, n : Nat} -> 
+> tabCval : {t, n : Nat} -> 
 >         (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
 >         (vt : Vect (cardReachableAndViableState (S t) n) Val) -> 
 >         GoodCtrl t x n -> Val
-> tcval {t} x r v vt gy = let y    : Ctrl t x
+> tabCval {t} x r v vt gy = let y    : Ctrl t x
 >                                  = ctrl gy in
 >                         let mx'  : M (State (S t))
 >                                  = nexts t x y in
->                         meas (fmap (tsval x r v gy vt) (tagElem mx'))
+>                         meas (fmap (tabSval x r v gy vt) (tagElem mx'))
 
 And finally
 
-> tcvalargmax : {t, n : Nat} -> 
+> tabCvalargmax : {t, n : Nat} -> 
 >               (x  : State t) -> .(r : Reachable x) -> .(v : Viable (S n) x) ->
 >               (vt : Vect (cardReachableAndViableState (S t) n) Val) -> GoodCtrl t x n
 
 > {-
-> toptExt {t} {n} vt = pt where
+> tabOptExt {t} {n} vt = pt where
 >   pt : PolicyTable t (S n)
 >   pt = toVect ptf where
 >     ptf : Fin (cardReachableAndViableState t (S n)) -> (Sigma (State t) (\x => (ReachableAndViable (S n) x, GoodCtrl t x n)))
@@ -168,9 +174,9 @@ And finally
 >       rv  : ReachableAndViable (S n) x
 >       rv  = outr xrv
 >       gy  : GoodCtrl t x n
->       gy  = tcvalargmax x (fst rv) (snd rv) vt
+>       gy  = tabCvalargmax x (fst rv) (snd rv) vt
 > -}
-> toptExt {t} {n} vt = 
+> tabOptExt {t} {n} vt = 
 >   let xrv -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Sigma (State t) (ReachableAndViable (S n)))
 >           = \ k => index k (vectReachableAndViableState t (S n)) in
 >   let x   : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
@@ -178,7 +184,7 @@ And finally
 >   let rv  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x k))
 >           = \ k => outr (xrv k) in
 >   let gy  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->           = \ k => tcvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
+>           = \ k => tabCvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
 >   let ptf -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n))))
 >           = \ k => MkSigma (x k) (rv k, gy k) in
 >   let pt  : PolicyTable t (S n)
@@ -187,12 +193,8 @@ And finally
 
 * Tabulated tail-recursive backwards induction
 
-With |toptExt| in place, it is easy to implement a tabulated version of
+With |tabOptExt| in place, it is easy to implement a tabulated version of
 |trbi|:
-
-> ||| A table of the result of calling |flip val| (roughly) on a policy sequence
-> ValueTable : Nat -> Nat -> Type
-> ValueTable t n = Vect (cardReachableAndViableState t n) Val
 
 > |||
 > PolicySeqAndTab : Nat -> Nat -> Type
@@ -217,13 +219,13 @@ With |toptExt| in place, it is easy to implement a tabulated version of
 >   prf' : LTE c' n
 >   prf' = lteLemma1 c' n prf
 >   pt   : PolicyTable (c' + t) (S (n - S c'))
->   pt   = toptExt vt
+>   pt   = tabOptExt vt
 >   pts' : PolicyTableSeq (c' + t) (n - c')
 >   pts' = replace {P = \ z => PolicyTableSeq (c' + t) z} bic (pt :: pts)
 >   vt'  : Vect (cardReachableAndViableState (c' + t) (S (n - S c'))) Val
 >   vt'  = toVect vt'f where
 >     vt'f : Fin (cardReachableAndViableState (c' + t) (S (n - S c'))) -> Val
->     vt'f k = tcval x r v vt gy where
+>     vt'f k = tabCval x r v vt gy where
 >       xrvgy : Sigma (State (c' + t)) (\ x => (ReachableAndViable (S (n - S c')) x, GoodCtrl (c' + t) x (n - S c')))
 >       xrvgy = index k pt
 >       x     : State (c' + t)
@@ -245,7 +247,7 @@ With |toptExt| in place, it is easy to implement a tabulated version of
 >   let prf'  : LTE c' n
 >             = lteLemma1 c' n prf in
 >   let pt    : PolicyTable (c' + t) (S (n - S c'))
->             = toptExt vt in
+>             = tabOptExt vt in
 >   let pts'  : PolicyTableSeq (c' + t) (n - c')
 >             = replace {P = \ z => PolicyTableSeq (c' + t) z} bic (pt :: pts) in
 >   let xrvgy -- : ((k : Fin (cardReachableAndViableState (c' + t) (S (n - S c')))) -> 
@@ -262,7 +264,7 @@ With |toptExt| in place, it is easy to implement a tabulated version of
 >   let gy    : ((k : Fin (cardReachableAndViableState (c' + t) (S (n - S c')))) -> GoodCtrl (c' + t) (x k) (n - S c'))
 >             = \ k => snd (outr (xrvgy k)) in          
 >   let vt'f  : ((k : Fin (cardReachableAndViableState (c' + t) (S (n - S c')))) -> Val)
->             = \ k => tcval (x k) (r k) (v k) vt (gy k) in
+>             = \ k => tabCval (x k) (r k) (v k) vt (gy k) in
 >   let vt'   : Vect (cardReachableAndViableState (c' + t) (S (n - S c'))) Val
 >             = toVect vt'f in
 >   let vt''  : Vect (cardReachableAndViableState (c' + t) (n - c')) Val

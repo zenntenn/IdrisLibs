@@ -1104,7 +1104,8 @@ process. This means implemeting functions to print states and controls:
 >        putStrLn ("  " ++ show (meas (SequentialDecisionProblems.CoreTheory.fmap snd constLow_mxysv)))            
 >                    
 >        putStrLn "computing optimal policies ..."
->        ps <- pure (fst (tabBackwardsInduction Z nSteps))
+>        -- ps <- pure (fst (tabBackwardsInduction Z nSteps))
+>        ps <- pure (tabBackwardsInduction Z nSteps)
 >              
 >        putStrLn "computing possible state-control sequences ..."
 >        mxys <- pure (adHocPossibleStateCtrlSeqs1 ps (FZ, High, Unavailable, Good))

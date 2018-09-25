@@ -24,8 +24,8 @@
 > %auto_implicits off
 
 
-> SequentialDecisionProblems.TabBackwardsInduction1.tcvalargmax {n} x r v ps =
->   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (tcval x r v ps)
+> SequentialDecisionProblems.TabBackwardsInduction1.tabCvalargmax {n} x r v ps =
+>   Opt.Operations.argmax totalPreorderLTE (finiteGoodCtrl n x) (cardNotZGoodCtrl n x v) (tabCval x r v ps)
 
 > |||
 > goodCtrl : {t, m : Nat} ->
