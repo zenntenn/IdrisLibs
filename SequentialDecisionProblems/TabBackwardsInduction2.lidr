@@ -209,30 +209,32 @@ Next, we implement a tabulated version of |cval|:
 > ---}
 > --{-
 > tabOptExt {t} {n} vt = 
->   let xrv   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Sigma (State t) (ReachableAndViable (S n)))
+>   let xrv   : ((k : Fin (cardReachableAndViableState t (S n))) -> 
+>                Sigma (State t) (ReachableAndViable {t = t} (S n)))
 >             = \ k => index k (vectReachableAndViableState t (S n)) in
 >   let x     : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
 >             = \ k => outl (xrv k) in
->   let rv    -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x k))
+>   let rv    : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable {t = t} (S n) (x k))
 >             = \ k => outr (xrv k) in
->   let gy    -- : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->             = \ k => tabCvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
->   let ptf   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n))))
+>   let gy    : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
+>             = \ k => tabCvalargmax {t = t} {n = n} (x k) (Prelude.Basics.fst (rv k)) (Prelude.Basics.snd (rv k)) vt in
+>   let ptf   : ((k : Fin (cardReachableAndViableState t (S n))) -> 
+>                (Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))))
 >             = \ k => MkSigma (x k) (rv k, gy k) in
 >   let pt    : PolicyTable t (S n)
 >             = toVect ptf in
->   let xrvgy -- : ((k : Fin (cardReachableAndViableState t (S n))) -> 
->             --    Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n)))
+>   let xrvgy : ((k : Fin (cardReachableAndViableState t (S n))) -> 
+>                Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n)))
 >             = \ k => index k pt in
 >   let x'    : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
 >             = \ k => outl (xrvgy k) in
->   let rv'   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x' k))
->             = \ k => fst (outr (xrvgy k)) in
->   -- let r'    -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Reachable (x' k))
->   --           = \ k => fst (rv' k) in                    
+>   let rv'   : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable {t = t} (S n) (x' k))
+>             = \ k => Prelude.Basics.fst (outr (xrvgy k)) in
+>   let gy'   : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x' k) n)
+>             = \ k => Prelude.Basics.snd (outr (xrvgy k)) in                    
 >   let vtf'  : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
->             = \ k => tabCval (x k) (fst (rv k)) (snd (rv k)) vt (gy k) in
->             -- = \ k => tabCval (x' k) (fst (rv' k)) (snd (rv' k)) vt ?kiku in
+>             -- = \ k => tabCval (x k) (Prelude.Basics.fst (rv k)) (Prelude.Basics.snd (rv k)) vt (gy k) in
+>             = \ k => tabCval (x' k) (Prelude.Basics.fst (rv' k)) (Prelude.Basics.snd (rv' k)) vt (gy' k) in
 >   let vt'   : ValueTable t (S n)
 >             = toVect vtf' in
 >   (pt, vt') 
