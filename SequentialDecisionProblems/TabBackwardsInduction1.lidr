@@ -2,7 +2,7 @@
 
 > import Data.Vect
 > import Control.Isomorphism
-> import Debug.Trace
+> -- import Debug.Trace
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.Utils
@@ -140,7 +140,8 @@ of the core theory. We start with a tabulated version of |sval|:
 >   let prf' : Elem x' rvxs
 >            = filterTagSigmaLemma {P = ReachableAndViable n} dRV x' (vectState (S t)) prf (r',v') in
 >   let k    : Fin (cardReachableAndViableState (S t) n)
->            = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
+>            -- = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
+>            = lookup x' rvxs prf' in
 >   reward t x y x' `plus` index k vt
 
 Next, we implement a tabulated version of |cval|:

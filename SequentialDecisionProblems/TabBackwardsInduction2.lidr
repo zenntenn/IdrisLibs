@@ -2,7 +2,7 @@
 
 > import Data.Vect
 > import Control.Isomorphism
-> import Debug.Trace
+> -- import Debug.Trace
 
 > import SequentialDecisionProblems.CoreTheory
 > import SequentialDecisionProblems.Utils
@@ -116,17 +116,16 @@ where
 For one or more backwards induction steps, we invoke a tabulated version of |optExt|
 
 < tabBackwardsInduction t (S n)  =  let (pts, vt) = tabBackwardsInduction (S t) n in
-<                                   let (pt, vt') = tabOptExt vt in
+<                                   let (pt, vt') = tabOptExt' vt in
 <                                   (pt :: pts, vt')
 
 Here
 
-> |||
-> tabOptExt : {t, n : Nat} -> 
->             (vt : ValueTable (S t) n) -> 
->             (PolicyTable t (S n), ValueTable t (S n))
+< tabOptExt' : {t, n : Nat} -> 
+<             (vt : ValueTable (S t) n) -> 
+<             (PolicyTable t (S n), ValueTable t (S n))
 
-We implement |tabOptExt| on the basis of the implementation of |optExt|
+We implement |tabOptExt'| on the basis of the implementation of |optExt|
 of the core theory. We start with a tabulated version of |sval|:
 
 > tabSval : {t,n : Nat} -> 
@@ -156,7 +155,8 @@ of the core theory. We start with a tabulated version of |sval|:
 >   let prf' : Elem x' rvxs
 >            = filterTagSigmaLemma {P = ReachableAndViable n} dRV x' (vectState (S t)) prf (r',v') in
 >   let k    : Fin (cardReachableAndViableState (S t) n)
->            = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
+>            -- = trace ("Lookup " ++ show n) (lookup x' rvxs prf') in
+>            = lookup x' rvxs prf' in
 >   reward t x y x' `plus` index k vt
 
 Next, we implement a tabulated version of |cval|:
@@ -179,118 +179,65 @@ Next, we implement a tabulated version of |cval|:
 >                 (x  : State t) -> .(r : Reachable x) -> .(v : Viable (S n) x) ->
 >                 (vt : Vect (cardReachableAndViableState (S t) n) Val) -> GoodCtrl t x n
 
-< tabOptExt : {t, n : Nat} -> 
-<             (vt : ValueTable (S t) n) -> 
-<             (PolicyTable t (S n), ValueTable t (S n))
-
-< vectReachableAndViableState : (t : Nat) -> (n : Nat) -> 
-<                               Vect (cardReachableAndViableState t n) (Sigma (State t) (ReachableAndViable n))
-
-> {-
-> tabOptExt {t} {n} vt = 
->   let xrv  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Sigma (State t) (ReachableAndViable (S n)))
->            = \ k => index k (vectReachableAndViableState t (S n)) in
->   let x    : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
->            = \ k => outl (xrv k) in
->   let rv   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x k))
->            = \ k => outr (xrv k) in
->   let gy   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->            = \ k => tabCvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
->   let ptf  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n))))
->            -- = \ k => MkSigma (x k) (rv k, fst (gyv k)) in
->            = \ k => MkSigma (x k) (rv k, gy k) in
->   let vtf' : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
->            = \ k => tabCval (x k) (fst (rv k)) (snd (rv k)) vt (gy k) in -- \ k => snd (gyv k) in
->   let pt   : PolicyTable t (S n)
->            = toVect ptf in
->   let vt'  : ValueTable t (S n)
->            = toVect vtf' in
->   (pt, vt') 
-> ---}
-> --{-
-> tabOptExt {t} {n} vt = 
->   let xrv   : ((k : Fin (cardReachableAndViableState t (S n))) -> 
->                Sigma (State t) (ReachableAndViable {t = t} (S n)))
->             = \ k => index k (vectReachableAndViableState t (S n)) in
->   let x     : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
->             = \ k => outl (xrv k) in
->   let rv    : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable {t = t} (S n) (x k))
->             = \ k => outr (xrv k) in
->   let gy    : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->             = \ k => tabCvalargmax {t = t} {n = n} (x k) (Prelude.Basics.fst (rv k)) (Prelude.Basics.snd (rv k)) vt in
->   let ptf   : ((k : Fin (cardReachableAndViableState t (S n))) -> 
->                (Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))))
->             = \ k => MkSigma (x k) (rv k, gy k) in
->   let pt    : PolicyTable t (S n)
->             = toVect ptf in
->   let xrvgy : ((k : Fin (cardReachableAndViableState t (S n))) -> 
->                Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n)))
->             = \ k => index k pt in
->   let x'    : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
->             = \ k => outl (xrvgy k) in
->   let rv'   : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable {t = t} (S n) (x' k))
->             = \ k => Prelude.Basics.fst (outr (xrvgy k)) in
->   let gy'   : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x' k) n)
->             = \ k => Prelude.Basics.snd (outr (xrvgy k)) in                    
->   let vtf'  : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
->             -- = \ k => tabCval (x k) (Prelude.Basics.fst (rv k)) (Prelude.Basics.snd (rv k)) vt (gy k) in
->             = \ k => tabCval (x' k) (Prelude.Basics.fst (rv' k)) (Prelude.Basics.snd (rv' k)) vt (gy' k) in
->   let vt'   : ValueTable t (S n)
->             = toVect vtf' in
->   (pt, vt') 
-> ---}
-
-With |tabOptExt| in place, the full implementation of tabulated
-backwards induction is
-
-> {-
-
 > |||
-> tabBackwardsInduction : (t : Nat) -> (n : Nat) -> (PolicyTableSeq t n, ValueTable t n)
-> tabBackwardsInduction t  Z     =  (Nil, zeroVec (cardReachableAndViableState t Z))
-> tabBackwardsInduction t (S n)  =  let (pts, vt) = tabBackwardsInduction (S t) n in
->                                   let (pt, vt') = tabOptExt vt in
->                                   (pt :: pts, vt')
-
-> ---}
-
-> --{-
-
-> |||
-> tabBackwardsInduction' : (t : Nat) -> (n : Nat) -> (PolicyTableSeq t n, ValueTable t n)
-> tabBackwardsInduction' t  Z     =  (Nil, zeroVec (cardReachableAndViableState t Z))
-> tabBackwardsInduction' t (S n)  =  let (pts, vt) = tabBackwardsInduction' (S t) n in
->                                    let (pt, vt') = tabOptExt vt in
->                                    (pt :: pts, vt')
-
-> tabOptExt' : {t, n : Nat} -> 
->              (vt : ValueTable (S t) n) -> 
->              PolicyTable t (S n)
-> tabOptExt' {t} {n} vt = 
->   let xrv  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> Sigma (State t) (ReachableAndViable (S n)))
+> tabOptExt : {t, n : Nat} -> (vt : ValueTable (S t) n) -> PolicyTable t (S n)
+> tabOptExt {t} {n} vt =
+>   let c    : Nat 
+>            = cardReachableAndViableState t (S n) in
+>   let xrv  : ((k : Fin c) -> Sigma (State t) (ReachableAndViable {t = t} (S n)))
 >            = \ k => index k (vectReachableAndViableState t (S n)) in
->   let x    : ((k : Fin (cardReachableAndViableState t (S n))) -> State t)
+>   let x    : ((k : Fin c) -> State t)
 >            = \ k => outl (xrv k) in
->   let rv   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> ReachableAndViable (S n) (x k))
+>   let rv   : ((k : Fin c) -> ReachableAndViable {t = t} (S n) (x k))
 >            = \ k => outr (xrv k) in
->   let gy   -- : ((k : Fin (cardReachableAndViableState t (S n))) -> GoodCtrl t (x k) n)
->            = \ k => tabCvalargmax (x k) (fst (rv k)) (snd (rv k)) vt in
->   let ptf  -- : ((k : Fin (cardReachableAndViableState t (S n))) -> (Sigma (State t) (\ x => (ReachableAndViable (S n) x, GoodCtrl t x n))))
+>   let gy   : ((k : Fin c) -> GoodCtrl t (x k) n)
+>            = \ k => tabCvalargmax {t = t} {n = n} (x k) (fst (rv k)) (snd (rv k)) vt in
+>   let ptf  : ((k : Fin c) -> (Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))))
 >            = \ k => MkSigma (x k) (rv k, gy k) in
 >   let pt   : PolicyTable t (S n)
 >            = toVect ptf in
 >   pt
 
+> |||
+> tabOptExt' : {t, n : Nat} -> 
+>              (vt : ValueTable (S t) n) -> 
+>              (PolicyTable t (S n), ValueTable t (S n))
+> tabOptExt' {t} {n} vt =
+>   let pt    : PolicyTable t (S n)
+>             = tabOptExt vt in
+>   let c     : Nat 
+>             = cardReachableAndViableState t (S n) in
+>   let xrvgy : ((k : Fin c) -> Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n)))
+>             = \ k => index k pt in
+>   let x'    : ((k : Fin c) -> State t)
+>             = \ k => outl (xrvgy k) in
+>   let rv'   : ((k : Fin c) -> ReachableAndViable {t = t} (S n) (x' k))
+>             = \ k => fst (outr (xrvgy k)) in
+>   let gy'   : ((k : Fin c) -> GoodCtrl t (x' k) n)
+>             = \ k => snd (outr (xrvgy k)) in                    
+>   let vtf'  : ((k : Fin c) -> Val)
+>             = \ k => tabCval (x' k) (fst (rv' k)) (snd (rv' k)) vt (gy' k) in
+>   let vt'   : ValueTable t (S n)
+>             = toVect vtf' in
+>   (pt, vt') 
+
+With |tabOptExt'| in place, the full implementation of tabulated
+backwards induction is
+
+> |||
+> tabBackwardsInduction' : (t : Nat) -> (n : Nat) -> (PolicyTableSeq t n, ValueTable t n)
+> tabBackwardsInduction' t  Z     =  (Nil, zeroVec (cardReachableAndViableState t Z))
+> tabBackwardsInduction' t (S n)  =  let (pts, vt) = tabBackwardsInduction' (S t) n in
+>                                    let (pt, vt') = tabOptExt' vt in
+>                                    (pt :: pts, vt')
 
 > |||
 > tabBackwardsInduction : (t : Nat) -> (n : Nat) -> PolicyTableSeq t n
 > tabBackwardsInduction t  Z     =  Nil
 > tabBackwardsInduction t (S n)  =  let (pts, vt) = tabBackwardsInduction' (S t) n in
->                                   let pt        = tabOptExt' vt in
+>                                   let pt        = tabOptExt vt in
 >                                   pt :: pts
                                    
-> ---}
-
 
 > {-
 
