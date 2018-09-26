@@ -182,18 +182,17 @@ Next, we implement a tabulated version of |cval|:
 > |||
 > tabOptExt : {t, n : Nat} -> (vt : ValueTable (S t) n) -> PolicyTable t (S n)
 > tabOptExt {t} {n} vt =
->   let c    : Nat 
->            = cardReachableAndViableState t (S n) in
->   let xrv  : ((k : Fin c) -> Sigma (State t) (ReachableAndViable {t = t} (S n)))
->            = \ k => index k (vectReachableAndViableState t (S n)) in
->   let x    : ((k : Fin c) -> State t)
->            = \ k => outl (xrv k) in
->   let rv   : ((k : Fin c) -> ReachableAndViable {t = t} (S n) (x k))
->            = \ k => outr (xrv k) in
->   let gy   : ((k : Fin c) -> GoodCtrl t (x k) n)
->            = \ k => tabCvalargmax {t = t} {n = n} (x k) (fst (rv k)) (snd (rv k)) vt in
->   let ptf  : ((k : Fin c) -> (Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))))
->            = \ k => MkSigma (x k) (rv k, gy k) in
+>   let ptf  : ((k : Fin (cardReachableAndViableState t (S n))) -> 
+>               (Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))))
+>            = \ k => let xrvk : Sigma (State t) (ReachableAndViable {t = t} (S n))
+>                              = index k (vectReachableAndViableState t (S n)) in
+>                     let x    : State t
+>                              = outl xrvk in
+>                     let rv   : ReachableAndViable {t = t} (S n) x
+>                              = outr xrvk in
+>                     let gy   : GoodCtrl t x n
+>                              = tabCvalargmax {t = t} {n = n} x (fst rv) (snd rv) vt in
+>                     MkSigma x (rv, gy) in
 >   let pt   : PolicyTable t (S n)
 >            = toVect ptf in
 >   pt
@@ -205,18 +204,16 @@ Next, we implement a tabulated version of |cval|:
 > tabOptExt' {t} {n} vt =
 >   let pt    : PolicyTable t (S n)
 >             = tabOptExt vt in
->   let c     : Nat 
->             = cardReachableAndViableState t (S n) in
->   let xrvgy : ((k : Fin c) -> Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n)))
->             = \ k => index k pt in
->   let x'    : ((k : Fin c) -> State t)
->             = \ k => outl (xrvgy k) in
->   let rv'   : ((k : Fin c) -> ReachableAndViable {t = t} (S n) (x' k))
->             = \ k => fst (outr (xrvgy k)) in
->   let gy'   : ((k : Fin c) -> GoodCtrl t (x' k) n)
->             = \ k => snd (outr (xrvgy k)) in                    
->   let vtf'  : ((k : Fin c) -> Val)
->             = \ k => tabCval (x' k) (fst (rv' k)) (snd (rv' k)) vt (gy' k) in
+>   let vtf'  : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
+>             = \ k => let ptk : Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))
+>                              = index k pt in
+>                      let x   : State t
+>                              = outl ptk in
+>                      let rv  : ReachableAndViable {t = t} (S n) x
+>                              = fst (outr ptk) in
+>                      let gy  : GoodCtrl t x n
+>                              = snd (outr ptk) in
+>                      tabCval x (fst rv) (snd rv) vt gy in
 >   let vt'   : ValueTable t (S n)
 >             = toVect vtf' in
 >   (pt, vt') 
