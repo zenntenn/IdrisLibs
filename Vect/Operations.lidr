@@ -26,6 +26,16 @@ Lookup
 > lookup {n = S m} a (a :: as)   Here       = FZ
 > lookup {n = S m} a (a' :: as) (There prf) = FS (lookup a as prf)
 
+> ||| Lookup the index of an element of a vector
+> -- lookup' : {n : Nat} -> {A : Type} -> (DecEq A) => (a : A) -> (as : Vect n A) -> Maybe (Fin n)
+> lookup' : {n : Nat} -> {A : Type} -> (DecEq A) -> (a : A) -> (as : Vect n A) -> Maybe (Fin n)
+> lookup' {n = Z}   _ _  Nil        = Nothing
+> lookup' {n = S m} d a  (a' :: as) with (decEq a a')
+>   | (Yes _) = Just FZ
+>   | (No  _) with (lookup' d a as)
+>     | Nothing  = Nothing
+>     | (Just k) = Just (FS k)
+
 
 Container monad operations
 
