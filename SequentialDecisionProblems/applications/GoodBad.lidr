@@ -47,6 +47,18 @@
 > cardNotZGoodBad = cardNotZLemma finiteGoodBad Good
 
 
+* |GoodBad| is in |DecEq|:
+
+> goodNotBad : Good = Bad -> Void
+> goodNotBad Refl impossible
+
+> implementation [DecEqGoodBad] DecEq GoodBad where
+>   decEq Good Good = Yes Refl
+>   decEq Good  Bad = No goodNotBad
+>   decEq  Bad Good = No (negEqSym goodNotBad)
+>   decEq  Bad  Bad = Yes Refl
+
+
 * |GoodBad| is in |Eq|:
 
 > implementation Eq GoodBad where

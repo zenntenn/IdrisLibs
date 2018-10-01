@@ -47,6 +47,18 @@
 > cardNotZLowHigh = cardNotZLemma finiteLowHigh Low
 
 
+* |LowHigh| is in |DecEq|:
+
+> lowNotHigh : Low = High -> Void
+> lowNotHigh Refl impossible
+
+> implementation [DecEqLowHigh] DecEq LowHigh where
+>   decEq Low  Low  = Yes Refl
+>   decEq Low  High = No lowNotHigh
+>   decEq High Low  = No (negEqSym lowNotHigh)
+>   decEq High High = Yes Refl
+
+
 * |LowHigh| is in |Eq|:
 
 > implementation Eq LowHigh where

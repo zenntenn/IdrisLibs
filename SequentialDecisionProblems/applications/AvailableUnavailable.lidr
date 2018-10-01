@@ -47,6 +47,18 @@
 > cardNotZAvailableUnavailable = cardNotZLemma finiteAvailableUnavailable Available
 
 
+* |AvailableUnavailable| is in |DecEq|:
+
+> availableNotUnavailable : Available = Unavailable -> Void
+> availableNotUnavailable Refl impossible
+
+> implementation [DecEqAvailableUnavailable] DecEq AvailableUnavailable where
+>   decEq Available  Available    = Yes Refl
+>   decEq Available  Unavailable  = No availableNotUnavailable
+>   decEq Unavailable Available   = No (negEqSym availableNotUnavailable)
+>   decEq Unavailable Unavailable = Yes Refl
+
+
 * |AvailableUnavailable| is in |Eq|:
 
 > implementation Eq AvailableUnavailable where
