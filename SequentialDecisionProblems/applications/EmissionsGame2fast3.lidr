@@ -112,6 +112,15 @@ unavailable. The state of the world can be either good or bad:
 > SequentialDecisionProblems.CoreTheory.State t 
 > = (CumulatedEmissions t, LowHigh, AvailableUnavailable, GoodBad)
 
+> SequentialDecisionProblems.TabBackwardsInduction2.decidableEqState t
+> = d0 where
+>   d0 : DecEq (State t) 
+>   d0 = decPair d1 d2 where 
+>     d1 : DecEq (CumulatedEmissions t)
+>     d1 = %implementation
+>     d2 : DecEq (LowHigh, AvailableUnavailable, GoodBad)
+>     d2 = decPair DecEqLowHigh (decPair DecEqAvailableUnavailable DecEqGoodBad)
+
 The idea is that the game starts with zero cumulated emissions, high
 emission levels, unavailable GHG technologies and with the world in a
 good state. 

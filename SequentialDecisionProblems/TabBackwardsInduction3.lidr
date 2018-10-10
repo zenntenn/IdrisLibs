@@ -71,6 +71,35 @@ and we can collect all states which are reachable and viable in a vector:
 >   f : (t : Nat) -> (n : Nat) -> Sigma Nat (\ m => Vect m (Sigma (State t) (ReachableAndViable n)))
 >   f t n = filterTagSigma (decidableReachableAndViable n) (vectState t)
 
+-- 
+
+If equality on values of type |State t| is decidable
+
+> decidableEqState : (t : Nat) -> DecEq (State t)
+
+we can store the result of looking up the index of a reachable and
+viable state in |vectReachableAndViableState t n| into a table
+
+> iat : {t, n : Nat} -> 
+>       Not (Z = cardReachableAndViableState t n) ->
+>       Vect (cardState t) (Fin (cardReachableAndViableState t n)) 
+> iat {t} {n} prf = toVect iatf where
+>   iatf : (Fin (cardState t) -> Fin (cardReachableAndViableState t n))
+>   iatf k with (lookup' (decidableEqState t) 
+>                        (from (iso (finiteState t)) k) 
+>                        (map outl (vectReachableAndViableState t n)))
+>     | Nothing with (cardReachableAndViableState t n) proof contra
+>         |   Z = void (prf Refl)
+>         | S m = FZ {k = m} 
+>     | Just k' = k'
+
+The table can then be used to replace lookups (like in |tabSval|, see
+below) with |index| operations. The idea is that indexing can in
+principle (Blodwin feature?) be done in constant time whereas lookups
+(searcing) takes liner time.
+
+--
+
 In this case, we can implement a "tabulated" versions of |backwardsInduction| 
 
 < backwardsInduction : (t : Nat) -> (n : Nat) -> PolicySeq t n
@@ -151,6 +180,21 @@ In order to implement this function, some additional notions are needed. ...
 >   reward t x y x' `plus` index k vt
 
 > |||
+> tabSval' : {t,n : Nat} -> 
+>            (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
+>            (gy  : GoodCtrl t x n) -> 
+>            (vt : Vect (cardReachableAndViableState (S t) n) Val) ->
+>            Vect (cardState (S t)) (Fin (cardReachableAndViableState (S t) n)) ->
+>            PossibleNextState x (ctrl gy) -> Val
+> tabSval' {t} {n} x r v gy vt iat (MkSigma x' x'emx') =
+>   let y    : Ctrl t x
+>            = ctrl gy in
+>   let k    : Fin (cardReachableAndViableState (S t) n)
+>            = index (to (iso (finiteState (S t))) x') iat in
+>   reward t x y x' `plus` index k vt
+
+
+> |||
 > tabCval : {t, n : Nat} -> 
 >           (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
 >           (vt : Vect (cardReachableAndViableState (S t) n) Val) -> 
@@ -160,6 +204,22 @@ In order to implement this function, some additional notions are needed. ...
 >                           let mx'  : M (State (S t))
 >                                    = nexts t x y in
 >                           meas (fmap (tabSval x r v gy vt) (tagElem mx'))
+
+
+> {-
+> tabCval' : {t, n : Nat} -> 
+>            (x  : State t) -> .(r  : Reachable x) -> .(v  : Viable (S n) x) ->
+>            (vt : Vect (cardReachableAndViableState (S t) n) Val) -> 
+>            Vect (cardState (S t)) (Fin (cardReachableAndViableState (S t) n)) ->
+>            GoodCtrl t x n -> Val
+> tabCval' {t} x r v vt iat gy = let y    : Ctrl t x
+>                                         = ctrl gy in
+>                                let mx'  : M (State (S t))
+>                                         = nexts t x y in
+>                                let tmp  : Vect (cardState (S t)) (Fin (cardReachableAndViableState (S t) n))
+>                                         = iat in
+>                                meas (fmap (tabSval' x r v gy vt iat) (tagElem mx'))
+> -}
 
 > |||
 > tabCvalargmaxMax : {t, n : Nat} -> 
@@ -196,6 +256,7 @@ In order to implement this function, some additional notions are needed. ...
 > tabOptExt' {t} {n} vt =
 >   let pt    : PolicyTable t (S n)
 >             = tabOptExt vt in
+>   -- let tmp   = iat {t = S t} {n = n} (believe_me 42) in
 >   let vtf'  : ((k : Fin (cardReachableAndViableState t (S n))) -> Val)
 >             = \ k => let ptk : Sigma (State t) (\ x => (ReachableAndViable {t = t} (S n) x, GoodCtrl t x n))
 >                              = index k pt in
@@ -206,6 +267,7 @@ In order to implement this function, some additional notions are needed. ...
 >                      let gy  : GoodCtrl t x n
 >                              = snd (outr ptk) in
 >                      tabCval x (fst rv) (snd rv) vt gy in
+>                      -- tabCval' x (fst rv) (snd rv) vt tmp in
 >   let vt'   : ValueTable t (S n)
 >             = toVect vtf' in
 >   (pt, vt') 
