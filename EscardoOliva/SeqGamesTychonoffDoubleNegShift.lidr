@@ -280,6 +280,80 @@ return numbers rather than Boolean values:
 > opairK : {X, Y, R : Type} -> K R X -> K R Y -> K R (X,Y)
 > opairK phix phiy p = phix (\ x => phiy (\ y => p (x, y)))
 
+It is easy to see that |opairJ| implements two backwards induction steps
+followed by a forward computation of "optimal" controls:
+
+> opairJ' : {X, Y, R : Type} -> J R X -> J R Y -> J R (X,Y)
+> opairJ' {X} {Y} epsx epsy p = (x, y) where
+>   piy  :  X -> Y
+>   piy  =  \ x => epsy (\ y => p (x, y))
+>   pix  :  Unit -> X
+>   pix  =  \ u => epsx (\ x => p (x, piy x))
+>   x    :  X
+>   x    =  pix ()
+>   y    :  Y
+>   y    =  piy x
+
+In this context, the set of states at decision steps one and two are
+|Unit| and |X|, respectively. The controls are |X| in the first step and
+|Y| in the second step.
+
+In order to compute the result of |opairJ' epsx epsy p|, we first
+compute |piy|. This is an optimal policy for the second (last) step in
+the sense that for every |x : X|, |piy x| is a "best" control, that is
+
+< p (x, piy x) = overline epsy (curry p x)
+
+< p (x, piy x)
+<
+<   { Def. |piy| } 
+<
+< p (x, epsy (\ y => p (x, y)))
+<
+<   { Def. |curry| }
+<
+< (curry p) x (epsy (\ y => curry p x y))
+<
+<   { Abstraction }
+<
+< (curry p) x (epsy (curry p x))
+<
+<   { |overline e q = q (e q)| with |q = (curry p) x| and |e = epsy| }
+<
+< overline epsy (curry p x)
+
+Then, we compute |pix|. This is an optimal extension of |piy| in the
+sense that for every |u : Unit|, |pix u| is a "best" control *under the
+assumption that the next decision is taken with |piy|*, that is
+
+< p (pix u, piy (pix u)) = overline epsx (\ x => curry p x (piy x))
+
+< p (pix u, piy (pix u))
+<
+<   { Def. |pix| }
+<
+< p (epsx (\ x => p (x, piy x)), piy (epsx (\ x => p (x, piy x))))
+<
+<   { Def. |curry| }
+<
+< (curry p) (epsx (\ x => p (x, piy x))) (piy (epsx (\ x => p (x, piy x))))
+<
+<   { Let |g = \ x => p (x, piy x)| }
+<
+< (curry p) (epsx g) (piy (epsx g))
+<
+<   { |overline e q = q (e q)| with |q = (curry p) x| and |e = epsy| }
+
+
+|optPP| takes two selection functions for values of arbitrary types |X|
+and |Y| and a predicate on |(X,Y)|. It returns a pair of functions. The
+first function associates a control |x : X| to every value of type
+|Unit|. Here |Unit| is the set of possible states at the first decision
+step. The second function associates a control |y : Y| to every state in
+|X|. At the second decision step, |X| and |Y| represent the state and
+the control sets, respectively. We can easily implement |opairJ| in
+terms of |optPP|:
+
 
 ** 3.2 Iterated product
 
