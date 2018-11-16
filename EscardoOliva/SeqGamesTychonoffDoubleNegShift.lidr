@@ -326,7 +326,7 @@ Then, we compute |pix|. This is an optimal extension of |piy| in the
 sense that for every |u : Unit|, |pix u| is a "best" control *under the
 assumption that the next decision is taken with |piy|*, that is
 
-< p (pix u, piy (pix u)) = overline epsx (\ x => curry p x (piy x))
+< p (pix u, piy (pix u)) = overline epsx (\ x => p (x, (piy x)))
 
 < p (pix u, piy (pix u))
 <
@@ -334,16 +334,13 @@ assumption that the next decision is taken with |piy|*, that is
 <
 < p (epsx (\ x => p (x, piy x)), piy (epsx (\ x => p (x, piy x))))
 <
-<   { Def. |curry| }
-<
-< (curry p) (epsx (\ x => p (x, piy x))) (piy (epsx (\ x => p (x, piy x))))
-<
 <   { Let |g = \ x => p (x, piy x)| }
 <
-< (curry p) (epsx g) (piy (epsx g))
+< p (epsx g, piy (epsx g))
 <
-<   { |overline e q = q (e q)| with |q = (curry p) x| and |e = epsy| }
-
+<   { |overline e q = q (e q)| with |q = g| and |e = epsy| }
+<
+< overline epsx g
 
 |optPP| takes two selection functions for values of arbitrary types |X|
 and |Y| and a predicate on |(X,Y)|. It returns a pair of functions. The
