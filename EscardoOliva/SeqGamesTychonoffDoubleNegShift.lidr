@@ -338,9 +338,19 @@ assumption that the next decision is taken with |piy|*, that is
 <
 < p (epsx g, piy (epsx g))
 <
-<   { |overline e q = q (e q)| with |q = g| and |e = epsy| }
+<   { Def. |g| }
+<
+< g (epsx g)
+<
+<   { Def. |overline| }
 <
 < overline epsx g
+<
+<   { Def. |g| }
+<
+< overline epsx (\ x => p (x, piy x))
+
+Finally
 
 |optPP| takes two selection functions for values of arbitrary types |X|
 and |Y| and a predicate on |(X,Y)|. It returns a pair of functions. The
