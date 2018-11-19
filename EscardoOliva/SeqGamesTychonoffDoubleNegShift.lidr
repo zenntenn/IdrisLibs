@@ -350,16 +350,57 @@ assumption that the next decision is taken with |piy|*, that is
 <
 < overline epsx (\ x => p (x, piy x))
 
-Finally
+Finally, we compute |x| by applying the policy |pix| to |()| and then
+|y| by applying |piy| to |x|. It remains to show that |opairJ' epsx epsy
+p = opairJ eosx epsy p| for all |epsx : J R X|, |epsy : J R Y| and |p :
+(X, Y) -> R|:
 
-|optPP| takes two selection functions for values of arbitrary types |X|
-and |Y| and a predicate on |(X,Y)|. It returns a pair of functions. The
-first function associates a control |x : X| to every value of type
-|Unit|. Here |Unit| is the set of possible states at the first decision
-step. The second function associates a control |y : Y| to every state in
-|X|. At the second decision step, |X| and |Y| represent the state and
-the control sets, respectively. We can easily implement |opairJ| in
-terms of |optPP|:
+< opairJ' epsx epsy p
+<
+<   { Def. |opairJ'| }
+<
+< (x, y)
+<
+<   { Def. |x| and |y| in |opairJ'| }
+<
+< (pix (), piy (pix ()))
+<
+<   { Def. |pix ()| in |opairJ'| }
+<
+< (epsx (\ x => p (x, piy x)), piy (epsx (\ x => p (x, piy x))))
+<
+<   { Def. |piy| in |opairJ'| }
+<
+< (epsx (\ x => p (x, epsy (\ y => p (x, y)))), piy (epsx (\ x => p (x, epsy (\ y => p (x, y))))))
+<
+<   { Let |q x = \ y => p (x, y)| }
+<
+< (epsx (\ x => (q x) (epsy (q x))), piy (epsx (\ x => (q x) (epsy (qx)))))
+<
+<   { Def. |overline e p = p (e p)| with |p = q x| and |e = epsy| }
+<
+< (epsx (\ x => overline epsy (q x)), piy (epsx (\ x => overline epsy (q x))))
+<
+<   { Def. |q x| }
+<
+< (epsx (\ x => overline epsy (\ y => p (x, y))), piy (epsx (\ x => overline epsy (\ y => p (x, y)))))
+<
+<   { Def. |a| in |opairJ| }
+<
+< (a, piy a)
+<
+<   { Def. |piy| in |opairJ'| }
+<
+< (a, epsy (\ y => p (a, y)))
+<
+<   { Def. |b| in |opairJ| }
+<
+< (a, b)
+<   
+<   { Def. |opairJ| }
+<
+< opairJ epsx epsy p
+
 
 
 ** 3.2 Iterated product
