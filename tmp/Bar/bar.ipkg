@@ -1,4 +1,0 @@
-package bar
-
-modules = Bar
-        , Operations
